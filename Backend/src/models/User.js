@@ -20,6 +20,10 @@ const user = new mongoose.Schema({
     },
     ktm: {
         type: String,
+    },
+    password: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 
