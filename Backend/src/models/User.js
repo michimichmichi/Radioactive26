@@ -21,10 +21,6 @@ const user = new mongoose.Schema({
     ktm: {
         type: String,
     },
-    password: {
-        type: String,
-        required: true
-    }
 }, { timestamps: true });
 
 export default mongoose.model('User', user);
