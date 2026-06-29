@@ -113,7 +113,7 @@ function DashboardPanel({ users, teams, competitions }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className=" grid grid-cols-1 md:grid-cols-3 gap-6">
       {cards.map((card, i) => {
         const Icon = card.icon;
 
@@ -972,9 +972,9 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex min-h-screen bg-pink-50">
+    <div className="flex min-h-screen bg-black">
       {/* SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b from-pink-500 to-fuchsia-600 text-white p-6 shadow-2xl">
+      <div className="w-72 bg-gradient-to-b bg-black text-pink-600 p-6 shadow-2xl">
         <h1 className="text-4xl font-extrabold mb-10">
           ADMIN
         </h1>
@@ -1008,9 +1008,6 @@ export default function Admin() {
             {tab}
           </h1>
 
-          <p className="text-slate-500 mt-2 text-lg">
-            Manage your entire competition system
-          </p>
         </div>
 
         {renderPage()}
