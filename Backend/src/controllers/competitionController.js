@@ -1,11 +1,11 @@
-import competition from '../models/competition.js';
+import Competition from '../models/competition.js';
 
 // CREATE -- POST /api/competitions
 export const createCompetition = async (req, res) => {
     try {
         const { competitionName, time, place, termsAndConditions } = req.body;
 
-        const newCompetition = await competition.create({
+        const newCompetition = await Competition.create({
             competitionName, time, place, termsAndConditions
         });
         res.status(201).json(newCompetition);
@@ -18,7 +18,7 @@ export const createCompetition = async (req, res) => {
 // READ -- GET /api/competitions
 export const getCompetition = async (req, res) => { 
     try {
-        const comps = await competition.find();
+        const comps = await Competition.find();
         res.status(200).json(comps);
 
     } catch (error) { 
@@ -29,7 +29,7 @@ export const getCompetition = async (req, res) => {
 // UPDATE -- PUT /api/competitions/:id
 export const updateCompetition = async (req, res) => {
     try {
-        const updatedComp = await competition.findByIdAndUpdate(
+        const updatedComp = await Competition.findByIdAndUpdate(
             req.params.id, 
             req.body, 
             { new: true }
@@ -44,7 +44,7 @@ export const updateCompetition = async (req, res) => {
 // DELETE -- DELETE /api/competitions/:id
 export const deleteCompetition = async (req, res) => {
     try {
-        await competition.findByIdAndDelete(req.params.id);
+        await Competition.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Competition deleted successfully' });
 
     } catch (error) {
