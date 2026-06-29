@@ -1,4 +1,4 @@
-import User from '../models/user.js'
+import User from '../models/User.js'
 import bcrypt from 'bcrypt';
 import { generateToken } from '../middleware/auth.js';
 
@@ -47,7 +47,7 @@ export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const existingUser = await user.findOne({ email });
+        const existingUser = await User.findOne({ email });
 
         if (!existingUser) {
             return res.status(404).json({
@@ -96,8 +96,6 @@ export const getUser = async (req, res) => {
         } 
         return res.status(200).json(users);
 
-        return res.status(200).json(users);
-
     } catch (error) {
         return res.status(500).json({
             message: error.message
@@ -108,7 +106,7 @@ export const getUser = async (req, res) => {
 // READ USER BY ID -- GET /api/users/:id
 export const getUserById = async (req, res) => {
     try {
-        const foundUser = await user
+        const foundUser = await User
             .findById(req.params.id)
             .select('-password');
 
