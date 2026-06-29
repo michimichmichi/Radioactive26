@@ -1,8 +1,8 @@
 import User from '../models/user.js'
 import bcrypt from 'bcrypt';
+import { generateToken } from '../middleware/auth.js';
 
-
-// CREATE -- POST /api/users 
+// REGISTER -- POST /api/users/register
 export const createUser = async (req, res) => {
     try {
         const { name, email, password, university, ktm, nim } = req.body;
@@ -40,9 +40,54 @@ export const createUser = async (req, res) => {
         }
         return res.status(400).json({ message: error.message });
     }
-}
+};
 
-// READ -- GET /api/users
+// LOGIN -- POST /api/users/login
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const existingUser = await user.findOne({ email });
+
+        if (!existingUser) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            existingUser.password
+        );
+
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                message: 'Invalid credentials'
+            });
+        }
+
+        const token = generateToken(existingUser);
+
+        return res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                _id: existingUser._id,
+                name: existingUser.name,
+                email: existingUser.email,
+                university: existingUser.university,
+                ktm: existingUser.ktm
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+// READ ALL USERS -- GET /api/users
 export const getUser = async (req, res) => {
     try {
         const users = await User.find().select('-password');;
@@ -51,25 +96,38 @@ export const getUser = async (req, res) => {
         } 
         return res.status(200).json(users);
 
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+        return res.status(200).json(users);
 
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+// READ USER BY ID -- GET /api/users/:id
 export const getUserById = async (req, res) => {
     try {
-        const userId = await User.findById(req.params.id).select('-password');;
-        if (!userId) {
-            return res.status(404).json({ message: 'User not found' });
-        } 
-        return res.status(200).json(userId);
+        const foundUser = await user
+            .findById(req.params.id)
+            .select('-password');
+
+        if (!foundUser) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        return res.status(200).json(foundUser);
 
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({
+            message: error.message
+        });
     }
-}
+};
 
-// UPDATE -- PUT /api/users/:id
+// UPDATE USER -- PUT /api/users/:id
 export const updateUser = async (req, res) => {
     try {
         if (req.body.password) {
@@ -93,15 +151,15 @@ export const updateUser = async (req, res) => {
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({
-                message: "Email atau NIM sudah digunakan"
+                message: "Email or NIM is already used"
             });
         }
         return res.status(400).json({ message: error.message });
     }
-}
+};
 
-// DELETE -- DELETE /api/users/:id
-export const deleteUser = async (req, res) => { 
+// DELETE USER -- DELETE /api/users/:id
+export const deleteUser = async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
 
@@ -116,6 +174,8 @@ export const deleteUser = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({
+            message: error.message
+        });
     }
-}
+};

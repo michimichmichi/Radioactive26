@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     ktm: {
         type: String,
-    }
+    },
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
