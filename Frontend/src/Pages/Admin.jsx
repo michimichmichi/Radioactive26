@@ -326,6 +326,7 @@ function UsersPanel() {
     email: "",
     password: "",
     university: "",
+    nim: "",
     ktm: "",
   };
 
@@ -383,6 +384,7 @@ function UsersPanel() {
       password: "",
       university: user.university,
       ktm: user.ktm,
+      nim: user.nim,
     });
   };
 
@@ -461,6 +463,17 @@ function UsersPanel() {
             }
             required
           />
+          <Input
+            placeholder="nim"
+            value={form.nim}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                nim: e.target.value,
+              })
+            }
+            required
+          />
 
           <Input
             placeholder="ktm"
@@ -490,6 +503,7 @@ function UsersPanel() {
                 <th className="text-left py-4">name</th>
                 <th className="text-left py-4">email</th>
                 <th className="text-left py-4">university</th>
+                <th className="text-left py-4">nim</th>
                 <th className="text-left py-4">ktm</th>
                 <th className="text-right py-4">actions</th>
               </tr>
@@ -503,6 +517,8 @@ function UsersPanel() {
                   <td>{u.email}</td>
 
                   <td>{u.university}</td>
+
+                  <td>{u.nim}</td>
 
                   <td>{u.ktm}</td>
 
@@ -546,6 +562,7 @@ function TeamsPanel() {
   const [users, setUsers] = useState([]);
   const [competitions, setCompetitions] = useState([]);
   const [search, setSearch] = useState("");
+const [memberSearch, setMemberSearch] = useState("");
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -637,6 +654,17 @@ function TeamsPanel() {
     setTeams(res.data.teams);
   };
 
+  const filteredUsers = users.filter((u) => {
+  const keyword = memberSearch.toLowerCase();
+
+  return (
+    u.name.toLowerCase().includes(keyword) ||
+    u.email.toLowerCase().includes(keyword) ||
+    u.university.toLowerCase().includes(keyword) ||
+    u.nim.toLowerCase().includes(keyword)
+  );
+});
+
   return (
     <div className="space-y-6">
       <SectionCard>
@@ -718,26 +746,56 @@ function TeamsPanel() {
             ))}
           </Select>
 
-          <div className="md:col-span-2 border border-pink-200 rounded-2xl p-4 bg-pink-50">
-            <h3 className="font-semibold mb-3 text-pink-600">members</h3>
+       <div className="md:col-span-2 border border-pink-200 rounded-2xl p-4 bg-pink-50">
+  <h3 className="font-semibold mb-3 text-pink-600">
+    Members
+  </h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {users.map((u) => (
-                <label
-                  key={u._id}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <input
-                    type="checkbox"
-                    checked={form.members.includes(u._id)}
-                    onChange={() => handleMemberChange(u._id)}
-                  />
+  {/* Search box */}
+  <div className="relative mb-4">
+    <Search
+      className="absolute left-3 top-3 text-pink-400"
+      size={18}
+    />
 
-                  {u.name}
-                </label>
-              ))}
-            </div>
-          </div>
+    <input
+      type="text"
+      value={memberSearch}
+      onChange={(e) => setMemberSearch(e.target.value)}
+      placeholder="Search member by name, email or university..."
+      className="w-full border border-pink-200 rounded-2xl py-3 pl-10 pr-4 bg-white"
+    />
+  </div>
+
+  {/* Members */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-72 overflow-y-auto">
+    {filteredUsers.length > 0 ? (
+      filteredUsers.map((u) => (
+        <label
+          key={u._id}
+          className="flex items-center gap-2 text-sm"
+        >
+          <input
+            type="checkbox"
+            checked={form.members.includes(u._id)}
+            onChange={() => handleMemberChange(u._id)}
+          />
+
+         <div className="flex flex-col">
+        <span className="font-medium">{u.name}</span>
+        <span className="text-xs text-gray-500">
+          NIM: {u.nim}
+        </span>
+</div>
+        </label>
+      ))
+    ) : (
+      <p className="text-gray-500 text-sm col-span-4">
+        No users found.
+      </p>
+    )}
+  </div>
+</div>
 
           <Button
             type="submit"
@@ -960,3 +1018,4 @@ export default function Admin() {
     </div>
   );
 }
+     
