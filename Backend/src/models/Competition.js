@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const competition = new mongoose.Schema({
+const compSchema = new mongoose.Schema({
     competitionName: {
         type: String,
         required: true,
@@ -20,4 +20,4 @@ const competition = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-export default mongoose.model('Competition', competition);
+export default mongoose.model('Competition', compSchema);

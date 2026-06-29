@@ -1,45 +1,44 @@
-import user from '../models/user.js';
+import User from '../models/User.js'
 import bcrypt from 'bcrypt';
 import { generateToken } from '../middleware/auth.js';
 
 // REGISTER -- POST /api/users/register
 export const createUser = async (req, res) => {
     try {
-        const { name, email, password, university, ktm } = req.body;
+        const { name, email, password, university, ktm, nim } = req.body;
 
-        const existingUser = await user.findOne({ email });
-
-        if (existingUser) {
+        //cek uniqueness
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
             return res.status(400).json({
-                message: 'Email already registered'
+                message: "Email already exists"
+            });
+        }
+        const existingNim = await User.findOne({ nim });
+        if (existingNim) {
+            return res.status(400).json({
+                message: "NIM already exists"
             });
         }
 
+        //proses buat user
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = await user.create({
-            name,
-            email,
-            password: hashedPassword,
-            university,
-            ktm
+        const newUser = await User.create({
+            name, email, password: hashedPassword, university, ktm, nim
         });
 
-        return res.status(201).json({
-            message: 'User registered successfully',
-            user: {
-                _id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                university: newUser.university,
-                ktm: newUser.ktm
-            }
-        });
+        const response = newUser.toObject();
+        delete response.password;
+
+        return res.status(201).json(response);
 
     } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        });
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Email atau NIM sudah digunakan"
+            });
+        }
+        return res.status(400).json({ message: error.message });
     }
 };
 
@@ -48,7 +47,7 @@ export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const existingUser = await user.findOne({ email });
+        const existingUser = await User.findOne({ email });
 
         if (!existingUser) {
             return res.status(404).json({
@@ -91,14 +90,10 @@ export const loginUser = async (req, res) => {
 // READ ALL USERS -- GET /api/users
 export const getUser = async (req, res) => {
     try {
-        const users = await user.find().select('-password');
-
-        if (!users.length) {
-            return res.status(404).json({
-                message: 'No users found'
-            });
-        }
-
+        const users = await User.find().select('-password');;
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        } 
         return res.status(200).json(users);
 
     } catch (error) {
@@ -111,7 +106,7 @@ export const getUser = async (req, res) => {
 // READ USER BY ID -- GET /api/users/:id
 export const getUserById = async (req, res) => {
     try {
-        const foundUser = await user
+        const foundUser = await User
             .findById(req.params.id)
             .select('-password');
 
@@ -133,51 +128,47 @@ export const getUserById = async (req, res) => {
 // UPDATE USER -- PUT /api/users/:id
 export const updateUser = async (req, res) => {
     try {
-        const updateData = { ...req.body };
-
-        if (updateData.password) {
-            updateData.password = await bcrypt.hash(
-                updateData.password,
-                10
-            );
+        if (req.body.password) {
+            req.body.password = await bcrypt.hash(req.body.password, 10);
         }
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+             }
+        ).select('-password');
 
-        const updatedUser = await user
-            .findByIdAndUpdate(
-                req.params.id,
-                updateData,
-                { new: true }
-            )
-            .select('-password');
-
-        if (!updatedUser) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
+        if (!updatedUser) { 
+            return res.status(404).json({ message: 'User not found' });
         }
 
         return res.status(200).json(updatedUser);
 
     } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        });
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Email or NIM is already used"
+            });
+        }
+        return res.status(400).json({ message: error.message });
     }
 };
 
 // DELETE USER -- DELETE /api/users/:id
 export const deleteUser = async (req, res) => {
     try {
-        const deletedUser = await user.findByIdAndDelete(req.params.id);
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
 
         if (!deletedUser) {
             return res.status(404).json({
-                message: 'User not found'
+                message: "User not found"
             });
         }
 
         return res.status(200).json({
-            message: 'User deleted successfully'
+            message: "User deleted successfully"
         });
 
     } catch (error) {
