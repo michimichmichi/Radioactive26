@@ -5,6 +5,3 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    font-family: 'Bitcount Prop Double Ink', cursive;
-}
