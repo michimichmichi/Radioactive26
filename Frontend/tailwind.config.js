@@ -7,6 +7,9 @@ export default {
   theme: {
     extend: {
        fontFamily: {
+        avrile: ['AvrileSans', 'sans-serif'],
+        blok: ['BlokFont', 'sans-serif'],
+        boldfont: ['TheBoldFont', 'sans-serif'],
         bitcount: ["Bitcount Prop Double Ink", "sans-serif"],
     },
   },
