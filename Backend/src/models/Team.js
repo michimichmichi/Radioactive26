@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const team = new mongoose.Schema({
+const teamSchema = new mongoose.Schema({
     teamName: {
         type: String,
         required: true,
@@ -28,4 +28,4 @@ const team = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-export default mongoose.model('Team', team);
+export default mongoose.model('Team', teamSchema);
