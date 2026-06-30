@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api";
 import {
   Trophy,
   Users,
@@ -12,11 +12,6 @@ import {
   RefreshCcw,
 } from "lucide-react";
 
-
-
-const API = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
 
 const competitionAPI = {
   getAll: () => API.get("/competitions"),
@@ -35,7 +30,7 @@ const teamAPI = {
 
 const userAPI = {
   getAll: () => API.get("/users"),
-  create: (data) => API.post("/users/register", data),
+  create: (data) => API.post("/users", data),
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
 };
@@ -155,10 +150,6 @@ function CompetitionsPanel() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    fetchCompetitions();
-  }, []);
-
   const fetchCompetitions = async () => {
     try {
       const res = await competitionAPI.getAll();
@@ -167,6 +158,10 @@ function CompetitionsPanel() {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    fetchCompetitions();
+  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -325,6 +320,7 @@ function UsersPanel() {
     name: "",
     email: "",
     password: "",
+    role: "user",
     university: "",
     nim: "",
     ktm: "",
@@ -334,10 +330,6 @@ function UsersPanel() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
       const res = await userAPI.getAll();
@@ -346,6 +338,10 @@ function UsersPanel() {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -382,6 +378,7 @@ function UsersPanel() {
       name: user.name,
       email: user.email,
       password: "",
+      role: user.role || "user",
       university: user.university,
       ktm: user.ktm,
       nim: user.nim,
@@ -452,6 +449,19 @@ function UsersPanel() {
             }
           />
 
+          <Select
+            value={form.role}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                role: e.target.value,
+              })
+            }
+          >
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </Select>
+
           <Input
             placeholder="university"
             value={form.university}
@@ -502,6 +512,7 @@ function UsersPanel() {
               <tr className="border-b border-pink-100">
                 <th className="text-left py-4">name</th>
                 <th className="text-left py-4">email</th>
+                <th className="text-left py-4">role</th>
                 <th className="text-left py-4">university</th>
                 <th className="text-left py-4">nim</th>
                 <th className="text-left py-4">ktm</th>
@@ -515,6 +526,8 @@ function UsersPanel() {
                   <td className="py-4">{u.name}</td>
 
                   <td>{u.email}</td>
+
+                  <td>{u.role || "user"}</td>
 
                   <td>{u.university}</td>
 
@@ -567,10 +580,6 @@ const [memberSearch, setMemberSearch] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     try {
       const [teamsRes, usersRes, competitionsRes] = await Promise.all([
@@ -586,6 +595,10 @@ const [memberSearch, setMemberSearch] = useState("");
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -898,17 +911,15 @@ const [memberSearch, setMemberSearch] = useState("");
 
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
+  const [authError, setAuthError] = useState("");
 
   const [users, setUsers] = useState([]);
   const [teams, setTeams] = useState([]);
   const [competitions, setCompetitions] = useState([]);
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
   const loadDashboard = async () => {
     try {
+      setAuthError("");
       const [u, t, c] = await Promise.all([
         userAPI.getAll(),
         teamAPI.getAll(),
@@ -920,8 +931,16 @@ export default function Admin() {
       setCompetitions(c.data || []);
     } catch (err) {
       console.log(err);
+      setAuthError(
+        err.response?.data?.message ||
+          "Unable to load admin data. Please login again with an admin account.",
+      );
     }
   };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
   const menu = [
     {
@@ -1011,6 +1030,12 @@ export default function Admin() {
         </div>
 
         {renderPage()}
+
+        {authError && (
+          <div className="mt-6 rounded-lg border border-pink-200 bg-white px-5 py-4 text-sm font-semibold text-pink-700 shadow-xl">
+            {authError}
+          </div>
+        )}
       </div>
     </div>
   );
