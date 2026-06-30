@@ -48,7 +48,7 @@ export const getAllTeams = async (req, res) => {
         const teams = await Team.find()
             .populate("leaderId", "name email")
             .populate("members", "name email")
-            .populate("competitionId", "name");
+            .populate("competitionId", "competitionName time place");
 
         res.status(200).json(teams);
     } catch (error) {

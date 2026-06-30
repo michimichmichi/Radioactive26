@@ -1,0 +1,182 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { authAPI } from "../api";
+import logo from "../assets/LogoRadioactive.png";
+
+function RegisterPage() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    university: "",
+    nim: "",
+    ktm: "",
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const updateField = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      await authAPI.register(form);
+      navigate("/login", {
+        state: { message: "Registration successful. Please log in." },
+      });
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-[#050505] text-white">
+      <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
+        <div className="w-full max-w-2xl rounded-lg border border-white/10 bg-white p-8 text-zinc-950 shadow-2xl">
+          <div className="mb-8 flex items-center justify-between">
+            <Link to="/">
+              <img src={logo} alt="Radioactive" className="h-12 w-auto" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/"
+                className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+              >
+                Home
+              </Link>
+              <Link
+                to="/login"
+                className="rounded-md border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
+              >
+                Login
+              </Link>
+            </div>
+          </div>
+
+          <h1 className="font-thebold text-3xl uppercase text-pink-600">
+            Register
+          </h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Create your Radioactive account. New accounts are registered as users.
+          </p>
+
+          {error && (
+            <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
+            <label className="block md:col-span-2">
+              <span className="text-sm font-semibold text-zinc-800">Name</span>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={updateField}
+                required
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="Full name"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">Email</span>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={updateField}
+                required
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="you@example.com"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">Password</span>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={updateField}
+                required
+                minLength={6}
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="Create a password"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">
+                University
+              </span>
+              <input
+                type="text"
+                name="university"
+                value={form.university}
+                onChange={updateField}
+                required
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="University name"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-zinc-800">NIM</span>
+              <input
+                type="text"
+                name="nim"
+                value={form.nim}
+                onChange={updateField}
+                required
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="Student number"
+              />
+            </label>
+
+            <label className="block md:col-span-2">
+              <span className="text-sm font-semibold text-zinc-800">KTM</span>
+              <input
+                type="text"
+                name="ktm"
+                value={form.ktm}
+                onChange={updateField}
+                className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                placeholder="KTM link or identifier"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-md bg-pink-600 px-5 py-3 font-semibold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-pink-300 md:col-span-2"
+            >
+              {isLoading ? "Creating account..." : "Register"}
+            </button>
+
+            <Link
+              to="/"
+              className="block text-center text-sm font-semibold text-zinc-600 hover:text-pink-600 md:col-span-2"
+            >
+              Back to home
+            </Link>
+          </form>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default RegisterPage;

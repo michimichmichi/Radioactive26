@@ -2,10 +2,25 @@ import User from '../models/User.js'
 import bcrypt from 'bcrypt';
 import { generateToken } from '../middleware/auth.js';
 
+const sanitizeUser = (user) => {
+    const response = user.toObject ? user.toObject() : { ...user };
+    delete response.password;
+    delete response.tokenVersion;
+    response.role = response.role || 'user';
+    return response;
+};
+
 // REGISTER -- POST /api/users/register
 export const createUser = async (req, res) => {
     try {
         const { name, email, password, university, ktm, nim } = req.body;
+        const role = req.user?.role === 'admin' && req.body.role ? req.body.role : 'user';
+
+        if (!['user', 'admin'].includes(role)) {
+            return res.status(400).json({
+                message: 'Invalid user role'
+            });
+        }
 
         //cek uniqueness
         const existingEmail = await User.findOne({ email });
@@ -24,13 +39,17 @@ export const createUser = async (req, res) => {
         //proses buat user
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({
-            name, email, password: hashedPassword, university, ktm, nim
+            name, email, password: hashedPassword, university, ktm, nim, role
         });
 
-        const response = newUser.toObject();
-        delete response.password;
+        if (req.user?.role === 'admin') {
+            return res.status(201).json(sanitizeUser(newUser));
+        }
 
-        return res.status(201).json(response);
+        return res.status(201).json({
+            message: 'Registration successful',
+            user: sanitizeUser(newUser)
+        });
 
     } catch (error) {
         if (error.code === 11000) {
@@ -71,14 +90,44 @@ export const loginUser = async (req, res) => {
         return res.status(200).json({
             message: 'Login successful',
             token,
-            user: {
-                _id: existingUser._id,
-                name: existingUser.name,
-                email: existingUser.email,
-                university: existingUser.university,
-                ktm: existingUser.ktm
-            }
+            user: sanitizeUser(existingUser)
         });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+// LOGOUT -- POST /api/users/logout
+export const logoutUser = async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.user.id, { $inc: { tokenVersion: 1 } });
+
+        return res.status(200).json({
+            message: 'Logout successful'
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+// CURRENT USER -- GET /api/users/me
+export const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password -tokenVersion');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        return res.status(200).json(user);
 
     } catch (error) {
         return res.status(500).json({
@@ -90,7 +139,7 @@ export const loginUser = async (req, res) => {
 // READ ALL USERS -- GET /api/users
 export const getUser = async (req, res) => {
     try {
-        const users = await User.find().select('-password');;
+        const users = await User.find().select('-password -tokenVersion');
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         } 
@@ -108,7 +157,7 @@ export const getUserById = async (req, res) => {
     try {
         const foundUser = await User
             .findById(req.params.id)
-            .select('-password');
+            .select('-password -tokenVersion');
 
         if (!foundUser) {
             return res.status(404).json({
@@ -128,17 +177,32 @@ export const getUserById = async (req, res) => {
 // UPDATE USER -- PUT /api/users/:id
 export const updateUser = async (req, res) => {
     try {
-        if (req.body.password) {
-            req.body.password = await bcrypt.hash(req.body.password, 10);
+        const updateData = { ...req.body };
+        const shouldRevokeTokens = Boolean(updateData.password);
+
+        if (updateData.password) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
         }
+
+        if (updateData.role && !['user', 'admin'].includes(updateData.role)) {
+            return res.status(400).json({
+                message: 'Invalid user role'
+            });
+        }
+
+        delete updateData.tokenVersion;
+        const updateOperation = shouldRevokeTokens
+            ? { $set: updateData, $inc: { tokenVersion: 1 } }
+            : { $set: updateData };
+
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateOperation,
             {
                 new: true,
                 runValidators: true
              }
-        ).select('-password');
+        ).select('-password -tokenVersion');
 
         if (!updatedUser) { 
             return res.status(404).json({ message: 'User not found' });
