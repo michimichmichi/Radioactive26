@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, Menu, User } from "lucide-react";
+import { LogOut, Menu, User, ShieldAlert, Award, Layers } from "lucide-react";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 
@@ -35,7 +35,6 @@ const Navbar = () => {
     };
 
     document.addEventListener("mousedown", closeMenu);
-
     return () => document.removeEventListener("mousedown", closeMenu);
   }, []);
 
@@ -56,105 +55,148 @@ const Navbar = () => {
   };
 
   return (
-    <div>
-      <nav className="bg-[#FF0990] px-6 h-18 flex items-center justify-between text-white">
+    <div className="sticky top-0 z-50 w-full">
+      <nav className="bg-[#FF0990] px-6 h-20 flex items-center justify-between text-white shadow-md">
+        {/* LOGO */}
         <div>
           <Link to="/">
-            <img src={logo} alt="Logo" className="h-16 w-auto" />
+            <img src={logo} alt="Logo" className="h-14 w-auto object-contain" />
           </Link>
         </div>
 
-        <ul className="hidden md:flex items-center gap-8 text-sm font-avrile text-white font-semibold ">
-          <li>
-            <a href="#" className="hover:text-white transition-colors tracking-wider">ABOUT</a>
-          </li>
-          <li>
-            <a href="#" className="hover:text-white transition-colors tracking-wider">COMPETITION</a>
-          </li>
-          <li>
-            <a href="#" className="hover:text-white transition-colors tracking-wider">SPONSOR</a>
-          </li>
-          <li>
-            <a href="#" className="hover:text-white transition-colors tracking-wider">GALLERY</a>
-          </li>
+        {/* DESKTOP NAVIGATION LINKS */}
+        <ul className="hidden md:flex items-center gap-8 text-sm font-avrile text-zinc-100 font-semibold">
+          <li><a href="#about" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
+          <li><a href="#competition" className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
+          <li><a href="#sponsor" className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
+          <li><a href="#gallery" className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
         </ul>
 
+        {/* ACTION CONTROLS / DROPDOWN CONTAINER */}
         <div className="relative flex items-center gap-4" ref={menuRef}>
+          
+          {/* USER IS LOGGED IN */}
           {user ? (
             <>
               <button
                 type="button"
                 onClick={() => setIsMenuOpen((current) => !current)}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-black px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-900/70"
+                className="flex items-center gap-2 rounded-xl border border-white/20 bg-black/40 backdrop-blur-sm px-4 py-2 text-sm font-medium transition-all hover:bg-black/60"
                 aria-expanded={isMenuOpen}
-                aria-haspopup="menu"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-600">
-                  <User size={16} />
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-pink-600">
+                  <User size={14} />
                 </span>
-                <span className="hidden max-w-32 truncate md:inline">
-                  {user.name || "Profile"}
+                <span className="max-w-28 truncate hidden sm:inline">
+                  {user.name || "Account"}
                 </span>
-                <Menu size={18} />
+                <Menu size={16} />
               </button>
 
+              {/* UNIFIED DROPDOWN (Mobile + Desktop) */}
               {isMenuOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-lg border border-pink-100 bg-white text-zinc-900 shadow-2xl"
+                  className="absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-xl border border-zinc-100 bg-white text-zinc-900 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150"
                 >
-                  <div className="border-b border-pink-100 px-4 py-3">
-                    <p className="truncate text-sm font-bold text-pink-600">
+                  {/* User Profile Summary Header */}
+                  <div className="border-b border-zinc-100 bg-zinc-50/50 px-4 py-3">
+                    <p className="truncate text-sm font-bold text-pink-600 flex items-center gap-1.5">
+                      {user.role === "admin" && <ShieldAlert size={14} className="text-amber-500" />}
                       {user.name || "User"}
                     </p>
                     <p className="truncate text-xs text-zinc-500">{user.email}</p>
                   </div>
 
-                  <MenuLink to="/profile" label="Profile management" />
-                  <MenuLink to="/my-competitions" label="Competitions registered" />
+                  {/* MOBILE-ONLY NAVIGATION LINKS (Injected inside the menu wrapper) */}
+                  <div className="md:hidden border-b border-zinc-100 py-1">
+                    <MenuLink to="/#about" label="About" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#competition" label="Competitions" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#sponsor" label="Sponsors" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#gallery" label="Gallery" onClick={() => setIsMenuOpen(false)} />
+                  </div>
 
-                  {user.role === "admin" && (
-                    <MenuLink to="/admin" label="Admin dashboard" />
-                  )}
+                  {/* USER CONTENT LINKS */}
+                  <div className="py-1">
+                    <MenuLink to="/profile" label="Profile Management" icon={<User size={15} />} onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/my-competitions" label="Registered Events" icon={<Award size={15} />} onClick={() => setIsMenuOpen(false)} />
+                    
+                    {/* ADMIN STRATEGIC DASHBOARD ROUTE */}
+                    {user.role === "admin" && (
+                      <MenuLink 
+                        to="/admin" 
+                        label="Admin Dashboard" 
+                        icon={<ShieldAlert size={15} />} 
+                        className="text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                        onClick={() => setIsMenuOpen(false)} 
+                      />
+                    )}
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={logout}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
+                  {/* LOGOUT ACTION */}
+                  <div className="border-t border-zinc-100 bg-zinc-50/30 py-1">
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                    >
+                      <LogOut size={15} />
+                      Logout
+                    </button>
+                  </div>
                 </div>
               )}
             </>
           ) : (
-            <Link
-              to="/login"
-              className="bg-black border border-white/10 px-5 py-1.5 rounded-xl hover:bg-zinc-900/70 transition-colors text-sm font-medium"
-            >
-              Login
-            </Link>
+            /* USER IS GUEST (NOT LOGGED IN) */
+            <>
+              {/* Desktop & Mobile Login Trigger Link */}
+              <Link
+                to="/login"
+                className="bg-black/40 border border-white/20 px-5 py-1.5 rounded-xl hover:bg-black/60 transition-colors text-sm font-medium tracking-wide"
+              >
+                Login
+              </Link>
+              
+              {/* Mobile Guest Burger Option Menu */}
+              <div className="md:hidden">
+                <button 
+                  onClick={() => setIsMenuOpen((current) => !current)}
+                  className="p-1 text-white text-2xl focus:outline-none"
+                >
+                  <Menu size={24} />
+                </button>
+                
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-14 z-50 w-48 rounded-xl border border-zinc-100 bg-white text-zinc-900 shadow-2xl py-2">
+                    <MenuLink to="/#about" label="About" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#competition" label="Competitions" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#sponsor" label="Sponsors" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#gallery" label="Gallery" onClick={() => setIsMenuOpen(false)} />
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
-          <button className="md:hidden text-white text-3xl">
-            Menu
-          </button>
         </div>
       </nav>
 
+      {/* BLENDED PINK RADIAL TRANSITION EDGE */}
       <div className="pointer-events-none h-10 bg-gradient-to-b from-[#FF0990] to-transparent" />
     </div>
   );
 };
 
-function MenuLink({ to, label }) {
+function MenuLink({ to, label, icon = null, className = "", onClick }) {
   return (
     <Link
       to={to}
-      className="block px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-pink-50 hover:text-pink-600"
+      onClick={onClick}
+      className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-pink-50 hover:text-pink-600 ${className}`}
     >
-      {label}
+      {icon}
+      <span>{label}</span>
     </Link>
   );
 }
