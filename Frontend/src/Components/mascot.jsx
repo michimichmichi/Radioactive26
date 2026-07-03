@@ -5,9 +5,8 @@ import mascot from '../assets/mascot/glitz.png';
 
 export default function Mascot() {
   return (
-    <div className="relative w-full max-w-4xl mx-auto min-h-[400px] md:h-[600px] flex items-center justify-center overflow-visible select-none px-4">  
+    <div className="relative w-full max-w-4xl mx-auto min-h-[400px] md:h-[600px] flex items-center justify-center overflow-visible select-none px-4 ">  
       
-      {/* 0. Pop Animation Profile */}
       <style>{`
         @keyframes directPop {
           0%, 100% { transform: scale(1); }
@@ -22,7 +21,6 @@ export default function Mascot() {
 
       <div className="flex flex-row items-center justify-center -space-x-8 sm:-space-x-12 md:-space-x-20 lg:-space-x-28 w-full">
         
-        {/* Left Column: Slogan Image */}
         <div className="w-1/2 flex justify-end items-center animate-mascot-pop origin-right">
           <img 
             src={word} 
@@ -32,7 +30,6 @@ export default function Mascot() {
           />
         </div>
         
-        {/* Right Column: Glitz Mascot */}
         <div className="w-1/2 flex justify-start items-center">
           <img 
             src={mascot} 

@@ -1,0 +1,121 @@
+import React, { useState } from 'react';
+
+import competition from '../assets/competition/competition.png'; 
+import radAnnouncing from '../assets/competition/radio announcing competition.png';
+import podcast from '../assets/competition/podcast competition.png';
+import register from '../assets/competition/register now.png';
+
+export default function Competition() {
+    const [clickedId, setClickedId] = useState(null);
+    const handleRegisterClick = (id, url) => {
+        setClickedId(id);
+        setTimeout(() => setClickedId(null), 150);
+        if (url) {
+        window.open(url, '_blank');
+        }
+    };
+
+  return (
+    <div className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible ">  
+        <style>{`
+            @keyframes popShakePop {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            }
+            
+            /* 2. POP UP (Explodes outward quickly) */
+            10% { 
+                transform: scale(1.2); 
+            }
+
+            /* 3. SHAKE (Aggressive horizontal shifts) */
+            22% { transform: translateX(-8px) rotate(-3deg); }
+            30% { transform: translateX(6px) rotate(3deg); }
+            38% { transform: translateX(-6px) rotate(-2deg); }
+            46% { transform: translateX(4px) rotate(2deg); }
+            54% { transform: translateX(0) rotate(0); }
+
+            75% { 
+                transform: scale(1); 
+            }
+            
+            }
+
+            /* Fixed class hook name assignment to match your implementation below */
+            .animate-pop-shake {
+            animation: popShakePop 3s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            }
+        `}</style>
+
+
+        {/* Changed class hook name to .animate-pop-shake to activate your keyframe definition above */}
+        <div className="right-[4%] relative w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible animate-pop-shake">  
+            <img 
+                src={competition} 
+                alt="Competition" 
+                className="w-full max-w-[700px] md:max-w-[1000px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+            />
+        </div>
+
+        {/* Radio Announcing Competition */}
+        <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-10 md:mt-18">
+            <div className="relative w-full max-w-4xl mx-auto mb-5 md:mb-10 flex items-center justify-center overflow-visible">
+                <img 
+                    src={radAnnouncing} 
+                    alt="Radio Announcing Competition" 
+                    className=" transform w-full max-w-[300px] md:max-w-[600px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                />
+            </div>
+            <div>
+                <p className="text-white text-center text-[14px] md:text-[18px] font-avril px-10 md:px-10 mb-2">
+                    Radio Announcing Competition merupakan rangkaian acara utama RADIOACTIVE. Lomba ini merupakan ajang untuk siswa SMA dan mahasiswa se-Jabodetabek untuk memperluas wawasan dan mengasah kemampuan di dunia broadcasting. Radio Announcing Competition ini memiliki konsep yang sesuai dengan nilai utama RADIOACTIVE 2026, yaitu embracing the best version of yourself. Tujuan dari lomba ini adalah untuk mengasah kreativitas peserta dalam membuat siaran dan secara tidak langsung memberikan informasi hingga mengajak para peserta untuk keluar dari zona nyaman mereka.
+                </p>
+            </div>
+            <button 
+                onClick={() => handleRegisterClick('radio', 'https://link-pendaftaran-radio.com')} 
+                className={`transition-all duration-100 mb-5 md:mb-10
+                  ${clickedId === 'radio' 
+                    ? 'scale-90 brightness-75 drop-shadow-none' 
+                    : 'hover:scale-110 active:scale-95'
+                  }`} >   
+                  <img 
+                    src={register} 
+                    alt="Register Now" 
+                    className=" transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                />
+            </button>
+        </div>
+                
+        {/* Podcast Competition */}
+        <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-10 md:mt-20">
+            <div className="relative left-[2%] w-full max-w-4xl mx-auto mb-5 md:mb-10 flex items-center justify-center overflow-visible">
+                <img 
+                    src={podcast} 
+                    alt="Podcast Competition" 
+                    className=" transform w-full max-w-[250px] md:max-w-[500px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                />
+            </div>
+            <div>
+                <p className="text-white text-center text-[14px] md:text-[18px] font-avril px-10 md:px-10 mb-2">
+                    Lomba ini merupakan ajang untuk seluruh mahasiswa se-Jabodetabek mengasah kemampuan, dan kepercayaan diri dalam pemanfaatan media massa, khususnya di bidang podcast. RADIOACTIVE 2026 berharap melalui kompetisi ini, generasi muda dapat mengembangkan kemampuan diri sebagai wujud mengekspresikan pendapat dan kreativitas yang dimiliki.
+                </p>
+            </div>
+            <button 
+                onClick={() => handleRegisterClick('podcast', 'https://link-pendaftaran-podcast.com')} 
+                className={`transition-all duration-100 mb-5 md:mb-10
+                  ${clickedId === 'podcast' 
+                    ? 'scale-90 brightness-75 drop-shadow-none' 
+                    : 'hover:scale-110 active:scale-95'
+                  }`} >   
+                  <img 
+                    src={register} 
+                    alt="Register Now" 
+                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                />
+            </button>
+        </div>
+       
+    </div>
+  );
+}
