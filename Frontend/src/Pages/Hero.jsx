@@ -2,6 +2,7 @@ import FuzzyText from '../Components/RA';
 import Navbar from '../Components/NavigationBar';
 import OpeningTitle from '../Components/Opening';
 import Mascot from '../Components/mascot';
+import Competition from '../Components/Competition';
 
 function Hero() {
   return (
@@ -17,6 +18,7 @@ function Hero() {
       <Navbar />
       <OpeningTitle />
       <Mascot />
+      <Competition />
 
     </div>
   );
