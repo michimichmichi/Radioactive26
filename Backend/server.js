@@ -1,4 +1,5 @@
 import express from 'express';
+import path from "path";
 import cors from 'cors';
 import dotenv from 'dotenv';    
 import connectDB from './src/config/db.js';
@@ -31,6 +32,10 @@ app.use(cors({
     origin: CLIENT_ORIGIN,
     credentials: false
 })); 
+app.use(
+    "/uploads",
+    express.static(path.join("src", "uploads"))
+);
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use('/api', apiLimiter);
