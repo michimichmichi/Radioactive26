@@ -56,7 +56,7 @@ const Navbar = () => {
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      <nav className="bg-[#FF0990] px-6 h-20 flex items-center justify-between text-white shadow-md">
+      <nav className="bg-[#FF0990] px-6 h-16 flex items-center justify-between text-white shadow-md">
         {/* LOGO */}
         <div>
           <Link to="/">
