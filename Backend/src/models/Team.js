@@ -24,7 +24,7 @@ const teamSchema = new mongoose.Schema({
     },
     buktiTransfer: {
         type: String,
-        required: true
+        //required: true  --> gabisa krn nanti tim gabisa dibuat tanpa bukti tf
     }
 }, { timestamps: true });
 
