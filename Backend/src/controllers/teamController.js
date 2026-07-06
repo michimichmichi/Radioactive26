@@ -1,25 +1,56 @@
 import Team from "../models/Team.js";
+import fs from "fs/promises";
+import path from "path";
+
+const deleteTransferFile = async (transferPath) => {
+    if (!transferPath) return;
+
+    const filePath = path.join(
+        process.cwd(),
+        "src",
+        transferPath.replace(/^\//, "")
+    );
+
+    try {
+        await fs.unlink(filePath);
+
+    } catch (err) {
+        console.warn("Failed to delete Transfer:", err.message);
+
+    }
+};
+
+const deleteUploadedTransfer = async (filename) => {
+    if (!filename) return;
+
+    const filePath = path.join(
+        process.cwd(),
+        "src",
+        "uploads",
+        "transfer",
+        filename
+    );
+
+    try {
+        await fs.unlink(filePath);
+    } catch (err) {
+        console.warn("Failed to delete uploaded Transfer:", err.message);
+    }
+};
+
 //Create Team (Admin & User) 
 export const createTeam = async (req, res) => {
     try {
-        console.log("🔥 HIT CREATE TEAM ROUTE");
-        console.log("BODY:", req.body);
-
-        if (!req.body) {
-            return res.status(400).json({
-                message: "req.body is undefined"
-            });
-        }
-
         const {
             teamName,
             leaderId,
             members,
-            competitionId,
-            buktiTransfer
+            competitionId
         } = req.body;
 
-        console.log("STEP 2 PASSED");
+        const buktiTransfer = req.file
+            ? `/uploads/transfer/${req.file.filename}`
+            : null;
 
         const team = await Team.create({
             teamName,
@@ -29,16 +60,26 @@ export const createTeam = async (req, res) => {
             buktiTransfer
         });
 
-        console.log("💾 SAVED TEAM:", team);
-
         return res.status(201).json({
             message: "Team created",
             team
         });
 
     } catch (error) {
-        console.log("❌ ERROR CAUGHT:", error);
-        return res.status(500).json({ message: error.message });
+        if (req.file) {
+            await deleteUploadedTransfer(req.file.filename);
+        }
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Team name already exists"
+            });
+        }
+
+        return res.status(500).json({
+            message: error.message
+        });
+        
     }
 };
 
@@ -59,36 +100,92 @@ export const getAllTeams = async (req, res) => {
 //Update Team (Admin)
 export const updateTeam = async (req, res) => {
     try {
+        const existingTeam = await Team.findById(req.params.id);
+
+        if (!existingTeam) {
+            if (req.file) {
+                await deleteUploadedTransfer(req.file.filename);
+            }
+
+            return res.status(404).json({
+                message: "Team not found"
+            });
+        }
+
+        const oldTransfer = existingTeam.buktiTransfer;
+        const updateData = { ...req.body };
+
+        if (req.file) {
+            updateData.buktiTransfer =
+                `/uploads/transfer/${req.file.filename}`;
+        }
+
         const updatedTeam = await Team.findByIdAndUpdate(
             req.params.id,
-            req.body,
-            { new: true }
+            { $set: updateData },
+            {
+                new: true,
+                runValidators: true
+            }
         );
 
         if (!updatedTeam) {
-            return res.status(404).json({ message: "Team not found" });
+            if (req.file) {
+                await deleteUploadedTransfer(req.file.filename);
+            }
+
+            return res.status(404).json({
+                message: "Team not found"
+            });
         }
 
-        res.status(200).json({
+        if (req.file && oldTransfer) {
+            await deleteTransferFile(oldTransfer);
+        }
+
+        return res.status(200).json({
             message: "Team updated successfully",
             updatedTeam
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (req.file) {
+            await deleteUploadedTransfer(req.file.filename);
+        }
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Team name already exists"
+            });
+        }
+
+        return res.status(500).json({
+            message: error.message
+        });
     }
 };
 
 //Delete Team (Admin)
 export const deleteTeam = async (req, res) => {
     try {
-        const team = await Team.findByIdAndDelete(req.params.id);
+        const team = await Team.findById(req.params.id);
 
         if (!team) {
-            return res.status(404).json({ message: "Team not found" });
+            return res.status(404).json({
+                message: "Team not found"
+            });
         }
 
-        res.status(200).json({
+        const deletedTeam = await Team.findByIdAndDelete(req.params.id);
+        if (!deletedTeam) {
+            return res.status(404).json({
+                message: "Team not found"
+            });
+        }
+
+        await deleteTransferFile(deletedTeam.buktiTransfer);
+
+        return res.status(200).json({
             message: "Team deleted successfully"
         });
 
