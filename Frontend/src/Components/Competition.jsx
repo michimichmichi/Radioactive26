@@ -16,7 +16,7 @@ export default function Competition() {
     };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible ">  
+    <div id="competition" className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible ">  
         <style>{`
             @keyframes popShakePop {
             0%, 100% { 
@@ -39,17 +39,13 @@ export default function Competition() {
             75% { 
                 transform: scale(1); 
             }
-            
-            }
 
-            /* Fixed class hook name assignment to match your implementation below */
             .animate-pop-shake {
             animation: popShakePop 3s cubic-bezier(0.25, 1, 0.5, 1) infinite;
             }
         `}</style>
 
 
-        {/* Changed class hook name to .animate-pop-shake to activate your keyframe definition above */}
         <div className="right-[4%] relative w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible animate-pop-shake">  
             <img 
                 src={competition} 
