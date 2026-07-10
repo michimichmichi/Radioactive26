@@ -25,6 +25,8 @@ export default function Mascot() {
           <img 
             src={word} 
             alt="Embrace The Glow Rule The Show" 
+            loading="lazy"
+            decoding="async"
             className=" w-full max-w-[200px] sm:max-w-[250px] md:max-w-[280px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
             style={{ animationDelay: '0.2s' }}
           />
@@ -34,6 +36,8 @@ export default function Mascot() {
           <img 
             src={mascot} 
             alt="Glitz Mascot" 
+            loading="lazy"
+            decoding="async"
             className="w-full max-w-[280px] sm:max-w-[340px] md:max-w-[440px] h-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.6)]" 
           />
         </div>

@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../middleware/auth.js';
+import Team from '../models/Team.js';
 
 //helper buat hapus KTM
 const deleteKtmFile = async (ktmPath) => {
@@ -196,6 +197,59 @@ export const getUser = async (req, res) => {
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         } 
+        return res.status(200).json(users);
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+// READ PARTICIPANTS -- GET /api/users/participants
+export const getParticipants = async (req, res) => {
+    try {
+        const { competitionId, excludeTeamId, nim } = req.query;
+
+        if (!nim || nim.trim().length < 3) {
+            return res.status(200).json([]);
+        }
+
+        const unavailableUserIds = [];
+
+        if (competitionId) {
+            const teamQuery = { competitionId };
+
+            if (excludeTeamId) {
+                teamQuery._id = { $ne: excludeTeamId };
+            }
+
+            const teams = await Team.find(teamQuery).select('leaderId members');
+
+            teams.forEach((team) => {
+                if (team.leaderId) {
+                    unavailableUserIds.push(team.leaderId.toString());
+                }
+
+                team.members.forEach((memberId) => {
+                    unavailableUserIds.push(memberId.toString());
+                });
+            });
+        }
+
+        const userQuery = {
+            nim: { $regex: nim.trim(), $options: 'i' }
+        };
+
+        if (unavailableUserIds.length > 0) {
+            userQuery._id = { $nin: unavailableUserIds };
+        }
+
+        const users = await User.find(userQuery)
+            .select('name email university nim')
+            .limit(5)
+            .sort({ name: 1 });
+
         return res.status(200).json(users);
 
     } catch (error) {

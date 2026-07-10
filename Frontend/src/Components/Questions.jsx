@@ -51,6 +51,8 @@ export default function Questions() {
             <img 
                 src={faqImg} 
                 alt="FAQ" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[500px] md:max-w-[700px] h-auto object-contain drop-shadow-[0_0_20px_rgba(255,9,144,0.6)]" 
             />
         </div>

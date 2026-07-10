@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
+import { validateImageFile } from "../utils/fileValidation";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const formRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,8 +19,28 @@ function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const updateField = (event) => {
-    const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    const { files, name, type, value } = event.target;
+
+    if (type === "file") {
+      const file = files?.[0] || "";
+      const validationError = validateImageFile(file);
+
+      if (validationError) {
+        event.target.value = "";
+        setError(validationError);
+        setForm((current) => ({ ...current, [name]: "" }));
+        return;
+      }
+
+      setError("");
+      setForm((current) => ({ ...current, [name]: file }));
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (event) => {
@@ -27,7 +49,19 @@ function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await authAPI.register(form);
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("password", form.password);
+      formData.append("university", form.university);
+      formData.append("nim", form.nim);
+
+      if (form.ktm) {
+        formData.append("ktm", form.ktm);
+      }
+
+      await authAPI.register(formData);
+      formRef.current?.reset();
       navigate("/login", {
         state: { message: "Registration successful. Please log in." },
       });
@@ -77,7 +111,7 @@ function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
+          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
             <label className="block md:col-span-2">
               <span className="text-sm font-semibold text-zinc-800">Name</span>
               <input
@@ -149,13 +183,15 @@ function RegisterPage() {
             <label className="block md:col-span-2">
               <span className="text-sm font-semibold text-zinc-800">KTM</span>
               <input
-                type="text"
+                type="file"
                 name="ktm"
-                value={form.ktm}
                 onChange={updateField}
+                accept="image/jpeg,image/jpg,image/png"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
-                placeholder="KTM link or identifier"
               />
+              <span className="mt-1 block text-xs text-zinc-500">
+                JPG, JPEG, or PNG. Maximum 5MB.
+              </span>
             </label>
 
             <button

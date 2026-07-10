@@ -118,6 +118,7 @@ const Navbar = () => {
 
                   {/* USER CONTENT LINKS */}
                   <div className="py-1">
+                    <MenuLink to="/competition-registration" label="Register Competition" icon={<Layers size={15} />} onClick={() => setIsMenuOpen(false)} />
                     <MenuLink to="/profile" label="Profile Management" icon={<User size={15} />} onClick={() => setIsMenuOpen(false)} />
                     <MenuLink to="/my-competitions" label="Registered Events" icon={<Award size={15} />} onClick={() => setIsMenuOpen(false)} />
                     

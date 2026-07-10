@@ -34,7 +34,11 @@ app.use(cors({
 })); 
 app.use(
     "/uploads",
-    express.static(path.join("src", "uploads"))
+    express.static(path.join("src", "uploads"), {
+        setHeaders: (res) => {
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+        }
+    })
 );
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
@@ -44,6 +48,26 @@ app.use('/api/users/register', authLimiter);
 app.use("/api/teams", teamRoutes);
 app.use("/api/competitions", competitionRoutes);
 app.use("/api/users", userRoutes);
+
+app.use((err, req, res, next) => {
+    if (!err) {
+        next();
+        return;
+    }
+
+    const uploadErrorCodes = [
+        'LIMIT_FILE_SIZE',
+        'LIMIT_FILE_COUNT',
+        'LIMIT_UNEXPECTED_FILE'
+    ];
+    const status = uploadErrorCodes.includes(err.code) ? 400 : 400;
+
+    return res.status(status).json({
+        message: err.code === 'LIMIT_FILE_SIZE'
+            ? 'Uploaded file must be 5MB or smaller'
+            : err.message || 'File upload failed'
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

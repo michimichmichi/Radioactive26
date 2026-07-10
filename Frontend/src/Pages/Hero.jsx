@@ -1,4 +1,3 @@
-import FuzzyText from '../Components/RA';
 import Navbar from '../Components/NavigationBar';
 import OpeningTitle from '../Components/Opening';
 import Mascot from '../Components/mascot';
