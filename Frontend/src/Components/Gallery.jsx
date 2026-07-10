@@ -1,9 +1,6 @@
 import React from 'react';
 
 import gallery from '../assets/gallery/gallery.png';
-import cameraRoll from '../assets/gallery/camera roll.png';
-import star from '../assets/gallery/star 6.png';
-import camera from '../assets/gallery/kamera 1.png';
 
 export default function Gallery() {
   return (
@@ -12,6 +9,8 @@ export default function Gallery() {
             <img 
                 src={gallery} 
                 alt="Gallery" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[600px] md:max-w-[800px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
             />
         </div>

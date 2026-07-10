@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import API from "../api";
 import {
   Trophy,
@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   RefreshCcw,
 } from "lucide-react";
+import { validateImageFile } from "../utils/fileValidation";
 
 
 const competitionAPI = {
@@ -33,6 +34,52 @@ const userAPI = {
   create: (data) => API.post("/users", data),
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
+};
+
+const API_ORIGIN = (API.defaults.baseURL || "").replace(/\/api\/?$/, "");
+
+const isFile = (value) => typeof File !== "undefined" && value instanceof File;
+
+const getUploadUrl = (value) => {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${API_ORIGIN}${value}`;
+};
+
+const buildUserFormData = (form, { includeEmptyPassword = true } = {}) => {
+  const formData = new FormData();
+  formData.append("name", form.name);
+  formData.append("email", form.email);
+  formData.append("role", form.role);
+  formData.append("university", form.university);
+  formData.append("nim", form.nim);
+
+  if (includeEmptyPassword || form.password) {
+    formData.append("password", form.password);
+  }
+
+  if (isFile(form.ktm)) {
+    formData.append("ktm", form.ktm);
+  }
+
+  return formData;
+};
+
+const buildTeamFormData = (form) => {
+  const formData = new FormData();
+  formData.append("teamName", form.teamName);
+  formData.append("leaderId", form.leaderId);
+  formData.append("competitionId", form.competitionId);
+
+  form.members.forEach((memberId) => {
+    formData.append("members", memberId);
+  });
+
+  if (isFile(form.buktiTransfer)) {
+    formData.append("buktiTransfer", form.buktiTransfer);
+  }
+
+  return formData;
 };
 
 
@@ -327,8 +374,10 @@ function UsersPanel() {
   };
 
   const [users, setUsers] = useState([]);
+  const formRef = useRef(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [currentKtm, setCurrentKtm] = useState("");
 
   const fetchUsers = async () => {
     try {
@@ -346,6 +395,8 @@ function UsersPanel() {
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setCurrentKtm("");
+    formRef.current?.reset();
   };
 
   const submitHandler = async (e) => {
@@ -353,15 +404,12 @@ function UsersPanel() {
 
     try {
       if (editingId) {
-        const payload = { ...form };
-
-        if (!payload.password) {
-          delete payload.password;
-        }
-
-        await userAPI.update(editingId, payload);
+        await userAPI.update(
+          editingId,
+          buildUserFormData(form, { includeEmptyPassword: false }),
+        );
       } else {
-        await userAPI.create(form);
+        await userAPI.create(buildUserFormData(form));
       }
 
       resetForm();
@@ -373,6 +421,7 @@ function UsersPanel() {
 
   const editUser = (user) => {
     setEditingId(user._id);
+    setCurrentKtm(user.ktm || "");
 
     setForm({
       name: user.name,
@@ -380,7 +429,7 @@ function UsersPanel() {
       password: "",
       role: user.role || "user",
       university: user.university,
-      ktm: user.ktm,
+      ktm: "",
       nim: user.nim,
     });
   };
@@ -409,6 +458,7 @@ function UsersPanel() {
         </div>
 
         <form
+          ref={formRef}
           onSubmit={submitHandler}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
@@ -486,15 +536,39 @@ function UsersPanel() {
           />
 
           <Input
-            placeholder="ktm"
-            value={form.ktm}
-            onChange={(e) =>
+            type="file"
+            accept="image/jpeg,image/jpg,image/png"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || "";
+              const validationError = validateImageFile(file);
+
+              if (validationError) {
+                e.target.value = "";
+                alert(validationError);
+                setForm({
+                  ...form,
+                  ktm: "",
+                });
+                return;
+              }
+
               setForm({
                 ...form,
-                ktm: e.target.value,
-              })
-            }
+                ktm: file,
+              });
+            }}
           />
+
+          {editingId && currentKtm && (
+            <a
+              href={getUploadUrl(currentKtm)}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-semibold text-pink-600"
+            >
+              View current KTM
+            </a>
+          )}
 
           <Button
             type="submit"
@@ -533,7 +607,21 @@ function UsersPanel() {
 
                   <td>{u.nim}</td>
 
-                  <td>{u.ktm}</td>
+                  <td>
+                    {u.ktm ? (
+                      <a
+                        href={getUploadUrl(u.ktm)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700"
+                      >
+                        <FileText size={16} />
+                        View Image
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
 
                   <td className="text-right space-x-3">
                     <button
@@ -572,13 +660,15 @@ function TeamsPanel() {
   };
 
   const [teams, setTeams] = useState([]);
+  const formRef = useRef(null);
   const [users, setUsers] = useState([]);
   const [competitions, setCompetitions] = useState([]);
   const [search, setSearch] = useState("");
-const [memberSearch, setMemberSearch] = useState("");
+  const [memberSearch, setMemberSearch] = useState("");
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [currentTransfer, setCurrentTransfer] = useState("");
 
   const loadData = async () => {
     try {
@@ -603,6 +693,8 @@ const [memberSearch, setMemberSearch] = useState("");
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setCurrentTransfer("");
+    formRef.current?.reset();
   };
 
   const handleMemberChange = (id) => {
@@ -624,9 +716,9 @@ const [memberSearch, setMemberSearch] = useState("");
 
     try {
       if (editingId) {
-        await teamAPI.update(editingId, form);
+        await teamAPI.update(editingId, buildTeamFormData(form));
       } else {
-        await teamAPI.create(form);
+        await teamAPI.create(buildTeamFormData(form));
       }
 
       resetForm();
@@ -638,13 +730,14 @@ const [memberSearch, setMemberSearch] = useState("");
 
   const editTeam = (team) => {
     setEditingId(team._id);
+    setCurrentTransfer(team.buktiTransfer || "");
 
     setForm({
       teamName: team.teamName,
       leaderId: team.leaderId?._id || "",
-      members: team.members?.map((m) => m._id),
+      members: team.members?.map((m) => m._id) || [],
       competitionId: team.competitionId?._id || "",
-      buktiTransfer: team.buktiTransfer,
+      buktiTransfer: "",
     });
   };
 
@@ -695,6 +788,7 @@ const [memberSearch, setMemberSearch] = useState("");
         </div>
 
         <form
+          ref={formRef}
           onSubmit={submitHandler}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
@@ -711,15 +805,39 @@ const [memberSearch, setMemberSearch] = useState("");
           />
 
           <Input
-            placeholder="buktiTransfer"
-            value={form.buktiTransfer}
-            onChange={(e) =>
+            type="file"
+            accept="image/jpeg,image/jpg,image/png"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || "";
+              const validationError = validateImageFile(file);
+
+              if (validationError) {
+                e.target.value = "";
+                alert(validationError);
+                setForm({
+                  ...form,
+                  buktiTransfer: "",
+                });
+                return;
+              }
+
               setForm({
                 ...form,
-                buktiTransfer: e.target.value,
-              })
-            }
+                buktiTransfer: file,
+              });
+            }}
           />
+
+          {editingId && currentTransfer && (
+            <a
+              href={getUploadUrl(currentTransfer)}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-semibold text-pink-600"
+            >
+              View current buktiTransfer
+            </a>
+          )}
 
           <Select
             value={form.leaderId}
@@ -889,7 +1007,7 @@ const [memberSearch, setMemberSearch] = useState("");
 
                 {team.buktiTransfer && (
                   <a
-                    href={team.buktiTransfer}
+                    href={getUploadUrl(team.buktiTransfer)}
                     target="_blank"
                     rel="noreferrer"
                     className="mt-4 inline-flex items-center gap-2 text-pink-600"

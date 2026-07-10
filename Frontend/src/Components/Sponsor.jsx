@@ -39,6 +39,8 @@ export default function Sponsor() {
             <img 
                 src={sponsor} 
                 alt="Sponsor" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[600px] md:max-w-[800px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
             />
         </div>
@@ -47,6 +49,8 @@ export default function Sponsor() {
             <img 
                 src={media} 
                 alt="Media Partners" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[500px] md:max-w-[700px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)] mb-[50px] md:mb-[100px]" 
             />
         </div>

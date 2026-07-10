@@ -47,7 +47,6 @@ function ProfilePage() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <ProfileField label="Name" value={user?.name} />
             <ProfileField label="Email" value={user?.email} />
-            <ProfileField label="Role" value={user?.role || "user"} />
             <ProfileField label="University" value={user?.university} />
             <ProfileField label="NIM" value={user?.nim} />
             <ProfileField label="KTM" value={user?.ktm || "-"} />
