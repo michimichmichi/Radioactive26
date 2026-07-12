@@ -3,7 +3,6 @@ import OpeningTitle from '../Components/Opening';
 import Mascot from '../Components/mascot';
 import Competition from '../Components/Competition';
 import Sponsor from '../Components/Sponsor';
-import Questions from '../Components/Questions';
 import Gallery from '../Components/Gallery';
 
 function Hero() {
@@ -22,7 +21,6 @@ function Hero() {
       <Mascot />
       <Competition />
       <Sponsor />
-      <Questions />
       <Gallery />
 
 

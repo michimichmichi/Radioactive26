@@ -72,21 +72,6 @@ export default function Competition() {
                     Radio Announcing Competition merupakan rangkaian acara utama RADIOACTIVE. Lomba ini merupakan ajang untuk siswa SMA dan mahasiswa se-Jabodetabek untuk memperluas wawasan dan mengasah kemampuan di dunia broadcasting. Radio Announcing Competition ini memiliki konsep yang sesuai dengan nilai utama RADIOACTIVE 2026, yaitu embracing the best version of yourself. Tujuan dari lomba ini adalah untuk mengasah kreativitas peserta dalam membuat siaran dan secara tidak langsung memberikan informasi hingga mengajak para peserta untuk keluar dari zona nyaman mereka.
                 </p>
             </div>
-            <button 
-                onClick={() => handleRegisterClick('radio')} 
-                className={`transition-all duration-100 mb-5 md:mb-10
-                  ${clickedId === 'radio' 
-                    ? 'scale-90 brightness-75 drop-shadow-none' 
-                    : 'hover:scale-110 active:scale-95'
-                  }`} >   
-                  <img 
-                    src={register} 
-                    alt="Register Now" 
-                    loading="lazy"
-                    decoding="async"
-                    className=" transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
-                />
-            </button>
         </div>
                 
         {/* Podcast Competition */}
