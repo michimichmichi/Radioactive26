@@ -535,40 +535,34 @@ function UsersPanel() {
             required
           />
 
-          <Input
-            type="file"
-            accept="image/jpeg,image/jpg,image/png"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || "";
-              const validationError = validateImageFile(file);
+          <div className="md:col-span-2">
+  <label className="block mb-2 font-semibold text-gray-600">
+    KTM
+  </label>
+  <Input
+    type="file"
+    accept="image/jpeg,image/jpg,image/png"
+    onChange={(e) => {
+      const file = e.target.files?.[0] || "";
+      const validationError = validateImageFile(file);
 
-              if (validationError) {
-                e.target.value = "";
-                alert(validationError);
-                setForm({
-                  ...form,
-                  ktm: "",
-                });
-                return;
-              }
+      if (validationError) {
+        e.target.value = "";
+        alert(validationError);
+        setForm({
+          ...form,
+          ktm: "",
+        });
+        return;
+      }
 
-              setForm({
-                ...form,
-                ktm: file,
-              });
-            }}
-          />
-
-          {editingId && currentKtm && (
-            <a
-              href={getUploadUrl(currentKtm)}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-semibold text-pink-600"
-            >
-              View current KTM
-            </a>
-          )}
+      setForm({
+        ...form,
+        ktm: file,
+      });
+    }}
+  />
+</div>
 
           <Button
             type="submit"
@@ -849,7 +843,7 @@ function TeamsPanel() {
             }
             required
           >
-            <option value="">Select leaderId</option>
+            <option value="">Select Leader</option>
 
             {users.map((u) => (
               <option key={u._id} value={u._id}>
@@ -868,7 +862,7 @@ function TeamsPanel() {
             }
             required
           >
-            <option value="">Select competitionId</option>
+            <option value="">Select Competition</option>
 
             {competitions.map((c) => (
               <option key={c._id} value={c._id}>
