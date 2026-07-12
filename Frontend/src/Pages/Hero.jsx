@@ -8,7 +8,6 @@ import Gallery from '../Components/Gallery';
 
 function Hero() {
   return (
-    /* DIPERBAIKI: Mengubah 'h-auto' menjadi 'min-h-screen relative overflow-x-hidden' agar elemen sticky memiliki jangkar ruang untuk menempel */
     <div className="bg-black h-auto w-full items-center justify-center"
       style={{
       backgroundColor: "#050505",
@@ -19,7 +18,6 @@ function Hero() {
     >
 
       <Navbar />
-      
       <OpeningTitle />
       <Mascot />
       <Competition />
