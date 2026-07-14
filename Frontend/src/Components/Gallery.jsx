@@ -1,11 +1,14 @@
 import React from 'react';
 
 import gallery from '../assets/gallery/gallery.png';
+import cameraRoll from '../assets/gallery/camera roll.png';
+import star from '../assets/gallery/Star 6.png';
+
 
 export default function Gallery() {
   return (
     <div id="gallery" className="relative w-full max-w-4xl mx-auto h-[1200px] md:h-[2000px] flex-col items-center justify-center overflow-visible select-none px-4 ">
-        <div className="absolute right-[4%] w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible">  
+        <div className="absolute right-[4%] w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible z-10">  
             <img 
                 src={gallery} 
                 alt="Gallery" 
