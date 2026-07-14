@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import competition from '../assets/competition/competition.png'; 
 import radAnnouncing from '../assets/competition/radio announcing competition.png';
@@ -6,13 +7,12 @@ import podcast from '../assets/competition/podcast competition.png';
 import register from '../assets/competition/register now.png';
 
 export default function Competition() {
+    const navigate = useNavigate();
     const [clickedId, setClickedId] = useState(null);
-    const handleRegisterClick = (id, url) => {
+    const handleRegisterClick = (id) => {
         setClickedId(id);
         setTimeout(() => setClickedId(null), 150);
-        if (url) {
-        window.open(url, '_blank');
-        }
+        navigate('/competition-registration');
     };
 
   return (
@@ -50,6 +50,8 @@ export default function Competition() {
             <img 
                 src={competition} 
                 alt="Competition" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[700px] md:max-w-[1000px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
             />
         </div>
@@ -60,6 +62,8 @@ export default function Competition() {
                 <img 
                     src={radAnnouncing} 
                     alt="Radio Announcing Competition" 
+                    loading="lazy"
+                    decoding="async"
                     className=" transform w-full max-w-[300px] md:max-w-[600px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
                 />
             </div>
@@ -68,19 +72,6 @@ export default function Competition() {
                     Radio Announcing Competition merupakan rangkaian acara utama RADIOACTIVE. Lomba ini merupakan ajang untuk siswa SMA dan mahasiswa se-Jabodetabek untuk memperluas wawasan dan mengasah kemampuan di dunia broadcasting. Radio Announcing Competition ini memiliki konsep yang sesuai dengan nilai utama RADIOACTIVE 2026, yaitu embracing the best version of yourself. Tujuan dari lomba ini adalah untuk mengasah kreativitas peserta dalam membuat siaran dan secara tidak langsung memberikan informasi hingga mengajak para peserta untuk keluar dari zona nyaman mereka.
                 </p>
             </div>
-            <button 
-                onClick={() => handleRegisterClick('radio', 'https://link-pendaftaran-radio.com')} 
-                className={`transition-all duration-100 mb-5 md:mb-10
-                  ${clickedId === 'radio' 
-                    ? 'scale-90 brightness-75 drop-shadow-none' 
-                    : 'hover:scale-110 active:scale-95'
-                  }`} >   
-                  <img 
-                    src={register} 
-                    alt="Register Now" 
-                    className=" transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
-                />
-            </button>
         </div>
                 
         {/* Podcast Competition */}
@@ -89,6 +80,8 @@ export default function Competition() {
                 <img 
                     src={podcast} 
                     alt="Podcast Competition" 
+                    loading="lazy"
+                    decoding="async"
                     className=" transform w-full max-w-[250px] md:max-w-[500px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
                 />
             </div>
@@ -98,7 +91,7 @@ export default function Competition() {
                 </p>
             </div>
             <button 
-                onClick={() => handleRegisterClick('podcast', 'https://link-pendaftaran-podcast.com')} 
+                onClick={() => handleRegisterClick('podcast')} 
                 className={`transition-all duration-100 mb-5 md:mb-10
                   ${clickedId === 'podcast' 
                     ? 'scale-90 brightness-75 drop-shadow-none' 
@@ -107,6 +100,8 @@ export default function Competition() {
                   <img 
                     src={register} 
                     alt="Register Now" 
+                    loading="lazy"
+                    decoding="async"
                     className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
                 />
             </button>
