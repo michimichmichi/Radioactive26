@@ -56,16 +56,16 @@ const Navbar = () => {
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      <nav className="bg-[#FF0990] px-6 h-16 flex items-center justify-between text-white shadow-md">
+      <nav className="flex h-[4.5rem] items-center justify-between bg-[#FF0990]/95 px-4 text-white shadow-[0_8px_24px_rgba(0,0,0,.18)] backdrop-blur-md sm:px-6">
         {/* LOGO */}
         <div>
           <Link to="/">
-            <img src={logo} alt="Logo" className="h-14 w-auto object-contain" />
+            <img src={logo} alt="Radioactive" className="h-12 w-auto object-contain sm:h-14" />
           </Link>
         </div>
 
         {/* DESKTOP NAVIGATION LINKS */}
-        <ul className="hidden md:flex items-center gap-8 text-sm font-avrile text-zinc-100 font-semibold">
+        <ul className="hidden items-center gap-6 text-xs font-avrile font-semibold tracking-[0.14em] text-zinc-100 lg:flex xl:gap-9">
           <li><a href="#about" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
           <li><a href="#competition" className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
           <li><a href="#sponsor" className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>

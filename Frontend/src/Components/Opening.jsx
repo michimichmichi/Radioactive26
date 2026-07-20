@@ -7,7 +7,7 @@ import logo from '../assets/LogoRadioactive.png';
 
 export default function OpeningTitle() {
   return (
-    <div className="relative w-full max-w-5xl h-[700px] mx-auto flex items-center justify-center overflow-visible select-none">  
+    <section id="about" className="hero-stage relative mx-auto flex w-full max-w-6xl items-center justify-center overflow-visible px-4 select-none">  
       <style>{`
         @keyframes directPop {
           0%, 100% { transform: scale(1); }
@@ -25,7 +25,7 @@ export default function OpeningTitle() {
         src={vinyl} 
         alt="Vinyl" 
         decoding="async"
-        className="absolute top-[-8%] right-[20%] w-[260px] md:w-[320px] h-auto z-0 opacity-90 drop-shadow-[0_0_20px_rgba(255,9,144,0.2)] animate-direct-pop" 
+        className="absolute right-[7%] top-[4%] z-0 w-[150px] opacity-90 drop-shadow-[0_0_20px_rgba(255,9,144,0.2)] sm:right-[14%] sm:w-[220px] md:right-[18%] md:top-[-4%] md:w-[320px] animate-direct-pop" 
         style={{ animationDelay: '0.4s', animationDuration: '1.6s' }}
       />
       
@@ -34,17 +34,17 @@ export default function OpeningTitle() {
         alt="Glistening Peak" 
         fetchPriority="high"
         decoding="async"
-        className="absolute top-[23%] w-[550px] md:w-[680px] h-auto z-20 object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop" 
+        className="absolute top-[27%] z-20 w-[min(94vw,550px)] object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop md:top-[23%] md:w-[680px]" 
         style={{ animationDelay: '0.2s' }}
       />
 
-      <div className="absolute top-[10%] z-30 transform -rotate-[3deg] filter contrast-110 drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop">
+      <div className="absolute top-[14%] z-30 -rotate-[3deg] filter contrast-110 drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop md:top-[10%]">
         <img 
           src={logo} 
           alt="Logo" 
           fetchPriority="high"
           decoding="async"
-          className="w-[400px] md:w-[500px] h-auto object-contain" 
+          className="w-[min(86vw,400px)] object-contain md:w-[500px]" 
         />
       </div>
 
@@ -52,7 +52,7 @@ export default function OpeningTitle() {
         src={star7} 
         alt="Left Star" 
         decoding="async"
-        className="absolute top-[28%] left-[2%] w-[70px] md:w-[100px] h-auto z-20 object-contain transform -rotate-[15deg] drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
+        className="absolute left-[-2%] top-[34%] z-20 w-[48px] -rotate-[15deg] object-contain drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop sm:left-[2%] sm:w-[70px] md:top-[28%] md:w-[100px]" 
         style={{ animationDelay: '0s', animationDuration: '1.3s' }}
       />
 
@@ -60,10 +60,10 @@ export default function OpeningTitle() {
         src={star7} 
         alt="Right Star" 
         decoding="async"
-        className="absolute bottom-[30%] right-[5%] w-[60px] md:w-[80px] h-auto z-20 transform drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
+        className="absolute bottom-[24%] right-[0%] z-20 w-[42px] object-contain drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop sm:right-[5%] sm:w-[60px] md:bottom-[30%] md:w-[80px]" 
         style={{ animationDelay: '0.6s', animationDuration: '1.5s' }}
       />
 
-    </div>
+    </section>
   );
 }

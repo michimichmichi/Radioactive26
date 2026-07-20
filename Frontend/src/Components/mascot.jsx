@@ -5,7 +5,7 @@ import mascot from '../assets/mascot/glitz.png';
 
 export default function Mascot() {
   return (
-    <div className="relative w-full max-w-4xl mx-auto min-h-[400px] md:h-[600px] flex items-center justify-center overflow-visible select-none px-4 ">  
+    <section className="section-shell relative mx-auto flex min-h-[430px] w-full max-w-6xl flex-col items-center justify-center overflow-visible px-4 py-12 select-none md:min-h-[560px] md:py-20">  
       
       <style>{`
         @keyframes directPop {
@@ -19,7 +19,7 @@ export default function Mascot() {
         }
       `}</style>
 
-      <div className="flex flex-row items-center justify-center -space-x-8 sm:-space-x-12 md:-space-x-20 lg:-space-x-28 w-full">
+      <div className="flex w-full flex-row items-center justify-center -space-x-7 sm:-space-x-12 md:-space-x-20 lg:-space-x-28">
         
         <div className="w-1/2 flex justify-end items-center animate-mascot-pop origin-right">
           <img 
@@ -44,6 +44,6 @@ export default function Mascot() {
 
       </div>
        
-    </div>
+    </section>
   );
 }

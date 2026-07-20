@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import API from "../api";
 import {
   Trophy,
@@ -86,7 +87,7 @@ const buildTeamFormData = (form) => {
 
 function SectionCard({ children }) {
   return (
-    <div className="bg-white rounded-3xl shadow-lg border border-pink-100 p-6">
+    <div className="account-panel rounded-3xl p-6">
       {children}
     </div>
   );
@@ -96,7 +97,7 @@ function Input(props) {
   return (
     <input
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field"
     />
   );
 }
@@ -105,7 +106,7 @@ function Select(props) {
   return (
     <select
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field"
     />
   );
 }
@@ -114,7 +115,7 @@ function Textarea(props) {
   return (
     <textarea
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field"
     />
   );
 }
@@ -123,7 +124,7 @@ function Button({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`px-4 py-3 rounded-2xl font-semibold transition-all duration-300 ${className}`}
+      className={`rounded-xl px-4 py-3 font-semibold transition-all duration-300 ${className}`}
     >
       {children}
     </button>
@@ -135,19 +136,19 @@ function Button({ children, className = "", ...props }) {
 function DashboardPanel({ users, teams, competitions }) {
   const cards = [
     {
-      title: "Users",
+      title: "Pengguna",
       value: users.length,
       icon: ShieldAlert,
       color: "bg-pink-500",
     },
     {
-      title: "Teams",
+      title: "Tim",
       value: teams.length,
       icon: Users,
       color: "bg-fuchsia-500",
     },
     {
-      title: "Competitions",
+      title: "Kompetisi",
       value: competitions.length,
       icon: Trophy,
       color: "bg-rose-500",
@@ -162,12 +163,12 @@ function DashboardPanel({ users, teams, competitions }) {
         return (
           <div
             key={i}
-            className="bg-white rounded-3xl shadow-lg border border-pink-100 p-6 hover:scale-105 transition-all duration-300"
+            className="account-panel rounded-3xl p-6 hover:scale-[1.02] transition-all duration-300"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-pink-500 font-medium">{card.title}</p>
-                <h1 className="text-4xl font-bold mt-2 text-slate-800">
+                <h1 className="mt-2 text-4xl font-bold text-white">
                   {card.value}
                 </h1>
               </div>
@@ -207,7 +208,8 @@ function CompetitionsPanel() {
   };
 
   useEffect(() => {
-    fetchCompetitions();
+    const timeoutId = window.setTimeout(() => void fetchCompetitions(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const resetForm = () => {
@@ -255,7 +257,7 @@ function CompetitionsPanel() {
       <SectionCard>
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold text-pink-600">
-            {editingId ? "Edit Competition" : "Create Competition"}
+            {editingId ? "Edit Kompetisi" : "Buat Kompetisi"}
           </h2>
 
           <Button
@@ -309,7 +311,7 @@ function CompetitionsPanel() {
             type="submit"
             className="bg-pink-500 hover:bg-pink-600 text-white md:col-span-2"
           >
-            {editingId ? "Update Competition" : "Create Competition"}
+            {editingId ? "Perbarui Kompetisi" : "Buat Kompetisi"}
           </Button>
         </form>
       </SectionCard>
@@ -377,7 +379,6 @@ function UsersPanel() {
   const formRef = useRef(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-  const [currentKtm, setCurrentKtm] = useState("");
 
   const fetchUsers = async () => {
     try {
@@ -389,13 +390,13 @@ function UsersPanel() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    const timeoutId = window.setTimeout(() => void fetchUsers(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
-    setCurrentKtm("");
     formRef.current?.reset();
   };
 
@@ -421,7 +422,6 @@ function UsersPanel() {
 
   const editUser = (user) => {
     setEditingId(user._id);
-    setCurrentKtm(user.ktm || "");
 
     setForm({
       name: user.name,
@@ -446,7 +446,7 @@ function UsersPanel() {
       <SectionCard>
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold text-pink-600">
-            {editingId ? "Edit User" : "Create User"}
+            {editingId ? "Edit Pengguna" : "Buat Pengguna"}
           </h2>
 
           <Button
@@ -568,7 +568,7 @@ function UsersPanel() {
             type="submit"
             className="bg-pink-500 hover:bg-pink-600 text-white md:col-span-2"
           >
-            {editingId ? "Update User" : "Create User"}
+            {editingId ? "Perbarui Pengguna" : "Buat Pengguna"}
           </Button>
         </form>
       </SectionCard>
@@ -681,7 +681,8 @@ function TeamsPanel() {
   };
 
   useEffect(() => {
-    loadData();
+    const timeoutId = window.setTimeout(() => void loadData(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const resetForm = () => {
@@ -933,7 +934,7 @@ function TeamsPanel() {
 
       <SectionCard>
         <div className="flex justify-between items-center mb-5">
-          <h2 className="text-2xl font-bold text-pink-600">Teams</h2>
+          <h2 className="text-2xl font-bold text-pink-600">Tim</h2>
 
           <div className="relative w-80">
             <Search
@@ -944,7 +945,7 @@ function TeamsPanel() {
             <input
               value={search}
               onChange={(e) => searchTeams(e.target.value)}
-              placeholder="Search team..."
+              placeholder="Cari tim..."
               className="w-full border border-pink-200 rounded-2xl py-3 pl-10 pr-4 bg-pink-50"
             />
           </div>
@@ -963,7 +964,7 @@ function TeamsPanel() {
                   </h2>
 
                   <p className="text-sm text-slate-500 mt-1">
-                    Competition: {team.competitionId?.competitionName}
+                    Kompetisi: {team.competitionId?.competitionName}
                   </p>
                 </div>
 
@@ -986,11 +987,11 @@ function TeamsPanel() {
 
               <div className="mt-5">
                 <p>
-                  <strong>leaderId:</strong> {team.leaderId?.name}
+                  <strong>Ketua:</strong> {team.leaderId?.name}
                 </p>
 
                 <div className="mt-3">
-                  <strong>members:</strong>
+                  <strong>Anggota:</strong>
 
                   <ul className="list-disc ml-5 mt-2 text-sm">
                     {team.members?.map((m) => (
@@ -1051,28 +1052,29 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    loadDashboard();
+    const timeoutId = window.setTimeout(() => void loadDashboard(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const menu = [
     {
       id: "dashboard",
-      label: "Dashboard",
+      label: "Dasbor",
       icon: LayoutDashboard,
     },
     {
       id: "competitions",
-      label: "Competitions",
+      label: "Kompetisi",
       icon: Trophy,
     },
     {
       id: "teams",
-      label: "Teams",
+      label: "Tim",
       icon: Users,
     },
     {
       id: "users",
-      label: "Users",
+      label: "Pengguna",
       icon: ShieldAlert,
     },
   ];
@@ -1103,12 +1105,19 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="admin-page flex min-h-screen">
       {/* SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b bg-black text-pink-600 p-6 shadow-2xl">
+      <div className="w-72 border-r border-pink-500/20 bg-black/70 p-6 text-pink-300 shadow-2xl backdrop-blur-md">
         <h1 className="text-4xl font-extrabold mb-10">
           ADMIN
         </h1>
+
+        <Link
+          to="/"
+          className="mb-6 flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-200 transition hover:bg-white/10"
+        >
+          Kembali ke Beranda
+        </Link>
 
         <div className="space-y-3">
           {menu.map((item) => {
@@ -1120,8 +1129,8 @@ export default function Admin() {
                 onClick={() => setTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all duration-300 ${
                   tab === item.id
-                    ? "bg-white text-pink-600 shadow-lg"
-                    : "hover:bg-pink-400"
+                    ? "bg-pink-500/15 text-pink-200 shadow-lg"
+                    : "text-zinc-400 hover:bg-pink-500/10 hover:text-pink-200"
                 }`}
               >
                 <Icon size={20} />
@@ -1135,8 +1144,8 @@ export default function Admin() {
       {/* CONTENT */}
       <div className="flex-1 p-8">
         <div className="mb-8">
-          <h1 className="text-5xl font-bold capitalize text-pink-600">
-            {tab}
+          <h1 className="font-boldfont text-4xl uppercase tracking-wide text-pink-300">
+            {{ dashboard: "Dasbor", competitions: "Kompetisi", teams: "Tim", users: "Pengguna" }[tab]}
           </h1>
 
         </div>
@@ -1144,7 +1153,7 @@ export default function Admin() {
         {renderPage()}
 
         {authError && (
-          <div className="mt-6 rounded-lg border border-pink-200 bg-white px-5 py-4 text-sm font-semibold text-pink-700 shadow-xl">
+          <div className="mt-6 rounded-xl border border-red-400/30 bg-red-400/10 px-5 py-4 text-sm font-semibold text-red-200 shadow-xl">
             {authError}
           </div>
         )}

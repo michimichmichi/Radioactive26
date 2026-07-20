@@ -24,7 +24,7 @@ export default function Medpar() {
 ]
 
   return (
-    <div id="medpar" className="relative w-full max-w-4xl mx-auto h-auto flex-col items-center justify-center overflow-visible select-none px-4 ">
+    <section id="sponsor" className="section-shell relative mx-auto w-full max-w-6xl overflow-visible px-4 py-16 select-none md:px-8 md:py-24">
         <style>{`
             @keyframes popShakePop {
             0%, 100% { 
@@ -54,7 +54,7 @@ export default function Medpar() {
             }
         `}</style>  
         
-        <div className="relative w-full max-w-4xl mx-auto flex justify-center animate-pop-shake mb-10 md:mb-16">
+        <div className="relative mx-auto mb-8 flex w-full max-w-4xl justify-center animate-pop-shake md:mb-12">
     <img
         src={sponsor}
         alt="Sponsor"
@@ -64,11 +64,11 @@ export default function Medpar() {
     />
 </div>
 
-<div className="mx-auto flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16 pb-12">
+<div className="partner-row mx-auto flex flex-wrap items-center justify-center gap-8 px-6 py-8 md:gap-16 md:px-12 md:py-10">
     {sponsorLogos.map((logo, index) => (
         <div
             key={index}
-            className="flex items-center justify-center rounded-2xlobject-contain transition-transform duration-300 hover:scale-110"
+            className="flex items-center justify-center transition-transform duration-300 hover:scale-110"
         >
             <img
                 src={logo}
@@ -79,7 +79,7 @@ export default function Medpar() {
     ))}
 </div>
 
-        <div className="right-[4%] relative w-full max-w-7xl mx-auto flex items-center justify-center overflow-visible animate-pop-shake">  
+        <div className="relative mx-auto mt-20 flex w-full max-w-7xl items-center justify-center overflow-visible animate-pop-shake md:mt-28">
             <img 
                 src={media} 
                 alt="Media Partners" 
@@ -88,7 +88,7 @@ export default function Medpar() {
                 className="w-full max-w-[500px] md:max-w-[700px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)] mb-[50px] md:mb-[100px]" 
             />
         </div>
-      <div className="flex justify-center items-center gap-6 lg:gap-10 pb-10 pt-0">
+      <div className="partner-row mx-auto flex flex-wrap justify-center items-center gap-8 px-6 py-8 md:gap-14 md:px-12 md:py-10">
         {medparLogos.map((logo, index) => (
             <img
             key={index}
@@ -97,7 +97,7 @@ export default function Medpar() {
             className="h-10 md:h-16 lg:h-24 xl:h-32 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-110"
             />
         ))}
-    </div>
-    </div>
+      </div>
+    </section>
   );
 }

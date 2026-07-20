@@ -6,6 +6,195 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #050505;
+  color: #fff;
+  font-family: 'AvrileSans', sans-serif;
+  overflow-x: hidden;
+}
+
+.hero-stage {
+  min-height: clamp(520px, 76vw, 760px);
+}
+
+.section-shell {
+  scroll-margin-top: 5rem;
+}
+
+.section-kicker {
+  margin: 0 0 1.25rem;
+  color: #ff72bd;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-align: center;
+}
+
+.competition-card {
+  border-top: 1px solid rgba(255, 9, 144, 0.28);
+  border-bottom: 1px solid rgba(255, 9, 144, 0.12);
+  background: linear-gradient(90deg, rgba(255, 9, 144, 0.04), transparent 70%);
+}
+
+.partner-row {
+  border-top: 1px solid rgba(255, 9, 144, 0.24);
+  border-bottom: 1px solid rgba(255, 9, 144, 0.12);
+  background: rgba(255, 9, 144, 0.035);
+}
+
+.account-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #050505;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, transparent 1px);
+  background-size: 5px 5px;
+}
+
+.account-panel {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 60px rgba(255, 9, 144, 0.16);
+  backdrop-filter: blur(14px);
+}
+
+.account-subpanel {
+  border: 1px solid rgba(255, 9, 144, 0.22);
+  border-radius: 0.9rem;
+  background: rgba(255, 9, 144, 0.06);
+}
+
+.account-field {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.account-field:focus {
+  border-color: rgba(255, 64, 170, 0.9);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 9, 144, 0.16);
+}
+
+.account-select {
+  color-scheme: dark;
+}
+
+.account-select option {
+  background: #120b12;
+  color: #fff;
+}
+
+.account-label {
+  color: #d4d4d8;
+  font-family: 'AvrileSans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account-muted {
+  color: #a1a1aa;
+}
+
+.account-button {
+  border-radius: 0.75rem;
+  background: #ff0990;
+  color: white;
+  box-shadow: 0 0 24px rgba(255, 9, 144, 0.28);
+  font-family: 'AvrileSans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.account-button:hover {
+  background: #ff36a8;
+  transform: translateY(-1px);
+}
+
+.admin-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #050505;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, transparent 1px);
+  background-size: 5px 5px;
+  color: #fff;
+}
+
+.admin-page .bg-white {
+  background-color: rgba(0, 0, 0, 0.68);
+}
+
+.admin-page .bg-pink-50,
+.admin-page .bg-pink-100 {
+  background-color: rgba(255, 9, 144, 0.07);
+}
+
+.admin-page .text-slate-800,
+.admin-page .text-zinc-800,
+.admin-page .text-gray-600,
+.admin-page .text-gray-500 {
+  color: #d4d4d8;
+}
+
+.admin-page .border-pink-100,
+.admin-page .border-pink-200 {
+  border-color: rgba(255, 9, 144, 0.24);
+}
+
+.admin-page .shadow-lg,
+.admin-page .shadow-xl,
+.admin-page .shadow-2xl {
+  box-shadow: 0 0 42px rgba(255, 9, 144, 0.1);
+}
+
+.admin-field {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  padding: 0.75rem 1rem;
+  outline: none;
+}
+
+.admin-field:focus {
+  border-color: rgba(255, 64, 170, 0.9);
+  box-shadow: 0 0 0 3px rgba(255, 9, 144, 0.16);
+}
+
+.admin-field option {
+  background: #120b12;
+  color: white;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #ff0990;
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer base {
   @font-face {
     font-family: 'AvrileSans';

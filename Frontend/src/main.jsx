@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import ProtectedAdminRoute from './Components/ProtectedAdminRoute.jsx'
 import ProtectedUserRoute from './Components/ProtectedUserRoute.jsx'
+import PageLoader from './Components/PageLoader.jsx'
 
 const AdminPage = lazy(() => import('./Pages/Admin.jsx'))
 const LoginPage = lazy(() => import('./Pages/Login.jsx'))
@@ -12,16 +13,6 @@ const RegisterPage = lazy(() => import('./Pages/Register.jsx'))
 const CompetitionRegistrationPage = lazy(() => import('./Pages/CompetitionRegistration.jsx'))
 const ProfilePage = lazy(() => import('./Pages/Profile.jsx'))
 const MyCompetitionsPage = lazy(() => import('./Pages/MyCompetitions.jsx'))
-
-function PageLoader() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-black text-white">
-      <div className="rounded-lg border border-pink-400/30 px-6 py-4 text-pink-300">
-        Loading...
-      </div>
-    </main>
-  )
-}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

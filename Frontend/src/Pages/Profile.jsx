@@ -24,22 +24,30 @@ function ProfilePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
-      <section className="mx-auto max-w-3xl">
-        <Link to="/" className="inline-flex">
-          <img src={logo} alt="Radioactive" className="h-14 w-auto" />
-        </Link>
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
+      <div className="pointer-events-none fixed -left-24 top-1/3 h-72 w-72 rounded-full bg-[#FF0990]/20 blur-[120px]" />
+      <div className="pointer-events-none fixed -right-24 bottom-0 h-80 w-80 rounded-full bg-[#FF0990]/25 blur-[120px]" />
+      <section className="relative z-10 mx-auto max-w-4xl">
+        <div className="flex items-center justify-between gap-4">
+          <Link to="/" className="inline-flex">
+            <img src={logo} alt="Radioactive" className="h-14 w-auto drop-shadow-[0_0_18px_rgba(255,9,144,0.55)]" />
+          </Link>
+          <Link to="/" className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-200 transition hover:bg-white/10">
+            Home
+          </Link>
+        </div>
 
-        <div className="mt-8 rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
-          <h1 className="font-thebold text-3xl uppercase text-pink-600">
+        <div className="account-panel mt-8 p-6 sm:p-9">
+          <p className="font-avrile text-xs uppercase tracking-[0.35em] text-pink-400">Your frequency</p>
+          <h1 className="mt-2 font-boldfont text-3xl uppercase tracking-wide text-white sm:text-4xl">
             Profile Management
           </h1>
-          <p className="mt-2 text-sm text-zinc-600">
-            Review your account details.
+          <p className="account-muted mt-3 text-sm leading-6">
+            Lihat detail akun kamu.
           </p>
 
           {error && (
-            <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="mt-6 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -59,11 +67,11 @@ function ProfilePage() {
 
 function ProfileField({ label, value }) {
   return (
-    <div className="rounded-md border border-pink-100 bg-pink-50 px-4 py-3">
-      <p className="text-xs font-semibold uppercase tracking-wider text-pink-600">
+    <div className="account-subpanel px-4 py-4">
+      <p className="account-label text-pink-300">
         {label}
       </p>
-      <p className="mt-1 break-words text-sm font-semibold text-zinc-800">
+      <p className="mt-1 break-words text-sm font-semibold text-white">
         {value || "-"}
       </p>
     </div>

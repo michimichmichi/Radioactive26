@@ -7,7 +7,7 @@ import Gallery from '../Components/Gallery';
 
 function Hero() {
   return (
-    <div className="bg-black h-auto w-full items-center justify-center"
+    <main className="home-shell min-h-screen w-full overflow-hidden"
       style={{
       backgroundColor: "#050505",
       backgroundImage:
@@ -17,11 +17,13 @@ function Hero() {
     >
 
       <Navbar />
-      <OpeningTitle />
-      <Mascot />
-      <Competition />
-      <Medpar />
-      <Gallery />
+      <div className="relative z-0">
+        <OpeningTitle />
+        <Mascot />
+        <Competition />
+        <Medpar />
+        <Gallery />
+      </div>
 
 
       {/* bottom pink fade */}
@@ -35,7 +37,7 @@ function Hero() {
 
       </div>
 
-    </div>
+    </main>
   );
 }
 
