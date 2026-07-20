@@ -2,7 +2,7 @@ import Navbar from '../Components/NavigationBar';
 import OpeningTitle from '../Components/Opening';
 import Mascot from '../Components/mascot';
 import Competition from '../Components/Competition';
-import Sponsor from '../Components/Sponsor';
+import Medpar from '../Components/Medpar';
 import Gallery from '../Components/Gallery';
 
 function Hero() {
@@ -20,7 +20,7 @@ function Hero() {
       <OpeningTitle />
       <Mascot />
       <Competition />
-      <Sponsor />
+      <Medpar />
       <Gallery />
 
 
