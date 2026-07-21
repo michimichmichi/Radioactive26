@@ -121,12 +121,6 @@ export default function Gallery() {
       />
 
       <img
-        src={star}
-        alt="Star"
-        className="absolute bottom-[15%] right-[10%] w-[40px] md:w-[70px] z-40 drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop"
-        style={{ animationDelay: '0.2s', animationDuration: '1.5s' }}
-      />
-      <img
     src={kamera}
     alt="Camera"
     className="

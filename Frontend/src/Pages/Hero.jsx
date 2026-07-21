@@ -4,6 +4,7 @@ import Mascot from '../Components/mascot';
 import Competition from '../Components/Competition';
 import Medpar from '../Components/Medpar';
 import Gallery from '../Components/Gallery';
+import Timeline from '../Components/Timeline';
 
 function Hero() {
   return (
@@ -20,6 +21,7 @@ function Hero() {
       <OpeningTitle />
       <Mascot />
       <Competition />
+      <Timeline/>
       <Medpar />
       <Gallery />
 
