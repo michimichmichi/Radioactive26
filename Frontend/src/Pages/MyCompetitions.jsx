@@ -42,10 +42,10 @@ function MyCompetitionsPage() {
     <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
       <section className="mx-auto max-w-5xl">
         <Link to="/" className="inline-flex">
-          <img src={logo} alt="Radioactive" className="h-14 w-auto" />
+          <img src={logo} alt="Radioactive" className="h-20 w-auto" />
         </Link>
 
-        <div className="mt-8 rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className=" rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
             Registered Competitions
           </h1>

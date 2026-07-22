@@ -78,9 +78,9 @@ function RegisterPage() {
     <main className="min-h-screen bg-[#050505] text-white">
       <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
         <div className="w-full max-w-2xl rounded-lg border border-white/10 bg-white p-8 text-zinc-950 shadow-2xl">
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-5 flex items-center justify-between">
             <Link to="/">
-              <img src={logo} alt="Radioactive" className="h-12 w-auto" />
+              <img src={logo} alt="Radioactive" className="h-20 w-auto" />
             </Link>
             <div className="flex items-center gap-2">
               <Link

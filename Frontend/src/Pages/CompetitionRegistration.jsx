@@ -93,54 +93,65 @@ function CompetitionRegistrationPage() {
   };
 
   const submitRegistration = async (event) => {
-    event.preventDefault();
-    setError("");
-    setIsSubmitting(true);
+  event.preventDefault();
 
-    try {
-      const formData = new FormData();
-      formData.append("teamName", form.teamName);
-      formData.append("leaderId", currentUser?._id || "");
-      formData.append("competitionId", form.competitionId);
+  // Open guidebook in a new tab immediately on click
+  window.open(
+    "https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing",
+    "_blank",
+    "noopener,noreferrer"
+  );
 
-      form.members.forEach((memberId) => {
-        formData.append("members", memberId);
-      });
+  setError("");
+  setIsSubmitting(true);
 
-      if (form.buktiTransfer) {
-        formData.append("buktiTransfer", form.buktiTransfer);
-      }
+  try {
+    const formData = new FormData();
+    formData.append("teamName", form.teamName);
+    formData.append("leaderId", currentUser?._id || "");
+    formData.append("competitionId", form.competitionId);
 
-      await API.post("/teams", formData);
-      formRef.current?.reset();
-      setForm({
-        teamName: "",
-        competitionId: "",
-        members: [],
-        buktiTransfer: "",
-      });
-      setSelectedMembers([]);
-      setNimQuery("");
-      setNimResults([]);
-      navigate("/my-competitions");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Unable to submit registration. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
+    form.members.forEach((memberId) => {
+      formData.append("members", memberId);
+    });
+
+    if (form.buktiTransfer) {
+      formData.append("buktiTransfer", form.buktiTransfer);
     }
-  };
+
+    await API.post("/teams", formData);
+
+    formRef.current?.reset();
+    setForm({
+      teamName: "",
+      competitionId: "",
+      members: [],
+      buktiTransfer: "",
+    });
+
+    setSelectedMembers([]);
+    setNimQuery("");
+    setNimResults([]);
+
+    navigate("/my-competitions");
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        "Unable to submit registration. Please try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
       <section className="mx-auto max-w-5xl">
         <Link to="/" className="inline-flex">
-          <img src={logo} alt="Radioactive" className="h-14 w-auto" />
+          <img src={logo} alt="Radioactive" className="h-20 w-auto" />
         </Link>
 
-        <div className="mt-8 rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className=" rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
             Competition Registration
           </h1>

@@ -90,9 +90,10 @@ export default function Competition() {
                     Lomba ini merupakan ajang untuk seluruh mahasiswa se-Jabodetabek mengasah kemampuan, dan kepercayaan diri dalam pemanfaatan media massa, khususnya di bidang podcast. RADIOACTIVE 2026 berharap melalui kompetisi ini, generasi muda dapat mengembangkan kemampuan diri sebagai wujud mengekspresikan pendapat dan kreativitas yang dimiliki.
                 </p>
             </div>
+           
             <button 
                 onClick={() => handleRegisterClick('podcast')} 
-                className={`transition-all duration-100 mb-5 md:mb-10
+                className={`transition-all duration-100 mb-0 md:mb-2
                   ${clickedId === 'podcast' 
                     ? 'scale-90 brightness-75 drop-shadow-none' 
                     : 'hover:scale-110 active:scale-95'
@@ -105,6 +106,15 @@ export default function Competition() {
                     className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
                 />
             </button>
+
+             <a
+                href="https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="center text-pink-500 font-avril hover:scale-105 transition-all duration-200"
+                >
+                Download Guidebook
+                </a>
         </div>
        
     </div>
