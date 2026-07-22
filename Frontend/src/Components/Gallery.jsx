@@ -16,11 +16,6 @@ import photo8 from '../assets/gallery/8.JPG';
 import photo9 from '../assets/gallery/9.JPG';
 import photo10 from '../assets/gallery/10.PNG';
 import photo11 from '../assets/gallery/11.PNG';
-import photo17 from '../assets/gallery/17.JPG';
-import photo18 from '../assets/gallery/18.JPG';
-import photo19 from '../assets/gallery/19.JPG';
-import photo20 from '../assets/gallery/20.JPG';
-import photo21 from '../assets/gallery/21.JPG';
 
 export default function Gallery() {
   const photos = [
@@ -35,11 +30,6 @@ export default function Gallery() {
   photo9,
   photo10,
   photo11,
-  photo17,
-  photo18,
-  photo19,
-  photo20,
-  photo21,
 ];
 
   return (
