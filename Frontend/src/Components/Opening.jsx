@@ -1,7 +1,7 @@
 import React from 'react';
 
 import vinyl from '../assets/opening/vinyl.png';
-import star7 from '../assets/opening/star 7.png'; 
+import star7 from '../assets/opening/Star 7.png'; 
 import glistening from '../assets/opening/glistening peak.png';
 import logo from '../assets/LogoRadioactive.png';
 
