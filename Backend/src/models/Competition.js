@@ -4,7 +4,9 @@ const compSchema = new mongoose.Schema({
     competitionName: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true,
+        maxlength: 120
     },
     time: {
         type: Date,
@@ -12,11 +14,14 @@ const compSchema = new mongoose.Schema({
     },
     place: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        maxlength: 200
     },
     termsAndConditions: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 5000
     }
 }, { timestamps: true });
 

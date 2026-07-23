@@ -24,7 +24,7 @@ export default function Medpar() {
 ]
 
   return (
-    <div id="medpar" className="relative w-full max-w-4xl mx-auto h-auto flex-col items-center justify-center overflow-visible select-none px-4 ">
+    <div id="sponsor" className="relative w-full max-w-4xl mx-auto h-auto flex-col items-center justify-center overflow-visible select-none px-4 ">
         <style>{`
             @keyframes popShakePop {
             0%, 100% { 
@@ -73,6 +73,8 @@ export default function Medpar() {
             <img
                 src={logo}
                 alt={`Sponsor ${index + 1}`}
+                loading="lazy"
+                decoding="async"
                 className="h-20 md:h-28 lg:h-36 w-auto object-contain"
             />
         </div>
@@ -94,6 +96,8 @@ export default function Medpar() {
             key={index}
             src={logo}
             alt={`Medpar ${index + 1}`}
+            loading="lazy"
+            decoding="async"
             className="h-10 md:h-16 lg:h-24 xl:h-32 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-110"
             />
         ))}

@@ -12,8 +12,8 @@ import { verifyToken, requireRole } from "../middleware/auth.js";
 const router = express.Router();
 
 router.post("/", verifyToken, requireRole('admin', 'user'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, createTeam);
-router.get("/", getAllTeams);
-router.get("/search", searchTeams);
+router.get("/", verifyToken, getAllTeams);
+router.get("/search", verifyToken, requireRole('admin'), searchTeams);
 router.delete("/:id", verifyToken, requireRole('admin'), deleteTeam);
 router.put("/:id", verifyToken, requireRole('admin', 'user'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, updateTeam);
 

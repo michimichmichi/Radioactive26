@@ -6,6 +6,226 @@ html {
   scroll-behavior: smooth;
 }
 
+.timeline-wrap {
+  --timeline-pink: #ff0990;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-path {
+  position: absolute;
+  display: none;
+  inset: 50% 0 auto;
+  height: 3px;
+  background: var(--timeline-pink);
+  filter: drop-shadow(0 0 10px rgba(255, 9, 144, 0.8));
+  opacity: 0.95;
+}
+
+.timeline-event {
+  min-height: 118px;
+  transition: transform 220ms ease;
+}
+
+.timeline-event .timeline-star {
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.timeline-event .timeline-label {
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.timeline-grid {
+  order: 1;
+}
+
+.timeline-info {
+  order: 2;
+}
+
+@media (min-width: 768px) {
+  .timeline-path {
+    display: block;
+  }
+
+  .timeline-grid {
+    min-height: 260px;
+  }
+
+  .timeline-event {
+    position: relative;
+    width: 16%;
+    height: 260px;
+    min-height: 0;
+    flex: 0 0 16%;
+    align-self: stretch;
+    justify-content: flex-start;
+  }
+
+  .timeline-event-1,
+  .timeline-event-3,
+  .timeline-event-5 {
+    justify-content: flex-end;
+  }
+
+  .timeline-event-2,
+  .timeline-event-4,
+  .timeline-event-6 {
+    justify-content: flex-start;
+  }
+
+  .timeline-event.is-selected {
+    transform: none;
+  }
+
+  .timeline-event:hover,
+  .timeline-event.is-selected {
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 767px) {
+  .timeline-info {
+    order: 1;
+    position: sticky;
+    top: 5rem;
+    z-index: 20;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-grid {
+    order: 2;
+    padding-left: 44px;
+  }
+
+  .timeline-path {
+    display: block;
+    inset: 0 auto 0 20px;
+    width: 3px;
+    height: auto;
+    background: var(--timeline-pink);
+  }
+
+  .timeline-event {
+    position: relative;
+  }
+}
+
+.account-panel .bg-white,
+.account-panel .bg-pink-50,
+.account-panel .bg-pink-100 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.account-panel .text-zinc-950,
+.account-panel .text-zinc-800,
+.account-panel .text-zinc-700,
+.account-panel .text-zinc-600 { color: #e4e4e7; }
+
+.account-panel input:not([type="file"]),
+.account-panel select,
+.account-panel textarea {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.account-panel input::placeholder,
+.account-panel textarea::placeholder { color: #71717a; }
+
+.admin-page .bg-white { background-color: rgba(0, 0, 0, 0.68); }
+.admin-page .bg-pink-50,
+.admin-page .bg-pink-100 { background-color: rgba(255, 9, 144, 0.07); }
+.admin-page .text-slate-800,
+.admin-page .text-zinc-800,
+.admin-page .text-gray-600,
+.admin-page .text-gray-500 { color: #d4d4d8; }
+
+.account-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #050505;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, transparent 1px);
+  background-size: 5px 5px;
+}
+
+.account-panel {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 60px rgba(255, 9, 144, 0.16);
+  backdrop-filter: blur(14px);
+}
+
+.account-subpanel {
+  border: 1px solid rgba(255, 9, 144, 0.22);
+  border-radius: 0.9rem;
+  background: rgba(255, 9, 144, 0.06);
+}
+
+.account-field,
+.admin-field {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  outline: none;
+}
+
+.account-field:focus,
+.admin-field:focus {
+  border-color: rgba(255, 64, 170, 0.9);
+  box-shadow: 0 0 0 3px rgba(255, 9, 144, 0.16);
+}
+
+.account-label {
+  color: #d4d4d8;
+  font-family: 'AvrileSans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account-muted { color: #a1a1aa; }
+
+.account-button {
+  border-radius: 0.75rem;
+  background: #ff0990;
+  color: white;
+  box-shadow: 0 0 24px rgba(255, 9, 144, 0.28);
+  font-family: 'AvrileSans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.account-button:hover { background: #ff36a8; transform: translateY(-1px); }
+
+.admin-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #050505;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, transparent 1px);
+  background-size: 5px 5px;
+  color: #fff;
+}
+
+.admin-page .bg-white { background-color: rgba(0, 0, 0, 0.68); }
+.admin-page .bg-pink-50,
+.admin-page .bg-pink-100 { background-color: rgba(255, 9, 144, 0.07); }
+.admin-page .text-slate-800,
+.admin-page .text-zinc-800,
+.admin-page .text-gray-600,
+.admin-page .text-gray-500 { color: #d4d4d8; }
+.admin-page .border-pink-100,
+.admin-page .border-pink-200 { border-color: rgba(255, 9, 144, 0.24); }
+
 @layer base {
   @font-face {
     font-family: 'AvrileSans';
