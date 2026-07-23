@@ -70,7 +70,7 @@ export default function Gallery() {
         .gallery-track {
           display: flex;
           width: max-content;
-          animation: scrollGallery 25s linear infinite;
+          animation: scrollGallery 40s linear infinite;
         }
 
         .gallery-track:hover {

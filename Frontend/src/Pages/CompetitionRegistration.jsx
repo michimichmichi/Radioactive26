@@ -416,10 +416,10 @@ function CompetitionRegistrationPage() {
                       onClick={() => addMember(participant)}
                       className="rounded-md border border-pink-100 bg-white px-3 py-3 text-left text-sm transition hover:border-pink-300 hover:bg-pink-100"
                     >
-                      <span className="block font-semibold text-zinc-900">
+                      <span className="block font-semibold text-zinc-300">
                         {participant.nim}
                       </span>
-                      <span className="block text-xs text-zinc-500">
+                      <span className="block text-xs text-zinc-400">
                         {participant.name} - {participant.university || "-"}
                       </span>
                     </button>
