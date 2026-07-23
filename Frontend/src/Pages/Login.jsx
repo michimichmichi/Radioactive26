@@ -45,22 +45,6 @@ function LoginPage() {
             <Link to="/">
               <img src={logo} alt="Radioactive" className="h-12 w-auto" />
             </Link>
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
-              >
-                Home
-              </Link>
-              <Link
-                to="/register"
-                onMouseEnter={() => import("./Register.jsx")}
-                onFocus={() => import("./Register.jsx")}
-                className="rounded-md border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
-              >
-                Register
-              </Link>
-            </div>
           </div>
 
           <h1 className="font-thebold text-3xl uppercase text-pink-600">Login</h1>
@@ -115,6 +99,13 @@ function LoginPage() {
             >
               {isLoading ? "Logging in..." : "Login"}
             </button>
+
+            <p className="text-center text-sm text-zinc-600">
+              Don't have an account?{" "}
+              <Link to="/register" className="font-semibold text-pink-600 hover:text-pink-700">
+                Register Here
+              </Link>
+            </p>
 
             <Link
               to="/"

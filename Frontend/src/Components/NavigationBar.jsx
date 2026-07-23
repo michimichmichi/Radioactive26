@@ -4,7 +4,7 @@ import { LogOut, Menu, User, ShieldAlert, Award, Layers } from "lucide-react";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 
-const preloadLogin = () => import("../Pages/Login.jsx");
+const preloadRegister = () => import("../Pages/Register.jsx");
 const preloadCompetitionRegistration = () => import("../Pages/CompetitionRegistration.jsx");
 
 const Navbar = () => {
@@ -151,14 +151,14 @@ const Navbar = () => {
           ) : (
             /* USER IS GUEST (NOT LOGGED IN) */
             <>
-              {/* Desktop & Mobile Login Trigger Link */}
+              {/* Desktop & Mobile Register Trigger Link */}
               <Link
-                to="/login"
-                onMouseEnter={preloadLogin}
-                onFocus={preloadLogin}
+                to="/register"
+                onMouseEnter={preloadRegister}
+                onFocus={preloadRegister}
                 className="bg-black/40 border border-white/20 px-5 py-1.5 rounded-xl hover:bg-black/60 transition-colors text-sm font-medium tracking-wide"
               >
-                Login
+                Register
               </Link>
               
               {/* Mobile Guest Burger Option Menu */}

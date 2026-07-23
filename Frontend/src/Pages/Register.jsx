@@ -82,20 +82,6 @@ function RegisterPage() {
             <Link to="/">
               <img src={logo} alt="Radioactive" className="h-20 w-auto" />
             </Link>
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
-              >
-                Home
-              </Link>
-              <Link
-                to="/login"
-                className="rounded-md border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
-              >
-                Login
-              </Link>
-            </div>
           </div>
 
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
@@ -201,6 +187,13 @@ function RegisterPage() {
             >
               {isLoading ? "Creating account..." : "Register"}
             </button>
+
+            <p className="text-center text-sm text-zinc-600 md:col-span-2">
+              Already have an account?{" "}
+              <Link to="/login" className="font-semibold text-pink-600 hover:text-pink-700">
+                Login here
+              </Link>
+            </p>
 
             <Link
               to="/"
