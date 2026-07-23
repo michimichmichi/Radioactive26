@@ -7,13 +7,6 @@ function ProtectedUserRoute({ children }) {
 
   useEffect(() => {
     const verifyUser = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        setStatus("unauthenticated");
-        return;
-      }
-
       try {
         const response = await authAPI.getCurrentUser();
         localStorage.setItem("user", JSON.stringify(response.data));

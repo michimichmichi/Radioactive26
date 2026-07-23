@@ -2,12 +2,13 @@ import User from '../models/User.js'
 import fs from 'fs/promises';
 import path from 'path';
 import bcrypt from 'bcrypt';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, setAuthCookie, clearAuthCookie } from '../middleware/auth.js';
 import Team from '../models/Team.js';
+import { isValidObjectId, normalizeEmail, normalizeString, escapeRegex } from '../utils/security.js';
 
 //helper buat hapus KTM
 const deleteKtmFile = async (ktmPath) => {
-    if (!ktmPath) return;
+    if (!ktmPath || !/^\/uploads\/ktm\/[^/]+$/.test(ktmPath)) return;
 
     const filePath = path.join(
         process.cwd(),
@@ -22,7 +23,7 @@ const deleteKtmFile = async (ktmPath) => {
     }
 };
 const deleteUploadedKtm = async (filename) => {
-    if (!filename) return;
+    if (!filename || !/^(?:\d{10,}-)?[a-f\d-]{16,}\.(?:jpg|jpeg|png)$/i.test(filename)) return;
 
     const filePath = path.join(
         process.cwd(),
@@ -50,7 +51,16 @@ const sanitizeUser = (user) => {
 // REGISTER -- POST /api/users/register
 export const createUser = async (req, res) => {
     try {
-        const { name, email, password, university, nim } = req.body;
+        const name = normalizeString(req.body.name, { max: 120, required: true });
+        const email = normalizeEmail(req.body.email);
+        const password = typeof req.body.password === 'string' ? req.body.password : '';
+        const university = normalizeString(req.body.university, { max: 160, required: true });
+        const nim = normalizeString(req.body.nim, { max: 50, required: true });
+
+        if (!name || !email || password.length < 8 || password.length > 128 || !university || !nim) {
+            if (req.file) await deleteUploadedKtm(req.file.filename);
+            return res.status(400).json({ message: 'Invalid registration data' });
+        }
 
         const ktm = req.file //upload ktm
             ? `/uploads/ktm/${req.file.filename}`
@@ -88,7 +98,7 @@ export const createUser = async (req, res) => {
         }
 
         //proses buat user
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await User.create({
             name, email, password: hashedPassword, university, ktm, nim, role
         });
@@ -120,13 +130,9 @@ export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email }).select('+password');
 
-        if (!existingUser) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
-        }
+        if (!existingUser) return res.status(401).json({ message: 'Invalid credentials' });
 
         const isPasswordValid = await bcrypt.compare(
             password,
@@ -140,10 +146,10 @@ export const loginUser = async (req, res) => {
         }
 
         const token = generateToken(existingUser);
+        setAuthCookie(res, token);
 
         return res.status(200).json({
             message: 'Login successful',
-            token,
             user: sanitizeUser(existingUser)
         });
 
@@ -158,6 +164,7 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     try {
         await User.findByIdAndUpdate(req.user.id, { $inc: { tokenVersion: 1 } });
+        clearAuthCookie(res);
 
         return res.status(200).json({
             message: 'Logout successful'
@@ -193,7 +200,7 @@ export const getCurrentUser = async (req, res) => {
 // READ ALL USERS -- GET /api/users
 export const getUser = async (req, res) => {
     try {
-        const users = await User.find().select('-password -tokenVersion');
+        const users = await User.find().select('-password -tokenVersion').limit(1000);
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         } 
@@ -211,8 +218,16 @@ export const getParticipants = async (req, res) => {
     try {
         const { competitionId, excludeTeamId, nim } = req.query;
 
-        if (!nim || nim.trim().length < 3) {
+        if (typeof nim !== 'string' || nim.trim().length < 3 || nim.trim().length > 50) {
             return res.status(200).json([]);
+        }
+
+        if (competitionId && !isValidObjectId(competitionId)) {
+            return res.status(400).json({ message: 'Invalid competition id' });
+        }
+
+        if (excludeTeamId && !isValidObjectId(excludeTeamId)) {
+            return res.status(400).json({ message: 'Invalid team id' });
         }
 
         const unavailableUserIds = [];
@@ -238,7 +253,7 @@ export const getParticipants = async (req, res) => {
         }
 
         const userQuery = {
-            nim: { $regex: nim.trim(), $options: 'i' }
+            nim: { $regex: escapeRegex(nim.trim().slice(0, 50)), $options: 'i' }
         };
 
         if (unavailableUserIds.length > 0) {
@@ -262,6 +277,9 @@ export const getParticipants = async (req, res) => {
 // READ USER BY ID -- GET /api/users/:id
 export const getUserById = async (req, res) => {
     try {
+        if (!isValidObjectId(req.params.id)) {
+            return res.status(400).json({ message: 'Invalid user id' });
+        }
         const foundUser = await User
             .findById(req.params.id)
             .select('-password -tokenVersion');
@@ -284,6 +302,11 @@ export const getUserById = async (req, res) => {
 // UPDATE USER -- PUT /api/users/:id
 export const updateUser = async (req, res) => {
     try {
+        if (!isValidObjectId(req.params.id)) {
+            if (req.file) await deleteUploadedKtm(req.file.filename);
+            return res.status(400).json({ message: 'Invalid user id' });
+        }
+
         const existingUser = await User.findById(req.params.id); // cari user lama
         if (!existingUser) { // hapus file kalo gaada usernya
            if (req.file) {
@@ -296,7 +319,22 @@ export const updateUser = async (req, res) => {
         }
 
         const oldKtm = existingUser.ktm;
-        const updateData = { ...req.body };
+        const allowedFields = ['name', 'email', 'password', 'university', 'nim', 'role'];
+        const updateData = Object.fromEntries(
+            allowedFields
+                .filter((field) => Object.prototype.hasOwnProperty.call(req.body, field))
+                .map((field) => [field, req.body[field]])
+        );
+
+        if (updateData.name !== undefined) updateData.name = normalizeString(updateData.name, { max: 120, required: true });
+        if (updateData.email !== undefined) updateData.email = normalizeEmail(updateData.email);
+        if (updateData.university !== undefined) updateData.university = normalizeString(updateData.university, { max: 160, required: true });
+        if (updateData.nim !== undefined) updateData.nim = normalizeString(updateData.nim, { max: 50, required: true });
+
+        if (Object.values(updateData).some((value) => value === null)) {
+            if (req.file) await deleteUploadedKtm(req.file.filename);
+            return res.status(400).json({ message: 'Invalid user data' });
+        }
 
         if (req.file) { //kalau user upload ktm baru
             updateData.ktm = `/uploads/ktm/${req.file.filename}`;
@@ -304,8 +342,13 @@ export const updateUser = async (req, res) => {
 
         const shouldRevokeTokens = Boolean(updateData.password);
 
+        if (updateData.password && (typeof updateData.password !== 'string' || updateData.password.length < 8 || updateData.password.length > 128)) {
+            if (req.file) await deleteUploadedKtm(req.file.filename);
+            return res.status(400).json({ message: 'Password must be 8 to 128 characters' });
+        }
+
         if (updateData.password) {
-            updateData.password = await bcrypt.hash(updateData.password, 10);
+            updateData.password = await bcrypt.hash(updateData.password, 12);
         }
 
         if (updateData.role && !["user", "admin"].includes(updateData.role)) {
@@ -374,6 +417,10 @@ export const updateUser = async (req, res) => {
 // DELETE USER -- DELETE /api/users/:id
 export const deleteUser = async (req, res) => {
     try {
+       if (!isValidObjectId(req.params.id)) {
+            return res.status(400).json({ message: 'Invalid user id' });
+        }
+
        const deletedUser = await User.findById(req.params.id);
 
         if (!deletedUser) {

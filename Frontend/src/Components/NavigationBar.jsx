@@ -4,6 +4,9 @@ import { LogOut, Menu, User, ShieldAlert, Award, Layers } from "lucide-react";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 
+const preloadRegister = () => import("../Pages/Register.jsx");
+const preloadCompetitionRegistration = () => import("../Pages/CompetitionRegistration.jsx");
+
 const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
@@ -40,13 +43,10 @@ const Navbar = () => {
 
   const logout = async () => {
     try {
-      if (localStorage.getItem("token")) {
-        await authAPI.logout();
-      }
+      await authAPI.logout();
     } catch {
       // Local cleanup still happens if the token is already expired.
     } finally {
-      localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.dispatchEvent(new Event("auth-change"));
       setIsMenuOpen(false);
@@ -151,12 +151,14 @@ const Navbar = () => {
           ) : (
             /* USER IS GUEST (NOT LOGGED IN) */
             <>
-              {/* Desktop & Mobile Login Trigger Link */}
+              {/* Desktop & Mobile Register Trigger Link */}
               <Link
-                to="/login"
+                to="/register"
+                onMouseEnter={preloadRegister}
+                onFocus={preloadRegister}
                 className="bg-black/40 border border-white/20 px-5 py-1.5 rounded-xl hover:bg-black/60 transition-colors text-sm font-medium tracking-wide"
               >
-                Login
+                Register
               </Link>
               
               {/* Mobile Guest Burger Option Menu */}
@@ -190,10 +192,16 @@ const Navbar = () => {
 };
 
 function MenuLink({ to, label, icon = null, className = "", onClick }) {
+  const preload = to === "/competition-registration"
+    ? preloadCompetitionRegistration
+    : undefined;
+
   return (
     <Link
       to={to}
       onClick={onClick}
+      onMouseEnter={preload}
+      onFocus={preload}
       className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-pink-50 hover:text-pink-600 ${className}`}
     >
       {icon}

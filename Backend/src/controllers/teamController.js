@@ -1,9 +1,12 @@
 import Team from "../models/Team.js";
+import User from "../models/User.js";
+import Competition from "../models/Competition.js";
 import fs from "fs/promises";
 import path from "path";
+import { escapeRegex, isValidObjectId, normalizeString } from "../utils/security.js";
 
 const deleteTransferFile = async (transferPath) => {
-    if (!transferPath) return;
+    if (!transferPath || !/^\/uploads\/transfer\/[^/]+$/.test(transferPath)) return;
 
     const filePath = path.join(
         process.cwd(),
@@ -21,7 +24,7 @@ const deleteTransferFile = async (transferPath) => {
 };
 
 const deleteUploadedTransfer = async (filename) => {
-    if (!filename) return;
+    if (!filename || !/^(?:\d{10,}-)?[a-f\d-]{16,}\.(?:jpg|jpeg|png)$/i.test(filename)) return;
 
     const filePath = path.join(
         process.cwd(),
@@ -101,11 +104,34 @@ export const createTeam = async (req, res) => {
             competitionId
         } = req.body;
 
+        const normalizedTeamName = normalizeString(teamName, { max: 120, required: true });
+        if (!normalizedTeamName || !isValidObjectId(competitionId)) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid team data" });
+        }
+
         const teamLeaderId = req.user?.role === "admin" ? leaderId : req.user.id;
+        if (!isValidObjectId(teamLeaderId)) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid team leader" });
+        }
         const teamMembers = normalizeMembers(members).filter(
             (memberId) => memberId !== teamLeaderId?.toString()
         );
+        if (teamMembers.length > 50) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "A team cannot have more than 50 members" });
+        }
         const participantIds = getParticipantIds(teamLeaderId, teamMembers);
+        const [competition, participantCount] = await Promise.all([
+            Competition.exists({ _id: competitionId }),
+            User.countDocuments({ _id: { $in: participantIds } })
+        ]);
+
+        if (!competition || participantCount !== participantIds.length) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid competition or participant" });
+        }
         const conflictTeam = await findCompetitionConflict({
             competitionId,
             participantIds
@@ -126,7 +152,7 @@ export const createTeam = async (req, res) => {
             : null;
 
         const team = await Team.create({
-            teamName,
+            teamName: normalizedTeamName,
             leaderId: teamLeaderId,
             members: teamMembers,
             competitionId,
@@ -159,9 +185,14 @@ export const createTeam = async (req, res) => {
 //Tampilin Nama Teams(Admin)
 export const getAllTeams = async (req, res) => {
     try {
-        const teams = await Team.find()
-            .populate("leaderId", "name email university nim")
-            .populate("members", "name email university nim")
+        const query = req.user.role === 'admin'
+            ? {}
+            : { $or: [{ leaderId: req.user.id }, { members: req.user.id }] };
+        const userFields = req.user.role === 'admin' ? "name email university nim" : "name university nim";
+        const teams = await Team.find(query)
+            .limit(500)
+            .populate("leaderId", userFields)
+            .populate("members", userFields)
             .populate("competitionId", "competitionName time place");
 
         res.status(200).json(teams);
@@ -173,6 +204,11 @@ export const getAllTeams = async (req, res) => {
 //Update Team (Admin & Team Leader)
 export const updateTeam = async (req, res) => {
     try {
+        if (!isValidObjectId(req.params.id)) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid team id" });
+        }
+
         const existingTeam = await Team.findById(req.params.id);
 
         if (!existingTeam) {
@@ -210,7 +246,29 @@ export const updateTeam = async (req, res) => {
         const nextMembers = normalizeMembers(requestedMembers).filter(
             (memberId) => memberId !== nextLeaderId?.toString()
         );
+        if (nextMembers.length > 50) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "A team cannot have more than 50 members" });
+        }
+        const nextTeamName = req.body.teamName === undefined
+            ? existingTeam.teamName
+            : normalizeString(req.body.teamName, { max: 120, required: true });
+
+        if (!nextTeamName || !isValidObjectId(nextCompetitionId) || !isValidObjectId(nextLeaderId) || nextMembers.some((id) => !isValidObjectId(id))) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid team data" });
+        }
+
         const participantIds = getParticipantIds(nextLeaderId, nextMembers);
+        const [competition, participantCount] = await Promise.all([
+            Competition.exists({ _id: nextCompetitionId }),
+            User.countDocuments({ _id: { $in: participantIds } })
+        ]);
+
+        if (!competition || participantCount !== participantIds.length) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: "Invalid competition or participant" });
+        }
         const conflictTeam = await findCompetitionConflict({
             competitionId: nextCompetitionId,
             excludeTeamId: existingTeam._id,
@@ -229,11 +287,13 @@ export const updateTeam = async (req, res) => {
 
         const updateData = isAdmin
             ? {
-                ...req.body,
+                teamName: nextTeamName,
+                leaderId: nextLeaderId,
+                competitionId: nextCompetitionId,
                 members: nextMembers
             }
             : {
-                teamName: req.body.teamName,
+                teamName: nextTeamName,
                 members: nextMembers
             };
 
@@ -296,6 +356,9 @@ export const updateTeam = async (req, res) => {
 //Delete Team (Admin)
 export const deleteTeam = async (req, res) => {
     try {
+        if (!isValidObjectId(req.params.id)) {
+            return res.status(400).json({ message: "Invalid team id" });
+        }
         const team = await Team.findById(req.params.id);
 
         if (!team) {
@@ -327,13 +390,13 @@ export const searchTeams = async (req, res) => {
     try {
         const { query } = req.query;
 
-        if (!query) {
+        if (typeof query !== 'string' || !query.trim() || query.trim().length > 80) {
             return res.status(400).json({ message: "Search query is required" });
         }
 
         const teams = await Team.find({
-            teamName: { $regex: query, $options: "i" } 
-        });
+            teamName: { $regex: escapeRegex(query.trim()), $options: "i" }
+        }).limit(100).select('teamName leaderId members competitionId buktiTransfer');
 
         res.status(200).json({
             count: teams.length,

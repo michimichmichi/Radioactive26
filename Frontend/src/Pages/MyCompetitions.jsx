@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, UploadCloud } from "lucide-react";
-import API from "../api";
+import API, { openProtectedFile } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 import { validateImageFile } from "../utils/fileValidation";
-
-const API_ORIGIN = (API.defaults.baseURL || "").replace(/\/api\/?$/, "");
 
 function MyCompetitionsPage() {
   const [teams, setTeams] = useState([]);
@@ -39,13 +37,13 @@ function MyCompetitionsPage() {
   }, [userId]);
 
   return (
-    <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
       <section className="mx-auto max-w-5xl">
         <Link to="/" className="inline-flex">
           <img src={logo} alt="Radioactive" className="h-20 w-auto" />
         </Link>
 
-        <div className=" rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className="account-panel p-8 text-white shadow-2xl">
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
             Registered Competitions
           </h1>
@@ -408,21 +406,14 @@ function TransferLink({ value }) {
   }
 
   return (
-    <a
-      href={getUploadUrl(value)}
-      target="_blank"
-      rel="noreferrer"
+    <button
+      type="button"
+      onClick={() => openProtectedFile(value)}
       className="text-sm font-bold text-pink-600 hover:text-pink-700"
     >
       View bukti transfer
-    </a>
+    </button>
   );
-}
-
-function getUploadUrl(value) {
-  if (!value) return "";
-  if (/^https?:\/\//i.test(value)) return value;
-  return `${API_ORIGIN}${value}`;
 }
 
 function getId(value) {

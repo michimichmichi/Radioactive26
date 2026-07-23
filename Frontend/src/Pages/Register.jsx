@@ -75,27 +75,13 @@ function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
       <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
-        <div className="w-full max-w-2xl rounded-lg border border-white/10 bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className="account-panel w-full max-w-2xl p-8 text-white shadow-2xl">
           <div className="mb-5 flex items-center justify-between">
             <Link to="/">
               <img src={logo} alt="Radioactive" className="h-20 w-auto" />
             </Link>
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
-              >
-                Home
-              </Link>
-              <Link
-                to="/login"
-                className="rounded-md border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
-              >
-                Login
-              </Link>
-            </div>
           </div>
 
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
@@ -201,6 +187,13 @@ function RegisterPage() {
             >
               {isLoading ? "Creating account..." : "Register"}
             </button>
+
+            <p className="text-center text-sm text-zinc-600 md:col-span-2">
+              Already have an account?{" "}
+              <Link to="/login" className="font-semibold text-pink-600 hover:text-pink-700">
+                Login here
+              </Link>
+            </p>
 
             <Link
               to="/"

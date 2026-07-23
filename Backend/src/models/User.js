@@ -3,16 +3,22 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        maxlength: 120
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
+        trim: true,
+        maxlength: 254
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        select: false
     },
     role: {
         type: String,
@@ -27,12 +33,16 @@ const userSchema = new mongoose.Schema({
     },
     university: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        maxlength: 160
     },
     nim: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true,
+        maxlength: 50
     },
     ktm: {
         type: String,
