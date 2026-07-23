@@ -6,6 +6,28 @@ const JWT_ALGORITHM = 'HS256';
 const JWT_ISSUER = 'radioactive26-api';
 let hasWarnedWeakSecret = false;
 
+const parseCookies = (header = '') => Object.fromEntries(
+    header.split(';').map((part) => part.trim().split('='))
+        .filter(([key, value]) => key && value)
+        .map(([key, ...value]) => [key, decodeURIComponent(value.join('='))])
+);
+
+export const setAuthCookie = (res, token) => {
+    const secure = process.env.COOKIE_SECURE === 'false' ? '' : '; Secure';
+    res.setHeader(
+        'Set-Cookie',
+        `radioactive_token=${encodeURIComponent(token)}; Max-Age=43200; Path=/; HttpOnly${secure}; SameSite=Strict`
+    );
+};
+
+export const clearAuthCookie = (res) => {
+    const secure = process.env.COOKIE_SECURE === 'false' ? '' : '; Secure';
+    res.setHeader(
+        'Set-Cookie',
+        `radioactive_token=; Max-Age=0; Path=/${secure}; SameSite=Strict`
+    );
+};
+
 const getJwtSecret = () => {
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET is not configured');
@@ -42,14 +64,16 @@ export const generateToken = (user) => {
 export const verifyToken = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
+        const cookies = parseCookies(req.headers.cookie);
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = cookies.radioactive_token ||
+            (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
+
+        if (!token) {
             return res.status(401).json({
                 message: 'Access denied. No token provided.'
             });
         }
-
-        const token = authHeader.split(' ')[1];
 
         const decoded = jwt.verify(token, getJwtSecret(), {
             algorithms: [JWT_ALGORITHM],

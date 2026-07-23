@@ -22,7 +22,6 @@ function LoginPage() {
 
     try {
       const response = await authAPI.login(form);
-      localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       window.dispatchEvent(new Event("auth-change"));
       navigate(response.data.user?.role === "admin" ? "/admin" : "/");

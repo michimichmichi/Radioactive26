@@ -8,7 +8,7 @@ import Team from '../models/Team.js';
 
 dotenv.config();
 
-const password = 'password123';
+const password = process.env.SEED_USER_PASSWORD;
 
 const userSeeds = [
     {
@@ -87,7 +87,7 @@ const teamSeeds = [
 ];
 
 const seedUsers = async () => {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     for (const user of userSeeds) {
         await User.findOneAndUpdate(
@@ -145,13 +145,16 @@ const seedTeams = async () => {
 
 const seed = async () => {
     try {
+        if (!password || password.length < 8) {
+            throw new Error('SEED_USER_PASSWORD must be configured and at least 8 characters long');
+        }
+
         await connectDB();
         await seedUsers();
         await seedCompetitions();
         await seedTeams();
 
         console.log('Seed data inserted successfully.');
-        console.log(`User password for seeded users: ${password}`);
         await mongoose.connection.close();
         process.exit(0);
     } catch (error) {

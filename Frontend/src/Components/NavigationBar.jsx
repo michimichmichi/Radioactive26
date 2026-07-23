@@ -40,13 +40,10 @@ const Navbar = () => {
 
   const logout = async () => {
     try {
-      if (localStorage.getItem("token")) {
-        await authAPI.logout();
-      }
+      await authAPI.logout();
     } catch {
       // Local cleanup still happens if the token is already expired.
     } finally {
-      localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.dispatchEvent(new Event("auth-change"));
       setIsMenuOpen(false);

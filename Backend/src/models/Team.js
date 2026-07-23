@@ -4,19 +4,25 @@ const teamSchema = new mongoose.Schema({
     teamName: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true,
+        maxlength: 120
     },
     leaderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    members: [
-        {
+    members: {
+        type: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
+        }],
+        validate: {
+            validator: (members) => members.length <= 50,
+            message: 'A team cannot have more than 50 members'
         }
-    ],
+    },
     competitionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Competition',

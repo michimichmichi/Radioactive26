@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import API from "../api";
+import API, { openProtectedFile } from "../api";
 import {
   Trophy,
   Users,
@@ -36,15 +36,7 @@ const userAPI = {
   delete: (id) => API.delete(`/users/${id}`),
 };
 
-const API_ORIGIN = (API.defaults.baseURL || "").replace(/\/api\/?$/, "");
-
 const isFile = (value) => typeof File !== "undefined" && value instanceof File;
-
-const getUploadUrl = (value) => {
-  if (!value) return "";
-  if (/^https?:\/\//i.test(value)) return value;
-  return `${API_ORIGIN}${value}`;
-};
 
 const buildUserFormData = (form, { includeEmptyPassword = true } = {}) => {
   const formData = new FormData();
@@ -603,15 +595,14 @@ function UsersPanel() {
 
                   <td>
                     {u.ktm ? (
-                      <a
-                        href={getUploadUrl(u.ktm)}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => openProtectedFile(u.ktm)}
                         className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700"
                       >
                         <FileText size={16} />
                         View Image
-                      </a>
+                      </button>
                     ) : (
                       "-"
                     )}
@@ -823,14 +814,13 @@ function TeamsPanel() {
           />
 
           {editingId && currentTransfer && (
-            <a
-              href={getUploadUrl(currentTransfer)}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => openProtectedFile(currentTransfer)}
               className="text-sm font-semibold text-pink-600"
             >
               View current buktiTransfer
-            </a>
+            </button>
           )}
 
           <Select
@@ -1000,15 +990,14 @@ function TeamsPanel() {
                 </div>
 
                 {team.buktiTransfer && (
-                  <a
-                    href={getUploadUrl(team.buktiTransfer)}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => openProtectedFile(team.buktiTransfer)}
                     className="mt-4 inline-flex items-center gap-2 text-pink-600"
                   >
                     <FileText size={16} />
                     buktiTransfer
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
@@ -1152,4 +1141,3 @@ export default function Admin() {
     </div>
   );
 }
-     

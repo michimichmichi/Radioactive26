@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, UploadCloud } from "lucide-react";
-import API from "../api";
+import API, { openProtectedFile } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 import { validateImageFile } from "../utils/fileValidation";
-
-const API_ORIGIN = (API.defaults.baseURL || "").replace(/\/api\/?$/, "");
 
 function MyCompetitionsPage() {
   const [teams, setTeams] = useState([]);
@@ -408,21 +406,14 @@ function TransferLink({ value }) {
   }
 
   return (
-    <a
-      href={getUploadUrl(value)}
-      target="_blank"
-      rel="noreferrer"
+    <button
+      type="button"
+      onClick={() => openProtectedFile(value)}
       className="text-sm font-bold text-pink-600 hover:text-pink-700"
     >
       View bukti transfer
-    </a>
+    </button>
   );
-}
-
-function getUploadUrl(value) {
-  if (!value) return "";
-  if (/^https?:\/\//i.test(value)) return value;
-  return `${API_ORIGIN}${value}`;
 }
 
 function getId(value) {
