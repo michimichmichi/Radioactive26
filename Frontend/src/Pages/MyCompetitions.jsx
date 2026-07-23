@@ -59,7 +59,7 @@ function MyCompetitionsPage() {
 
           <div className="mt-6 space-y-5">
             {teams.length === 0 && !error ? (
-              <div className="rounded-md border border-pink-100 bg-pink-50 px-4 py-5 text-sm font-semibold text-zinc-700">
+              <div className="rounded-md border border-pink-100 bg-pink-50 px-4 py-5 text-sm font-semibold text-white ">
                 No registered competitions found yet.
               </div>
             ) : (
@@ -196,7 +196,7 @@ function TeamRegistrationCard({ team, userId, onUpdated }) {
       {!isViewingDetails ? (
         <div className="mt-5 flex flex-col gap-3 rounded-md border border-pink-100 bg-white px-4 py-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-zinc-800">
+            <p className="text-sm font-semibold text-white">
               Team: {team.teamName || "-"}
             </p>
             <p className="mt-1 text-xs text-zinc-500">
@@ -269,10 +269,10 @@ function TeamRegistrationCard({ team, userId, onUpdated }) {
                     onClick={() => addMember(participant)}
                     className="rounded-md border border-pink-100 bg-pink-50 px-3 py-3 text-left text-sm transition hover:border-pink-300"
                   >
-                    <span className="block font-semibold text-zinc-900">
+                    <span className="block font-semibold text-zinc-300">
                       {participant.nim}
                     </span>
-                    <span className="block text-xs text-zinc-500">
+                    <span className="block text-xs text-zinc-400">
                       {participant.name} - {participant.university || "-"}
                     </span>
                   </button>

@@ -102,7 +102,7 @@ export default function Competition() {
             </div>
            <div className="w-full max-w-3xl flex justify-end px-4 md:px-8 mt-3">
                 <a
-                    href="https://drive.google.com/file/d/1Jlvc2T3qRPbOvH1CbUUm133Ee0zZ489z/view?usp=drive_link"
+                    href="https://drive.google.com/file/d/1Jlvc2T3qRPbOvH1CbUUm133Ee0zZ489z/view?usp=drivesdk"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative inline-block px-4 py-2 md:px-5 md:py-2.5 bg-black border-2 border-[#FF0990] text-[#FF0990] font-avril text-xs md:text-sm tracking-widest uppercase rotate-0 hover:rotate-2 hover:bg-[#FF0990] hover:text-black transition-all duration-200 shadow-[4px_4px_0px_0px_#FF0990] hover:shadow-[0_0_20px_rgba(255,9,144,0.8)] active:scale-95"
@@ -113,6 +113,16 @@ export default function Competition() {
             
 
         </div>
+
+        <div className="mt-8 mb-6 flex flex-col items-center">
+            <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
+                Our judges will be officially revealed on 
+            </h3>
+             <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
+                5 august 2026
+            </h3>
+
+            </div>
 
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5">
             <button 
