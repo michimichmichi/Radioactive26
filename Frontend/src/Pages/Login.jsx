@@ -33,9 +33,9 @@ function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
       <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
-        <div className="w-full max-w-md rounded-lg border border-white/10 bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className="account-panel w-full max-w-md p-8 text-white shadow-2xl">
           <div className="mb-8 flex items-center justify-between">
             <Link to="/">
               <img src={logo} alt="Radioactive" className="h-12 w-auto" />

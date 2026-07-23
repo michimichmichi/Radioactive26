@@ -24,13 +24,13 @@ function ProfilePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
       <section className="mx-auto max-w-3xl">
         <Link to="/" className="inline-flex">
           <img src={logo} alt="Radioactive" className="h-20 w-auto" />
         </Link>
 
-        <div className=" rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className="account-panel p-8 text-white shadow-2xl">
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
             Profile Management
           </h1>

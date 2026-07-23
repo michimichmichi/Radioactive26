@@ -78,7 +78,7 @@ const buildTeamFormData = (form) => {
 
 function SectionCard({ children }) {
   return (
-    <div className="bg-white rounded-3xl shadow-lg border border-pink-100 p-6">
+    <div className="account-panel rounded-3xl p-6">
       {children}
     </div>
   );
@@ -88,7 +88,7 @@ function Input(props) {
   return (
     <input
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field w-full px-4 py-3"
     />
   );
 }
@@ -97,7 +97,7 @@ function Select(props) {
   return (
     <select
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field w-full px-4 py-3"
     />
   );
 }
@@ -106,7 +106,7 @@ function Textarea(props) {
   return (
     <textarea
       {...props}
-      className="w-full border border-pink-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 bg-pink-50"
+      className="admin-field w-full px-4 py-3"
     />
   );
 }
@@ -679,6 +679,7 @@ function TeamsPanel() {
     setForm(emptyForm);
     setEditingId(null);
     setCurrentTransfer("");
+    setMemberSearch("");
     formRef.current?.reset();
   };
 
@@ -746,13 +747,13 @@ function TeamsPanel() {
   };
 
   const filteredUsers = users.filter((u) => {
-  const keyword = memberSearch.toLowerCase();
+  const keyword = memberSearch.trim().toLowerCase();
 
   return (
-    u.name.toLowerCase().includes(keyword) ||
-    u.email.toLowerCase().includes(keyword) ||
-    u.university.toLowerCase().includes(keyword) ||
-    u.nim.toLowerCase().includes(keyword)
+    String(u.name || "").toLowerCase().includes(keyword) ||
+    String(u.email || "").toLowerCase().includes(keyword) ||
+    String(u.university || "").toLowerCase().includes(keyword) ||
+    String(u.nim || "").toLowerCase().includes(keyword)
   );
 });
 
@@ -877,7 +878,7 @@ function TeamsPanel() {
       type="text"
       value={memberSearch}
       onChange={(e) => setMemberSearch(e.target.value)}
-      placeholder="Search member by name, email or university..."
+      placeholder="Search member by name, email, university, or NIM..."
       className="w-full border border-pink-200 rounded-2xl py-3 pl-10 pr-4 bg-white"
     />
   </div>
@@ -1092,7 +1093,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="admin-page flex min-h-screen">
       {/* SIDEBAR */}
       <div className="w-72 bg-gradient-to-b bg-black text-pink-600 p-6 shadow-2xl">
         <h1 className="text-4xl font-extrabold mb-10">

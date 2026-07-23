@@ -12,6 +12,7 @@ function CompetitionRegistrationPage() {
   const [competitions, setCompetitions] = useState([]);
   const [nimQuery, setNimQuery] = useState("");
   const [nimResults, setNimResults] = useState([]);
+  const [nimStatus, setNimStatus] = useState("");
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [form, setForm] = useState({
     teamName: "",
@@ -43,22 +44,38 @@ function CompetitionRegistrationPage() {
 
       if (keyword.length < 3 || !form.competitionId) {
         setNimResults([]);
+        setNimStatus(
+          !form.competitionId
+            ? "Select a competition first."
+            : keyword.length > 0
+              ? "Enter at least 3 characters of the NIM."
+              : "",
+        );
         return;
       }
 
+      setNimStatus("Searching participants...");
       try {
         const response = await API.get(
           `/users/participants?nim=${encodeURIComponent(keyword)}&competitionId=${encodeURIComponent(form.competitionId)}`,
         );
-        setNimResults(
-          (response.data || []).filter(
-            (participant) =>
-              participant._id !== currentUser?._id &&
-              !form.members.includes(participant._id),
-          ),
+        const matches = (response.data || []).filter(
+          (participant) =>
+            participant._id !== currentUser?._id &&
+            !form.members.includes(participant._id),
         );
-      } catch {
+        setNimResults(matches);
+        setNimStatus(
+          matches.length > 0
+            ? ""
+            : "No matching available participant found for this competition.",
+        );
+      } catch (err) {
         setNimResults([]);
+        setNimStatus(
+          err.response?.data?.message ||
+            "Participant search failed. Please try again.",
+        );
       }
     };
 
@@ -80,6 +97,7 @@ function CompetitionRegistrationPage() {
     );
     setNimQuery("");
     setNimResults([]);
+    setNimStatus("");
   };
 
   const removeMember = (memberId) => {
@@ -94,15 +112,13 @@ function CompetitionRegistrationPage() {
 
   const submitRegistration = async (event) => {
   event.preventDefault();
-
-  // Open guidebook in a new tab immediately on click
-  window.open(
-    "https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing",
-    "_blank",
-    "noopener,noreferrer"
-  );
-
   setError("");
+
+  if (!form.competitionId) {
+    setError("Please select a competition before registering your team.");
+    return;
+  }
+
   setIsSubmitting(true);
 
   try {
@@ -132,6 +148,7 @@ function CompetitionRegistrationPage() {
     setSelectedMembers([]);
     setNimQuery("");
     setNimResults([]);
+    setNimStatus("");
 
     navigate("/my-competitions");
   } catch (err) {
@@ -145,19 +162,27 @@ function CompetitionRegistrationPage() {
 };
 
   return (
-    <main className="min-h-screen bg-[#050505] px-6 py-10 text-white">
+    <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
       <section className="mx-auto max-w-5xl">
         <Link to="/" className="inline-flex">
           <img src={logo} alt="Radioactive" className="h-20 w-auto" />
         </Link>
 
-        <div className=" rounded-lg bg-white p-8 text-zinc-950 shadow-2xl">
+        <div className="account-panel p-8 text-white shadow-2xl">
           <h1 className="font-thebold text-3xl uppercase text-pink-600">
             Competition Registration
           </h1>
           <p className="mt-2 text-sm text-zinc-600">
             Register your team and upload your transfer proof.
           </p>
+          <a
+            href="https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing"
+            target="_blank"
+            rel="noopener,noreferrer"
+            className="mt-4 inline-flex text-sm font-semibold text-pink-300 hover:text-pink-200"
+          >
+            Open competition handbook
+          </a>
 
           {error && (
             <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -264,10 +289,13 @@ function CompetitionRegistrationPage() {
                     type="text"
                     value={nimQuery}
                     onChange={(event) => setNimQuery(event.target.value)}
-                    placeholder="Type member NIM..."
                     disabled={!form.competitionId}
+                    placeholder="Type member NIM..."
                     className="w-full rounded-md border border-pink-200 bg-white py-3 pl-10 pr-4 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   />
+                  {nimStatus && (
+                    <p className="mt-2 text-xs text-zinc-500">{nimStatus}</p>
+                  )}
                 </div>
               </div>
 
