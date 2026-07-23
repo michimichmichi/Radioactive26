@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
@@ -9,6 +9,11 @@ function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Prepare the next account route while the user is reading the login form.
+    void import("./Register.jsx");
+  }, []);
 
   const updateField = (event) => {
     const { name, value } = event.target;
@@ -49,6 +54,8 @@ function LoginPage() {
               </Link>
               <Link
                 to="/register"
+                onMouseEnter={() => import("./Register.jsx")}
+                onFocus={() => import("./Register.jsx")}
                 className="rounded-md border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
               >
                 Register
