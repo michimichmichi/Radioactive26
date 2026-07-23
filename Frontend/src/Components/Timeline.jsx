@@ -20,11 +20,16 @@ const events = [
   },
   {
     id: 4,
+    title: "Submission Podcast",
+    description: "28 September 2026 - 9 October 2026",
+  },
+  {
+    id: 5,
     title: "RAC 2026",
     description: "10 October 2026",
   },
   {
-    id: 5,
+    id: 6,
     title: "The Encore",
     description: "31 October 2026",
   },
@@ -34,43 +39,45 @@ export default function Timeline() {
   const [selected, setSelected] = useState(events[0]);
 
   return (
-    <section className="w-full flex flex-col items-center py-24">
+    <section className="flex w-full flex-col items-center px-4 py-16 md:px-0 md:py-24">
 
       {/* Timeline Heading */}
       <img
         src={timeline}
         alt="Timeline"
-        className="w-[700px] max-w-[90%]  select-none"
+        className="h-auto w-full max-w-[700px] select-none md:w-[700px] md:max-w-[90%]"
       />
 
       {/* Interactive Timeline */}
-      <div className="relative w-[90%] max-w-5xl top-[10%]">
+      <div className="relative w-full max-w-5xl md:top-[10%] md:w-[90%]">
 
         {/* Pink Line */}
-        <div className="absolute top-[40%] left-0 w-full h-1 bg-pink-500 rounded-full -translate-y-1/2 shadow-[0_0_20px_#ff1493]" />
+        <div className="absolute left-0 top-[40%] hidden h-1 w-full -translate-y-1/2 rounded-full bg-pink-500 shadow-[0_0_20px_#ff1493] md:block" />
 
         {/* Stars */}
-        <div className="relative flex justify-between items-center">
+        <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-0">
+
+          <div className="absolute bottom-6 left-6 top-6 w-1 rounded-full bg-pink-500 shadow-[0_0_20px_#ff1493] md:hidden" />
 
           {events.map((event) => (
             <button
               key={event.id}
               onClick={() => setSelected(event)}
-              className="group flex flex-col items-center z-10"
+              className="group z-10 flex w-full flex-row items-center gap-4 text-left md:w-auto md:flex-col md:items-center md:gap-0 md:text-center"
             >
               <img
                 src={star}
                 alt=""
-                className={`transition-all duration-300
+                  className={`transition-all duration-300
                 ${
                   selected.id === event.id
-                    ? "w-16 h-16 scale-125 drop-shadow-[0_0_20px_rgba(255,255,255,0.9)]"
+                    ? "h-16 w-16 scale-100 drop-shadow-[0_0_20px_rgba(255,255,255,0.9)] md:scale-125"
                     : "w-12 h-12 hover:scale-110"
                 }`}
               />
 
               <span
-                className={`mt-3 text-sm font-bold transition-colors duration-300
+                className={`min-w-0 flex-1 break-words text-sm font-bold transition-colors duration-300 md:mt-3
                 ${
                   selected.id === event.id
                     ? "text-pink-400"
@@ -84,9 +91,9 @@ export default function Timeline() {
         </div>
 
         {/* Info Card */}
-        <div className="mt-16 flex justify-center">
-          <div className="bg-[#181818] border border-pink-500 rounded-2xl p-6 w-[420px] text-center shadow-[0_0_30px_rgba(255,20,147,0.3)]">
-            <h2 className="text-3xl font-bold text-pink-400 mb-4">
+        <div className="mt-10 flex justify-center md:mt-16">
+          <div className="w-full max-w-[420px] rounded-2xl border border-pink-500 bg-[#181818] p-4 text-center shadow-[0_0_30px_rgba(255,20,147,0.3)] md:p-6">
+            <h2 className="mb-3 break-words text-2xl font-bold text-pink-400 md:mb-4 md:text-3xl">
               {selected.title}
             </h2>
 
