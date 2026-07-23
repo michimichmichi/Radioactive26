@@ -4,6 +4,9 @@ import { LogOut, Menu, User, ShieldAlert, Award, Layers } from "lucide-react";
 import { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 
+const preloadLogin = () => import("../Pages/Login.jsx");
+const preloadCompetitionRegistration = () => import("../Pages/CompetitionRegistration.jsx");
+
 const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
@@ -151,6 +154,8 @@ const Navbar = () => {
               {/* Desktop & Mobile Login Trigger Link */}
               <Link
                 to="/login"
+                onMouseEnter={preloadLogin}
+                onFocus={preloadLogin}
                 className="bg-black/40 border border-white/20 px-5 py-1.5 rounded-xl hover:bg-black/60 transition-colors text-sm font-medium tracking-wide"
               >
                 Login
@@ -187,10 +192,16 @@ const Navbar = () => {
 };
 
 function MenuLink({ to, label, icon = null, className = "", onClick }) {
+  const preload = to === "/competition-registration"
+    ? preloadCompetitionRegistration
+    : undefined;
+
   return (
     <Link
       to={to}
       onClick={onClick}
+      onMouseEnter={preload}
+      onFocus={preload}
       className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-pink-50 hover:text-pink-600 ${className}`}
     >
       {icon}

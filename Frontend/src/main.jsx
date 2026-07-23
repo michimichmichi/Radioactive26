@@ -6,12 +6,29 @@ import App from './App.jsx'
 import ProtectedAdminRoute from './Components/ProtectedAdminRoute.jsx'
 import ProtectedUserRoute from './Components/ProtectedUserRoute.jsx'
 
-const AdminPage = lazy(() => import('./Pages/Admin.jsx'))
-const LoginPage = lazy(() => import('./Pages/Login.jsx'))
-const RegisterPage = lazy(() => import('./Pages/Register.jsx'))
-const CompetitionRegistrationPage = lazy(() => import('./Pages/CompetitionRegistration.jsx'))
-const ProfilePage = lazy(() => import('./Pages/Profile.jsx'))
-const MyCompetitionsPage = lazy(() => import('./Pages/MyCompetitions.jsx'))
+const lazyWithRetry = (importer, chunkName) => lazy(async () => {
+  try {
+    return await importer();
+  } catch (error) {
+    const retryKey = `radioactive-chunk-retry:${chunkName}`;
+
+    if (!sessionStorage.getItem(retryKey)) {
+      sessionStorage.setItem(retryKey, '1');
+      window.location.reload();
+      return new Promise(() => {});
+    }
+
+    sessionStorage.removeItem(retryKey);
+    throw error;
+  }
+});
+
+const AdminPage = lazyWithRetry(() => import('./Pages/Admin.jsx'), 'admin')
+const LoginPage = lazyWithRetry(() => import('./Pages/Login.jsx'), 'login')
+const RegisterPage = lazyWithRetry(() => import('./Pages/Register.jsx'), 'register')
+const CompetitionRegistrationPage = lazyWithRetry(() => import('./Pages/CompetitionRegistration.jsx'), 'competition-registration')
+const ProfilePage = lazyWithRetry(() => import('./Pages/Profile.jsx'), 'profile')
+const MyCompetitionsPage = lazyWithRetry(() => import('./Pages/MyCompetitions.jsx'), 'my-competitions')
 
 function PageLoader() {
   return (
