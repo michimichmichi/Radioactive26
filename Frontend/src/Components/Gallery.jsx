@@ -53,8 +53,7 @@ export default function Gallery() {
   return (
     <div
       id="gallery"
-      className="relative w-full max-w-4xl mx-auto h-[1200px] md:h-[2000px] flex-col items-center justify-center overflow-visible select-none px-4"
-    >
+  className="relative w-full max-w-4xl mx-auto h-[500px] md:h-[700px] flex-col items-center justify-center overflow-visible select-none px-4"    >
 
       <style>{`
         @keyframes scrollGallery {

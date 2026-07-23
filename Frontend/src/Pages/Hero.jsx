@@ -5,6 +5,7 @@ import Competition from '../Components/Competition';
 import Medpar from '../Components/Medpar';
 import Gallery from '../Components/Gallery';
 import Timeline from '../Components/Timeline';
+import Footer from '../Components/Footer';
 
 function Hero() {
   return (
@@ -30,6 +31,7 @@ function Hero() {
         <Timeline />
         <Medpar />
         <Gallery />
+        <Footer />
       </div>
 
       {/* bottom pink fade */}

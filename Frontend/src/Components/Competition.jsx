@@ -72,6 +72,16 @@ export default function Competition() {
                     Radio Announcing Competition merupakan rangkaian acara utama RADIOACTIVE. Lomba ini merupakan ajang untuk siswa SMA dan mahasiswa se-Jabodetabek untuk memperluas wawasan dan mengasah kemampuan di dunia broadcasting. Radio Announcing Competition ini memiliki konsep yang sesuai dengan nilai utama RADIOACTIVE 2026, yaitu embracing the best version of yourself. Tujuan dari lomba ini adalah untuk mengasah kreativitas peserta dalam membuat siaran dan secara tidak langsung memberikan informasi hingga mengajak para peserta untuk keluar dari zona nyaman mereka.
                 </p>
             </div>
+            <div className="w-full max-w-3xl flex justify-end px-4 md:px-8">
+                <a
+                    href="https://drive.google.com/file/d/15lAr97WclBifRn3yiRCsZHs-P4tqSp1_/view?usp=sharing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative inline-block px-4 py-2 md:px-5 md:py-2.5 bg-black border-2 border-[#FF0990] text-[#FF0990] font-avril text-xs md:text-sm tracking-widest uppercase rotate-0 hover:rotate-2 hover:bg-[#FF0990] hover:text-black transition-all duration-200 shadow-[4px_4px_0px_0px_#FF0990] hover:shadow-[0_0_20px_rgba(255,9,144,0.8)] active:scale-95"
+                >
+                    Download Guidebook ➔
+                </a>
+            </div>
         </div>
                 
         {/* Podcast Competition */}
@@ -90,7 +100,21 @@ export default function Competition() {
                     Lomba ini merupakan ajang untuk seluruh mahasiswa se-Jabodetabek mengasah kemampuan, dan kepercayaan diri dalam pemanfaatan media massa, khususnya di bidang podcast. RADIOACTIVE 2026 berharap melalui kompetisi ini, generasi muda dapat mengembangkan kemampuan diri sebagai wujud mengekspresikan pendapat dan kreativitas yang dimiliki.
                 </p>
             </div>
-           
+           <div className="w-full max-w-3xl flex justify-end px-4 md:px-8 mt-3">
+                <a
+                    href="https://drive.google.com/file/d/1Jlvc2T3qRPbOvH1CbUUm133Ee0zZ489z/view?usp=drive_link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative inline-block px-4 py-2 md:px-5 md:py-2.5 bg-black border-2 border-[#FF0990] text-[#FF0990] font-avril text-xs md:text-sm tracking-widest uppercase rotate-0 hover:rotate-2 hover:bg-[#FF0990] hover:text-black transition-all duration-200 shadow-[4px_4px_0px_0px_#FF0990] hover:shadow-[0_0_20px_rgba(255,9,144,0.8)] active:scale-95"
+                >
+                    Download Guidebook ➔
+                </a>
+            </div>
+            
+
+        </div>
+
+        <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5">
             <button 
                 onClick={() => handleRegisterClick('podcast')} 
                 className={`transition-all duration-100 mb-0 md:mb-2
@@ -106,15 +130,6 @@ export default function Competition() {
                     className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
                 />
             </button>
-
-             <a
-                href="https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="center text-pink-500 font-avril hover:scale-105 transition-all duration-200"
-                >
-                Download Guidebook
-                </a>
         </div>
        
     </div>
