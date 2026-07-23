@@ -184,7 +184,7 @@ const Navbar = () => {
       </nav>
 
       {/* BLENDED PINK RADIAL TRANSITION EDGE */}
-      <div className="pointer-events-none h-10 bg-gradient-to-b from-[#FF0990] to-transparent" />
+      <div className="pointer-events-none h-4 bg-gradient-to-b from-[#FF0990] to-transparent" />
     </div>
   );
 };
