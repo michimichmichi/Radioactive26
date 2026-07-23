@@ -55,7 +55,7 @@ export default function Timeline() {
         <div className="timeline-grid relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-0">
 
           {/* Zigzag path */}
-          <div className="timeline-path" aria-hidden="true" />
+          <div className="timeline-path mt-20" aria-hidden="true" />
 
           {events.map((event) => (
             <button
@@ -82,24 +82,22 @@ export default function Timeline() {
                     : "text-white"
                 }`}
               >
-                {event.title}
+                {selected.id === event.id && (
+                    <div className=" w-full text-left  md:text-center">
+                      <h3 className="text-lg font-bold text-pink-400">
+                        {event.title}
+                      </h3>
+
+                      <p className="text-sm text-gray-300">
+                        {event.description}
+                      </p>
+                    </div>
+                  )}
               </span>
             </button>
           ))}
         </div>
 
-        {/* Info Card */}
-        <div className="timeline-info mt-10 flex justify-center md:-mt-6">
-          <div className="w-full max-w-[420px] rounded-2xl border border-pink-500 bg-[#181818] p-4 text-center shadow-[0_0_30px_rgba(255,20,147,0.3)] md:p-6">
-            <h2 className="mb-3 break-words text-2xl font-bold text-pink-400 md:mb-4 md:text-3xl">
-              {selected.title}
-            </h2>
-
-            <p className="text-gray-300">
-              {selected.description}
-            </p>
-          </div>
-        </div>
 
       </div>
     </section>
