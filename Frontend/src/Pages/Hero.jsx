@@ -5,7 +5,6 @@ import Competition from '../Components/Competition';
 import Medpar from '../Components/Medpar';
 import Gallery from '../Components/Gallery';
 import Timeline from '../Components/Timeline';
-import Footer from '../Components/Footer';
 
 function Hero() {
   return (
@@ -31,10 +30,7 @@ function Hero() {
         <Timeline />
         <Medpar />
         <Gallery />
-        <Footer />
       </div>
-
-      
 
       {/* bottom pink fade */}
       <div className="pointer-events-none fixed bottom-0 left-0 w-full z-10 flex justify-between overflow-visible">
