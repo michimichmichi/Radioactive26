@@ -1,9 +1,110 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, UploadCloud } from "lucide-react";
+import { ChevronDown, Search, UploadCloud } from "lucide-react";
 import API from "../api";
 import logo from "../assets/LogoRadioactive.png";
 import { validateImageFile } from "../utils/fileValidation";
+
+const RAC_GUIDEBOOK_URL =
+  "https://drive.google.com/uc?export=download&id=1g_PwDqTM62IuwucAvT2DyNtunxj0hR97";
+const PODCAST_GUIDEBOOK_URL =
+  "https://drive.google.com/uc?export=download&id=1Jlvc2T3qRPbOvH1CbUUm133Ee0zZ489z";
+
+function CompetitionDropdown({ competitions, value, onChange }) {
+  const dropdownRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedCompetition = competitions.find(
+    (competition) => competition._id === value,
+  );
+
+  useEffect(() => {
+    const closeDropdown = (event) => {
+      if (!dropdownRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeDropdown);
+    return () => document.removeEventListener("mousedown", closeDropdown);
+  }, []);
+
+  const selectCompetition = (competitionId) => {
+    onChange(competitionId);
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsOpen((current) => !current);
+    }
+  };
+
+  return (
+    <div ref={dropdownRef} className="relative mt-2">
+      <button
+        type="button"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls="competition-options"
+        onClick={() => setIsOpen((current) => !current)}
+        onKeyDown={handleKeyDown}
+        className={`flex w-full items-center justify-between rounded-md border px-4 py-3 text-left text-sm outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-200 ${
+          isOpen ? "border-pink-500 ring-2 ring-pink-200" : "border-zinc-300"
+        }`}
+      >
+        <span className={selectedCompetition ? "text-white" : "text-zinc-500"}>
+          {selectedCompetition?.competitionName || "Select competition"}
+        </span>
+        <ChevronDown
+          size={18}
+          aria-hidden="true"
+          className={`shrink-0 text-pink-400 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          id="competition-options"
+          role="listbox"
+          aria-label="Competition options"
+          className="absolute left-0 right-0 z-30 mt-2 max-h-60 overflow-y-auto rounded-md border border-pink-500/70 bg-zinc-950 p-1 shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
+        >
+          {competitions.length > 0 ? (
+            competitions.map((competition) => (
+              <button
+                type="button"
+                role="option"
+                aria-selected={competition._id === value}
+                key={competition._id}
+                onClick={() => selectCompetition(competition._id)}
+                className={`block w-full rounded px-3 py-2.5 text-left text-sm transition ${
+                  competition._id === value
+                    ? "bg-pink-600 text-white"
+                    : "text-zinc-200 hover:bg-pink-500/20 hover:text-pink-200"
+                }`}
+              >
+                {competition.competitionName}
+              </button>
+            ))
+          ) : (
+            <p className="px-3 py-2.5 text-sm text-zinc-500">
+              No competitions available.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function CompetitionRegistrationPage() {
   const navigate = useNavigate();
@@ -22,6 +123,15 @@ function CompetitionRegistrationPage() {
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const selectedCompetition = competitions.find(
+    (competition) => competition._id === form.competitionId,
+  );
+  const isPodcastCompetition = selectedCompetition?.competitionName
+    ?.toLowerCase()
+    .includes("podcast");
+  const guidebookUrl = isPodcastCompetition
+    ? PODCAST_GUIDEBOOK_URL
+    : RAC_GUIDEBOOK_URL;
 
   useEffect(() => {
     const loadRegistrationData = async () => {
@@ -175,14 +285,19 @@ function CompetitionRegistrationPage() {
           <p className="mt-2 text-sm text-zinc-600">
             Register your team and upload your transfer proof.
           </p>
-          <a
-            href="https://drive.google.com/file/d/1g_PwDqTM62IuwucAvT2DyNtunxj0hR97/view?usp=sharing"
-            target="_blank"
-            rel="noopener,noreferrer"
-            className="mt-4 inline-flex text-sm font-semibold text-pink-300 hover:text-pink-200"
-          >
-            Open competition handbook
-          </a>
+          {selectedCompetition ? (
+            <a
+              href={guidebookUrl}
+              download
+              className="mt-4 inline-flex text-sm font-semibold text-pink-300 hover:text-pink-200"
+            >
+              Download {isPodcastCompetition ? "Podcast" : "RAC"} competition handbook
+            </a>
+          ) : (
+            <p className="mt-4 text-sm text-zinc-500">
+              Select a competition to download its handbook.
+            </p>
+          )}
 
           {error && (
             <div className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -208,33 +323,26 @@ function CompetitionRegistrationPage() {
                 />
               </label>
 
-              <label className="block">
+              <div className="block">
                 <span className="text-sm font-semibold text-zinc-800">
                   Competition
                 </span>
-                <select
+                <CompetitionDropdown
+                  competitions={competitions}
                   value={form.competitionId}
-                  onChange={(event) => {
+                  onChange={(competitionId) => {
                     setForm({
                       ...form,
-                      competitionId: event.target.value,
+                      competitionId,
                       members: [],
                     });
                     setSelectedMembers([]);
                     setNimQuery("");
                     setNimResults([]);
                   }}
-                  required
-                  className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 >
-                  <option value="">Select competition</option>
-                  {competitions.map((competition) => (
-                    <option key={competition._id} value={competition._id}>
-                      {competition.competitionName}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                </CompetitionDropdown>
+              </div>
             </div>
 
             <label className="block">

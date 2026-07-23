@@ -10,17 +10,22 @@ const events = [
   },
   {
     id: 2,
-    title: "Technical Meeting",
+    title: "Technical Meeting RAC",
     description: "3 October 2026",
   },
   {
     id: 3,
+    title: "Technical Meeting Podcast Competition (online)",
+    description: "26 September 2026",
+  },
+  {
+    id: 4,
     title: "RAC Competition 2026",
     description: "10 October 2026",
   },
   {
-    id: 4,
-    title: "Winner Announcement",
+    id: 5,
+    title: "The Encore",
     description: "31 October 2026",
   },
 ];

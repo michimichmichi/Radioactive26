@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { authAPI } from "../api";
+import API, { authAPI } from "../api";
 import logo from "../assets/LogoRadioactive.png";
 
 function ProfilePage() {
@@ -8,6 +8,8 @@ function ProfilePage() {
     JSON.parse(localStorage.getItem("user") || "null"),
   );
   const [error, setError] = useState("");
+  const [ktmImage, setKtmImage] = useState("");
+  const [ktmError, setKtmError] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -22,6 +24,45 @@ function ProfilePage() {
 
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    let objectUrl = "";
+    let cancelled = false;
+
+    const loadKtmImage = async () => {
+      setKtmImage("");
+      setKtmError(false);
+
+      if (!user?.ktm) return;
+
+      if (/^https?:\/\//i.test(user.ktm)) {
+        setKtmImage(user.ktm);
+        return;
+      }
+
+      try {
+        const response = await API.get(user.ktm, { responseType: "blob" });
+        objectUrl = URL.createObjectURL(response.data);
+
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl);
+        } else {
+          setKtmImage(objectUrl);
+        }
+      } catch {
+        if (!cancelled) {
+          setKtmError(true);
+        }
+      }
+    };
+
+    loadKtmImage();
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [user?.ktm]);
 
   return (
     <main className="account-page px-5 py-8 text-white sm:px-8 sm:py-10">
@@ -49,11 +90,32 @@ function ProfilePage() {
             <ProfileField label="Email" value={user?.email} />
             <ProfileField label="University" value={user?.university} />
             <ProfileField label="NIM" value={user?.nim} />
-            <ProfileField label="KTM" value={user?.ktm || "-"} />
+            <KtmField imageUrl={ktmImage} hasError={ktmError} />
           </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function KtmField({ imageUrl, hasError }) {
+  return (
+    <div className="rounded-md border border-pink-100 bg-pink-50 px-4 py-3">
+      <p className="text-xs font-semibold uppercase tracking-wider text-pink-600">
+        KTM
+      </p>
+      {imageUrl && !hasError ? (
+        <img
+          src={imageUrl}
+          alt="KTM identification card"
+          className="mt-3 max-h-64 w-full rounded-md object-contain object-left"
+        />
+      ) : (
+        <p className="mt-1 text-sm font-semibold text-zinc-800">
+          {hasError ? "Unable to load KTM image." : "-"}
+        </p>
+      )}
+    </div>
   );
 }
 
