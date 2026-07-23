@@ -25,7 +25,7 @@ const events = [
   },
   {
     id: 5,
-    title: "RAC 2026",
+    title: "Radio Announcing Competition",
     description: "10 October 2026",
   },
   {
