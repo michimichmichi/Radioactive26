@@ -349,6 +349,64 @@ function CompetitionRegistrationPage() {
               <span className="text-sm font-semibold text-zinc-800">
                 Bukti Transfer
               </span>
+              <section className="rounded-md border border-pink-100 bg-pink-50 p-4">
+  <div className="flex items-start justify-between gap-4">
+    <div>
+      <h2 className="text-lg font-bold text-pink-600">
+        Payment Information
+      </h2>
+
+      <p className="mt-1 text-sm text-zinc-600">
+        Please transfer the registration fee to the following account before
+        uploading your payment proof.
+      </p>
+    </div>
+  </div>
+
+  <div className="mt-5 space-y-3">
+    <div className="rounded-md border border-pink-100 bg-white px-4 py-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        Bank / App
+      </p>
+      <p className="mt-1 font-semibold">
+        Blu by BCA Digital
+      </p>
+    </div>
+
+    <div className="rounded-md border border-pink-100 bg-white px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            Account Number
+          </p>
+
+          <p className="mt-1 font-mono text-lg font-bold tracking-widest">
+            4106128900
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigator.clipboard.writeText("4106128900")}
+          className="rounded-md bg-pink-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-pink-700"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <div className="rounded-md border border-pink-100 bg-white px-4 py-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+        Account Name
+      </p>
+
+      <p className="mt-1 font-semibold">
+        Lady Serenity
+      </p>
+    </div>
+  </div>
+</section>
+              
               <div className="mt-2 flex items-center gap-3 rounded-md border border-zinc-300 px-4 py-3 focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-200">
                 <UploadCloud className="shrink-0 text-pink-600" size={20} />
                 <input
