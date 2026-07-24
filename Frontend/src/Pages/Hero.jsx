@@ -1,11 +1,38 @@
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Navbar from '../Components/NavigationBar';
 import OpeningTitle from '../Components/Opening';
-import Mascot from '../Components/mascot';
-import Competition from '../Components/Competition';
-import Medpar from '../Components/Medpar';
-import Gallery from '../Components/Gallery';
-import Timeline from '../Components/Timeline';
-import Footer from '../Components/Footer';
+
+const Mascot = lazy(() => import('../Components/mascot'));
+const Competition = lazy(() => import('../Components/Competition'));
+const Timeline = lazy(() => import('../Components/Timeline'));
+const Medpar = lazy(() => import('../Components/Medpar'));
+const Gallery = lazy(() => import('../Components/Gallery'));
+const Footer = lazy(() => import('../Components/Footer'));
+
+function DeferredSection({ children }) {
+  const sectionRef = useRef(null);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldRender(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  return <div ref={sectionRef} className="min-h-[160px]">{shouldRender ? children : null}</div>;
+}
 
 function Hero() {
   return (
@@ -28,12 +55,14 @@ function Hero() {
       <div className="pt-20">
         <h1 className="sr-only">Radioactive 2026</h1>
         <OpeningTitle />
-        <Mascot />
-        <Competition />
-        <Timeline />
-        <Medpar />
-        <Gallery />
-        <Footer />
+        <Suspense fallback={null}>
+          <DeferredSection><Mascot /></DeferredSection>
+          <DeferredSection><Competition /></DeferredSection>
+          <DeferredSection><Timeline /></DeferredSection>
+          <DeferredSection><Medpar /></DeferredSection>
+          <DeferredSection><Gallery /></DeferredSection>
+          <DeferredSection><Footer /></DeferredSection>
+        </Suspense>
       </div>
 
       {/* bottom pink fade */}
