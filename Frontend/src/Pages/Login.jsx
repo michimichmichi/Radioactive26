@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
-import logo from "../assets/LogoRadioactive.png";
+import logo from "../assets/LogoRadioactive.webp";
 
 function LoginPage() {
   const navigate = useNavigate();

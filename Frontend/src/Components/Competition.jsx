@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import competition from '../assets/competition/competition.png'; 
+import competition from '../assets/competition/competition.webp'; 
 import radAnnouncing from '../assets/competition/radio announcing competition.png';
 import podcast from '../assets/competition/podcast competition.png';
-import register from '../assets/competition/register now.png';
+import register from '../assets/competition/register now.webp';
 
 export default function Competition() {
     const navigate = useNavigate();
@@ -50,6 +50,8 @@ export default function Competition() {
             <img 
                 src={competition} 
                 alt="Competition" 
+                width={1692}
+                height={954}
                 loading="lazy"
                 decoding="async"
                 className="w-full max-w-[700px] md:max-w-[1000px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
@@ -62,6 +64,8 @@ export default function Competition() {
                 <img 
                     src={radAnnouncing} 
                     alt="Radio Announcing Competition" 
+                    width={1185}
+                    height={107}
                     loading="lazy"
                     decoding="async"
                     className=" transform w-full max-w-[300px] md:max-w-[600px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
@@ -90,6 +94,8 @@ export default function Competition() {
                 <img 
                     src={podcast} 
                     alt="Podcast Competition" 
+                    width={797}
+                    height={99}
                     loading="lazy"
                     decoding="async"
                     className=" transform w-full max-w-[250px] md:max-w-[500px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
@@ -135,6 +141,8 @@ export default function Competition() {
                   <img 
                     src={register} 
                     alt="Register Now" 
+                    width={907}
+                    height={292}
                     loading="lazy"
                     decoding="async"
                     className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 

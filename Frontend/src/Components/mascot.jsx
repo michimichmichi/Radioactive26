@@ -1,7 +1,7 @@
 import React from 'react';
 
-import word from '../assets/mascot/embrace.png'; 
-import mascot from '../assets/mascot/glitz.png';  
+import word from '../assets/mascot/embrace.webp'; 
+import mascot from '../assets/mascot/glitz.webp';  
 
 export default function Mascot() {
   return (
@@ -25,6 +25,8 @@ export default function Mascot() {
           <img 
             src={word} 
             alt="Embrace The Glow Rule The Show" 
+            width={483}
+            height={506}
             loading="lazy"
             decoding="async"
             className=" w-full max-w-[200px] sm:max-w-[250px] md:max-w-[280px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
@@ -36,6 +38,8 @@ export default function Mascot() {
           <img 
             src={mascot} 
             alt="Glitz Mascot" 
+            width={661}
+            height={925}
             loading="lazy"
             decoding="async"
             className="w-full max-w-[280px] sm:max-w-[340px] md:max-w-[440px] h-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.6)]" 

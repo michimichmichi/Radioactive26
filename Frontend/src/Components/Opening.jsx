@@ -1,9 +1,9 @@
 import React from 'react';
 
-import vinyl from '../assets/opening/vinyl.png';
+import vinyl from '../assets/opening/vinyl.webp';
 import star7 from '../assets/opening/Star 7.png'; 
-import glistening from '../assets/opening/glistening peak.png';
-import logo from '../assets/LogoRadioactive.png';
+import glistening from '../assets/opening/glistening peak.webp';
+import logo from '../assets/LogoRadioactive.webp';
 
 export default function OpeningTitle() {
   return (
@@ -24,6 +24,8 @@ export default function OpeningTitle() {
       <img 
         src={vinyl} 
         alt="Vinyl" 
+        width={565}
+        height={1005}
         decoding="async"
         className="absolute top-[-8%] right-[20%] w-[260px] md:w-[320px] h-auto z-0 opacity-90 drop-shadow-[0_0_20px_rgba(255,9,144,0.2)] animate-direct-pop" 
         style={{ animationDelay: '0.4s', animationDuration: '1.6s' }}
@@ -32,6 +34,8 @@ export default function OpeningTitle() {
       <img 
         src={glistening} 
         alt="Glistening Peak" 
+        width={1328}
+        height={962}
         fetchPriority="high"
         decoding="async"
         className="absolute top-[23%] w-[550px] md:w-[680px] h-auto z-20 object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop" 
@@ -42,6 +46,8 @@ export default function OpeningTitle() {
         <img 
           src={logo} 
           alt="Logo" 
+          width={1920}
+          height={1080}
           fetchPriority="high"
           decoding="async"
           className="w-[400px] md:w-[500px] h-auto object-contain" 
@@ -51,6 +57,8 @@ export default function OpeningTitle() {
       <img 
         src={star7} 
         alt="Left Star" 
+        width={335}
+        height={334}
         decoding="async"
         className="absolute top-[28%] left-[2%] w-[70px] md:w-[100px] h-auto z-20 object-contain transform -rotate-[15deg] drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
         style={{ animationDelay: '0s', animationDuration: '1.3s' }}
@@ -59,6 +67,8 @@ export default function OpeningTitle() {
       <img 
         src={star7} 
         alt="Right Star" 
+        width={335}
+        height={334}
         decoding="async"
         className="absolute bottom-[30%] right-[5%] w-[60px] md:w-[80px] h-auto z-20 transform drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
         style={{ animationDelay: '0.6s', animationDuration: '1.5s' }}

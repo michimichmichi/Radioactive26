@@ -1,5 +1,5 @@
 import { useState } from "react";
-import timeline from "../assets/timeline/timeline.png";
+import timeline from "../assets/timeline/timeline.webp";
 import star from "../assets/gallery/Star 6.png";
 
 const events = [
@@ -45,6 +45,8 @@ export default function Timeline() {
       <img
         src={timeline}
         alt="Timeline"
+        width={700}
+        height={260}
         className="h-auto w-full max-w-[700px] select-none md:w-[700px] md:max-w-[90%]"
       />
 
@@ -66,6 +68,8 @@ export default function Timeline() {
               <img
                 src={star}
                 alt=""
+                width={80}
+                height={80}
                   className={`timeline-star transition-all duration-300
                 ${
                   selected.id === event.id

@@ -1,12 +1,12 @@
 import React from 'react';
-import sponsor from '../assets/sponsor.png';
-import media from '../assets/media partners.png';
-import comfest from '../assets/medpar/comfest.png';
+import sponsor from '../assets/sponsor.webp';
+import media from '../assets/media partners.webp';
+import comfest from '../assets/medpar/comfest.webp';
 import death from '../assets/medpar/deathrockstar.webp';
 import medic from '../assets/medpar/medic.png';
 import mufomic from '../assets/medpar/mufomic.png';
 import Cen from '../assets/sponsor/Cen.png';
-import roti from '../assets/sponsor/roti.png';
+import roti from '../assets/sponsor/roti.webp';
 
 
 export default function Medpar() {
@@ -46,6 +46,8 @@ return (
             <img
                 src={sponsor}
               alt="Sponsors"
+              width={1105}
+              height={607}
               loading="lazy"
               decoding="async"
               className="w-[400px] sm:w-[400px] md:w-[600px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
@@ -70,6 +72,8 @@ return (
                     <img
                     src={logo}
                     alt={`Sponsor ${index + 1}`}
+                    width={3164}
+                    height={3446}
                     className="h-16 sm:h-20 md:h-24 w-auto object-contain filter brightness-90 contrast-125 group-hover:brightness-100 transition-all"
                     />
                 </div>
@@ -88,6 +92,8 @@ return (
             <img
                 src={media}
               alt="Media Partners"
+              width={1183}
+              height={796}
               loading="lazy"
               decoding="async"
               className="w-[350px] sm:w-[360px] md:w-[500px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
@@ -113,6 +119,8 @@ return (
                   <img
                     src={logo}
                     alt={`Medpar ${index + 1}`}
+                    width={4500}
+                    height={4500}
                     className="max-h-full max-w-full object-contain filter contrast-125 brightness-90 group-hover:brightness-110 transition-all duration-200"
                   />
                 </div>

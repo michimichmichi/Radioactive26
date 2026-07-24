@@ -9,7 +9,8 @@ import Footer from '../Components/Footer';
 
 function Hero() {
   return (
-    <div
+    <main
+      id="about"
       className="bg-black h-auto w-full overflow-x-hidden"
       style={{
         backgroundColor: "#050505",
@@ -25,6 +26,7 @@ function Hero() {
 
       {/* Add top padding equal to navbar height */}
       <div className="pt-20">
+        <h1 className="sr-only">Radioactive 2026</h1>
         <OpeningTitle />
         <Mascot />
         <Competition />
@@ -39,7 +41,7 @@ function Hero() {
         <div className="w-[120px] md:w-[250px] h-[120px] md:h-[200px] bg-[#FF0990] opacity-25 md:opacity-30 blur-[60px] md:blur-[120px] -translate-x-1/4 translate-y-1/4" />
         <div className="w-[120px] md:w-[250px] h-[120px] md:h-[200px] bg-[#FF0990] opacity-25 md:opacity-30 blur-[60px] md:blur-[120px] translate-x-1/4 translate-y-1/4" />
       </div>
-    </div>
+    </main>
   );
 
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API, { authAPI } from "../api";
-import logo from "../assets/LogoRadioactive.png";
+import logo from "../assets/LogoRadioactive.webp";
 
 function ProfilePage() {
   const [user, setUser] = useState(() =>
