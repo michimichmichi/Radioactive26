@@ -168,20 +168,35 @@ function Detail({ label, value }) {
 function TransferLink({ value }) {
   if (!value) {
     return (
-      <p className="text-sm font-semibold text-zinc-500">
-        No transfer proof uploaded.
-      </p>
+      <div className="flex min-w-0 flex-col gap-2 rounded-md border border-pink-100 bg-white px-4 py-3 md:col-span-2">
+        <p className="text-xs font-semibold uppercase text-pink-600">
+          Bukti Transfer
+        </p>
+        <p className="text-sm font-semibold text-zinc-500">
+          No transfer proof uploaded.
+        </p>
+      </div>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => openProtectedFile(value)}
-      className="text-sm font-bold text-pink-600 hover:text-pink-700"
-    >
-      View bukti transfer
-    </button>
+    <div className="flex min-w-0 flex-col gap-3 rounded-md border border-pink-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:col-span-2">
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase text-pink-600">
+          Bukti Transfer
+        </p>
+        <p className="mt-1 text-sm font-semibold text-zinc-600">
+          Payment proof is available to view.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => openProtectedFile(value)}
+        className="inline-flex w-full shrink-0 items-center justify-center rounded-md bg-pink-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 sm:w-auto"
+      >
+        View Transfer Proof
+      </button>
+    </div>
   );
 }
 
