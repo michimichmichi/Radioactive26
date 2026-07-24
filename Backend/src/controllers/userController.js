@@ -163,8 +163,13 @@ export const loginUser = async (req, res) => {
 // LOGOUT -- POST /api/users/logout
 export const logoutUser = async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.user.id, { $inc: { tokenVersion: 1 } });
         clearAuthCookie(res);
+
+        // Revoke all tokens when the current token is still verifiable.
+        // Cookie removal still succeeds for expired or malformed tokens.
+        if (req.user?.id) {
+            await User.findByIdAndUpdate(req.user.id, { $inc: { tokenVersion: 1 } });
+        }
 
         return res.status(200).json({
             message: 'Logout successful'
