@@ -6,7 +6,7 @@ import logo from '../assets/LogoRadioactive.webp';
 
 export default function OpeningTitle() {
   return (
-    <div className="relative w-full max-w-5xl h-[700px] mx-auto flex items-center justify-center overflow-visible select-none">  
+    <div className="relative w-full max-w-5xl min-h-[600px] md:h-[700px] mx-auto flex items-center justify-center overflow-visible select-none">  
       <style>{`
         @keyframes directPop {
           0%, 100% { transform: scale(1); }
@@ -61,7 +61,7 @@ export default function OpeningTitle() {
         width={335}
         height={334}
         decoding="async"
-        className="absolute top-[28%] left-[2%] w-[70px] md:w-[100px] h-auto z-20 object-contain transform -rotate-[15deg] drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
+        className="absolute top-[20%] left-[2%] w-[70px] md:w-[100px] h-auto z-20 object-contain transform -rotate-[15deg] drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
         style={{ animationDelay: '0s', animationDuration: '1.3s' }}
       />
 
@@ -71,7 +71,7 @@ export default function OpeningTitle() {
         width={335}
         height={334}
         decoding="async"
-        className="absolute bottom-[30%] right-[5%] w-[60px] md:w-[80px] h-auto z-20 transform drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
+        className="absolute bottom-[50%] right-[5%] w-[60px] md:w-[80px] h-auto z-20 transform drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop" 
         style={{ animationDelay: '0.6s', animationDuration: '1.5s' }}
       />
 

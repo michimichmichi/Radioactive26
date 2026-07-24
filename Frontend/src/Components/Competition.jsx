@@ -121,10 +121,10 @@ export default function Competition() {
         </div>
 
         <div className="mt-8 mb-6 flex flex-col items-center">
-            <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
+            <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em]  text-center uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
                 Our judges will be officially revealed on 
             </h3>
-             <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
+             <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)] text-center">
                 5 august 2026
             </h3>
 
