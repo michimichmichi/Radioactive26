@@ -65,7 +65,7 @@ const Navbar = () => {
         </div>
 
         {/* DESKTOP NAVIGATION LINKS */}
-        <ul className="hidden md:flex items-center gap-8 text-sm font-avrile text-zinc-100 font-semibold">
+        <ul className="hidden md:flex items-center gap-8 text-sm text-zinc-100 font-semibold">
           <li><a href="#about" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
           <li><a href="#competition" className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
           <li><a href="#sponsor" className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>

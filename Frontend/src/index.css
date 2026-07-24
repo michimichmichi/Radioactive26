@@ -183,7 +183,7 @@ html {
 
 .account-label {
   color: #d4d4d8;
-  font-family: 'AvrileSans', sans-serif;
+  font-family: sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -197,7 +197,7 @@ html {
   background: #ff0990;
   color: white;
   box-shadow: 0 0 24px rgba(255, 9, 144, 0.28);
-  font-family: 'AvrileSans', sans-serif;
+  font-family: sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -227,14 +227,6 @@ html {
 .admin-page .border-pink-200 { border-color: rgba(255, 9, 144, 0.24); }
 
 @layer base {
-  @font-face {
-    font-family: 'AvrileSans';
-    src: url(./assets/fonts/avrile-sans/AvrileSans-Black.ttf) format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-
   @font-face {
     font-family: 'BlokFont';
     src: url(./assets/fonts/blok/Blok.ttf) format('truetype');

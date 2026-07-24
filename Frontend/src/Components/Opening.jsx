@@ -2,7 +2,6 @@ import React from 'react';
 
 import vinyl from '../assets/opening/vinyl.webp';
 import star7 from '../assets/opening/Star 7.png'; 
-import glistening from '../assets/opening/glistening peak.webp';
 import logo from '../assets/LogoRadioactive.webp';
 
 export default function OpeningTitle() {
@@ -32,11 +31,12 @@ export default function OpeningTitle() {
       />
       
       <img 
-        src={glistening} 
+        src="/glistening-peak.webp"
         alt="Glistening Peak" 
         width={1328}
         height={962}
         fetchPriority="high"
+        loading="eager"
         decoding="async"
         className="absolute top-[23%] w-[550px] md:w-[680px] h-auto z-20 object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop" 
         style={{ animationDelay: '0.2s' }}
@@ -49,6 +49,7 @@ export default function OpeningTitle() {
           width={1920}
           height={1080}
           fetchPriority="high"
+          loading="eager"
           decoding="async"
           className="w-[400px] md:w-[500px] h-auto object-contain" 
         />
