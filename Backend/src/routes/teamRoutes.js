@@ -15,6 +15,6 @@ router.post("/", verifyToken, requireRole('admin', 'user'), uploadTransfer.singl
 router.get("/", verifyToken, getAllTeams);
 router.get("/search", verifyToken, requireRole('admin'), searchTeams);
 router.delete("/:id", verifyToken, requireRole('admin'), deleteTeam);
-router.put("/:id", verifyToken, requireRole('admin', 'user'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, updateTeam);
+router.put("/:id", verifyToken, requireRole('admin'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, updateTeam);
 
 export default router;

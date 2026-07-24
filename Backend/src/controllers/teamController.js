@@ -201,9 +201,16 @@ export const getAllTeams = async (req, res) => {
     }
 };
 
-//Update Team (Admin & Team Leader)
+//Update Team (Admin only)
 export const updateTeam = async (req, res) => {
     try {
+        if (req.user?.role !== "admin") {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(403).json({
+                message: "Only admins can modify team registrations"
+            });
+        }
+
         if (!isValidObjectId(req.params.id)) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
             return res.status(400).json({ message: "Invalid team id" });
@@ -223,19 +230,6 @@ export const updateTeam = async (req, res) => {
 
         const oldTransfer = existingTeam.buktiTransfer;
         const isAdmin = req.user?.role === "admin";
-        const isLeader =
-            existingTeam.leaderId.toString() === req.user?.id?.toString();
-
-        if (!isAdmin && !isLeader) {
-            if (req.file) {
-                await deleteUploadedTransfer(req.file.filename);
-            }
-
-            return res.status(403).json({
-                message: "Only the team leader can manage this team"
-            });
-        }
-
         const nextCompetitionId = req.body.competitionId || existingTeam.competitionId;
         const nextLeaderId = isAdmin && req.body.leaderId
             ? req.body.leaderId
