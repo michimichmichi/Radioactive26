@@ -24,7 +24,7 @@ export const clearAuthCookie = (res) => {
     const secure = process.env.COOKIE_SECURE === 'false' ? '' : '; Secure';
     res.setHeader(
         'Set-Cookie',
-        `radioactive_token=; Max-Age=0; Path=/${secure}; SameSite=Strict`
+        `radioactive_token=; Max-Age=0; Path=/${secure}; HttpOnly; SameSite=Strict`
     );
 };
 
@@ -118,6 +118,36 @@ export const verifyToken = async (req, res, next) => {
             message: 'Invalid token'
         });
     }
+};
+
+// Used by logout: authenticate when possible, but never block cookie removal.
+export const optionalVerifyToken = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const cookies = parseCookies(req.headers.cookie);
+        const token = cookies.radioactive_token ||
+            (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
+
+        if (!token) return next();
+
+        const decoded = jwt.verify(token, getJwtSecret(), {
+            algorithms: [JWT_ALGORITHM],
+            issuer: JWT_ISSUER
+        });
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (user && (decoded.tokenVersion || 0) === (user.tokenVersion || 0)) {
+            req.user = {
+                id: user._id,
+                email: user.email,
+                role: user.role || 'user'
+            };
+        }
+    } catch {
+        // An expired or invalid token should not prevent logout.
+    }
+
+    next();
 };
 
 export const requireRole = (...roles) => {

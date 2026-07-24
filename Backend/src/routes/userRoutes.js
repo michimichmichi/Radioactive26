@@ -11,14 +11,14 @@ import {
     deleteUser 
 } from '../controllers/userController.js';
 import uploadKtm, { validateKtmUpload } from '../middleware/uploadKtm.js';
-import { verifyToken, requireRole } from '../middleware/auth.js';
+import { verifyToken, optionalVerifyToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
 
 router.post('/register', uploadKtm.single('ktm'), validateKtmUpload, createUser);
 router.post('/login', loginUser);
-router.post('/logout', verifyToken, logoutUser);
+router.post('/logout', optionalVerifyToken, logoutUser);
 router.get('/me', verifyToken, getCurrentUser);
 
 router.post('/', verifyToken, requireRole('admin'),  uploadKtm.single('ktm'), validateKtmUpload, createUser);
