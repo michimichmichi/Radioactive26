@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import API, { openProtectedFile } from "../api";
 import {
   Trophy,
@@ -10,6 +11,9 @@ import {
   FileText,
   LayoutDashboard,
   RefreshCcw,
+  ChevronDown,
+  Home,
+  Check,
 } from "lucide-react";
 import { validateImageFile } from "../utils/fileValidation";
 
@@ -94,11 +98,108 @@ function Input(props) {
 }
 
 function Select(props) {
+  const { children, value, onChange, placeholder = "Select an option", ...rest } = props;
+  const dropdownRef = useRef(null);
+  const listboxId = useId();
+  const [isOpen, setIsOpen] = useState(false);
+  const options = React.Children.toArray(children).filter(
+    (child) => child?.type === "option",
+  );
+  const selectedOption = options.find((option) => option.props.value === value);
+
+  useEffect(() => {
+    const closeDropdown = (event) => {
+      if (!dropdownRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeDropdown);
+    return () => document.removeEventListener("mousedown", closeDropdown);
+  }, []);
+
+  const selectOption = (nextValue) => {
+    onChange?.({ target: { value: nextValue } });
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsOpen((current) => !current);
+    }
+  };
+
   return (
-    <select
-      {...props}
-      className="admin-field w-full px-4 py-3"
-    />
+    <div ref={dropdownRef} className="relative">
+      <button
+        type="button"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls={listboxId}
+        aria-required={rest.required}
+        onClick={() => setIsOpen((current) => !current)}
+        onKeyDown={handleKeyDown}
+        className={`admin-field flex w-full items-center justify-between px-4 py-3 text-left transition ${
+          isOpen ? "border-pink-500 ring-2 ring-pink-500/20" : ""
+        }`}
+      >
+        <span className={selectedOption ? "text-white" : "text-zinc-500"}>
+          {selectedOption?.props.children || placeholder}
+        </span>
+        <ChevronDown
+          size={18}
+          aria-hidden="true"
+          className={`shrink-0 text-pink-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          id={listboxId}
+          role="listbox"
+          aria-label={rest["aria-label"] || "Options"}
+          className="absolute left-0 right-0 z-30 mt-2 max-h-60 overflow-y-auto rounded-xl border border-pink-500/70 bg-zinc-950 p-1 shadow-2xl"
+        >
+          {options.map((option) => {
+            const isSelected = option.props.value === value;
+
+            return (
+              <button
+                key={option.key || option.props.value}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => selectOption(option.props.value)}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                  isSelected
+                    ? "bg-pink-600 text-white"
+                    : "text-zinc-200 hover:bg-pink-500/20 hover:text-pink-200"
+                }`}
+              >
+                {option.props.children}
+                {isSelected && <Check size={16} aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <input
+        {...rest}
+        tabIndex={-1}
+        aria-hidden="true"
+        value={value}
+        readOnly
+        className="pointer-events-none absolute h-px w-px opacity-0"
+      />
+    </div>
   );
 }
 
@@ -1120,6 +1221,14 @@ export default function Admin() {
             );
           })}
         </div>
+
+        <Link
+          to="/"
+          className="mt-8 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
+        >
+          <Home size={20} />
+          Back to homepage
+        </Link>
       </div>
 
       {/* CONTENT */}
