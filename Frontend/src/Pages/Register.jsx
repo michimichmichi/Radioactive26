@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
-import logo from "../assets/LogoRadioactive.png";
+import logo from "../assets/LogoRadioactive.webp";
 import { validateImageFile } from "../utils/fileValidation";
 
 function RegisterPage() {

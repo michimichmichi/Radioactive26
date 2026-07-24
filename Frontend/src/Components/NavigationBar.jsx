@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut, Menu, User, ShieldAlert, Award, Layers } from "lucide-react";
 import { authAPI } from "../api";
-import logo from "../assets/LogoRadioactive.png";
+import logo from "../assets/LogoRadioactive.webp";
 
 const preloadRegister = () => import("../Pages/Register.jsx");
 const preloadCompetitionRegistration = () => import("../Pages/CompetitionRegistration.jsx");
@@ -60,13 +60,13 @@ const Navbar = () => {
         {/* LOGO */}
         <div>
           <Link to="/">
-            <img src={logo} alt="Logo" className="h-14 w-auto object-contain" />
+            <img src={logo} alt="Radioactive 2026" width={1920} height={1080} className="h-14 w-auto object-contain" />
           </Link>
         </div>
 
         {/* DESKTOP NAVIGATION LINKS */}
         <ul className="hidden md:flex items-center gap-8 text-sm font-avrile text-zinc-100 font-semibold">
-          <li><a href="" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
+          <li><a href="#about" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
           <li><a href="#competition" className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
           <li><a href="#sponsor" className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
           <li><a href="#gallery" className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
@@ -83,6 +83,7 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen((current) => !current)}
                 className="flex items-center gap-2 rounded-xl border border-white/20 bg-black/40 backdrop-blur-sm px-4 py-2 text-sm font-medium transition-all hover:bg-black/60"
                 aria-expanded={isMenuOpen}
+                aria-label="Open account menu"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-pink-600">
                   <User size={14} />
@@ -164,8 +165,11 @@ const Navbar = () => {
               {/* Mobile Guest Burger Option Menu */}
               <div className="md:hidden">
                 <button 
+                  type="button"
                   onClick={() => setIsMenuOpen((current) => !current)}
                   className="p-1 text-white text-2xl focus:outline-none"
+                  aria-expanded={isMenuOpen}
+                  aria-label="Open navigation menu"
                 >
                   <Menu size={24} />
                 </button>

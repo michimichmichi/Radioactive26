@@ -2,7 +2,7 @@ import React from 'react';
 import { FaInstagram } from 'react-icons/fa';
 import { SiLine } from 'react-icons/si';
 
-import RadioactiveLogo from '../assets/LogoRadioactive.png';
+import RadioactiveLogo from '../assets/LogoRadioactive.webp';
 
 const Footer = () => {
   return (
@@ -18,6 +18,8 @@ const Footer = () => {
             <img 
               src={RadioactiveLogo} 
               alt="Radioactive Logo" 
+              width={1920}
+              height={1080}
               className="h-16 md:h-28 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.6)]" 
             />
           </div>
@@ -36,11 +38,11 @@ const Footer = () => {
             <h3 className="text-xl font-bold tracking-wide">Connect With Us</h3>
             
             <div className="flex justify-center md:justify-start items-center gap-3">
-              <a href="https://www.instagram.com/umnradioactive/" className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-[#FF0990] hover:border-[#FF0990] hover:text-black transition-all">
-                <FaInstagram className="text-lg" />
+              <a href="https://www.instagram.com/umnradioactive/" aria-label="Radioactive on Instagram" className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-[#FF0990] hover:border-[#FF0990] hover:text-black transition-all">
+                <FaInstagram aria-hidden="true" className="text-lg" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-[#FF0990] hover:border-[#FF0990] hover:text-black transition-all">
-                <SiLine className="text-lg" />
+              <a href="#" aria-label="Radioactive on LINE" className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-[#FF0990] hover:border-[#FF0990] hover:text-black transition-all">
+                <SiLine aria-hidden="true" className="text-lg" />
               </a>
             </div>
 

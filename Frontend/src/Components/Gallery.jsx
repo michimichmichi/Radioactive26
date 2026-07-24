@@ -1,9 +1,8 @@
 import React from 'react';
 
-import gallery from '../assets/gallery/gallery.png';
-import cameraRoll from '../assets/gallery/camera roll.png';
+import gallery from '../assets/gallery/gallery.webp';
 import star from '../assets/gallery/Star 6.png';
-import kamera from '../assets/gallery/kamera 1.png';
+import kamera from '../assets/gallery/kamera 1.webp';
 
 // These gallery copies are resized for their 200px display size. The originals
 // are several megabytes each and should not be sent to visitors.
@@ -93,6 +92,8 @@ export default function Gallery() {
         <img
           src={gallery}
           alt="Gallery"
+          width={1920}
+          height={864}
           className="w-full max-w-[600px] md:max-w-[800px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
         />
       </div>
@@ -109,6 +110,8 @@ export default function Gallery() {
                 key={index}
                 src={photo}
                 alt=""
+                width={200}
+                height={260}
                 loading="lazy"
                 decoding="async"
                 className="gallery-photo"
@@ -127,6 +130,8 @@ export default function Gallery() {
       <img
         src={star}
         alt="Star"
+        width={80}
+        height={80}
         loading="lazy"
         decoding="async"
         className="absolute top-[10%] left-[5%] w-[50px] md:w-[80px] z-40 drop-shadow-[0_0_30px_rgba(255,9,144,0.75)] animate-direct-pop"
@@ -136,6 +141,8 @@ export default function Gallery() {
       <img
     src={kamera}
     alt="Camera"
+    width={320}
+    height={430}
     loading="lazy"
     decoding="async"
     className="

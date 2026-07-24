@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronDown, Search, UploadCloud } from "lucide-react";
 import API from "../api";
-import logo from "../assets/LogoRadioactive.png";
+import logo from "../assets/LogoRadioactive.webp";
 import { validateImageFile } from "../utils/fileValidation";
 
 const RAC_GUIDEBOOK_URL =
