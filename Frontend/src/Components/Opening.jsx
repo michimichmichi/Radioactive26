@@ -26,7 +26,7 @@ export default function OpeningTitle() {
         width={565}
         height={1005}
         decoding="async"
-        className="absolute top-[-8%] right-[20%] w-[260px] md:w-[320px] h-auto z-0 opacity-90 drop-shadow-[0_0_20px_rgba(255,9,144,0.2)] animate-direct-pop" 
+        className="absolute top-[-8%] right-[20%] w-[220px] sm:w-[260px] md:w-[320px] h-auto z-0 opacity-90 drop-shadow-[0_0_20px_rgba(255,9,144,0.2)] animate-direct-pop" 
         style={{ animationDelay: '0.4s', animationDuration: '1.6s' }}
       />
       
@@ -38,7 +38,7 @@ export default function OpeningTitle() {
         fetchPriority="high"
         loading="eager"
         decoding="async"
-        className="absolute top-[23%] w-[550px] md:w-[680px] h-auto z-20 object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop" 
+        className="absolute top-[23%] w-[420px] sm:w-[550px] md:w-[680px] h-auto z-20 object-contain drop-shadow-[3px_5px_8px_rgba(0,0,0,0.8)] animate-direct-pop" 
         style={{ animationDelay: '0.2s' }}
       />
 
@@ -51,7 +51,7 @@ export default function OpeningTitle() {
           fetchPriority="high"
           loading="eager"
           decoding="async"
-          className="w-[400px] md:w-[500px] h-auto object-contain" 
+          className="w-[330px] sm:w-[400px] md:w-[500px] h-auto object-contain" 
         />
       </div>
 
