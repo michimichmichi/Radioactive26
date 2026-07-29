@@ -32,7 +32,11 @@ function DeferredSection({ children }) {
     return () => observer.disconnect();
   }, []);
 
-  return <div ref={sectionRef} className="min-h-[160px]">{shouldRender ? children : null}</div>;
+  return (
+    <div ref={sectionRef} className="min-h-[160px]">
+      {shouldRender ? <Suspense fallback={null}>{children}</Suspense> : null}
+    </div>
+  );
 }
 
 function Hero() {
@@ -56,15 +60,13 @@ function Hero() {
       <div className="pt-20">
         <h1 className="sr-only">Radioactive 2026</h1>
         <OpeningTitle />
-        <Suspense fallback={null}>
-          <DeferredSection><Mascot /></DeferredSection>
-          <DeferredSection><Competition /></DeferredSection>
-          <DeferredSection><Timeline /></DeferredSection>
-          <DeferredSection><Medpar /></DeferredSection>
-          <DeferredSection><Teaser /></DeferredSection>
-          <DeferredSection><Gallery /></DeferredSection>
-          <DeferredSection><Footer /></DeferredSection>
-        </Suspense>
+        <DeferredSection><Mascot /></DeferredSection>
+        <DeferredSection><Competition /></DeferredSection>
+        <DeferredSection><Timeline /></DeferredSection>
+        <DeferredSection><Medpar /></DeferredSection>
+        <DeferredSection><Teaser /></DeferredSection>
+        <DeferredSection><Gallery /></DeferredSection>
+        <DeferredSection><Footer /></DeferredSection>
       </div>
 
       {/* bottom pink fade */}
