@@ -8,6 +8,7 @@ const Timeline = lazy(() => import('../Components/Timeline'));
 const Medpar = lazy(() => import('../Components/Medpar'));
 const Gallery = lazy(() => import('../Components/Gallery'));
 const Footer = lazy(() => import('../Components/Footer'));
+const Teaser = lazy(() => import('../Components/Teaser'))
 
 function DeferredSection({ children }) {
   const sectionRef = useRef(null);
@@ -60,6 +61,7 @@ function Hero() {
           <DeferredSection><Competition /></DeferredSection>
           <DeferredSection><Timeline /></DeferredSection>
           <DeferredSection><Medpar /></DeferredSection>
+          <DeferredSection><Teaser /></DeferredSection>
           <DeferredSection><Gallery /></DeferredSection>
           <DeferredSection><Footer /></DeferredSection>
         </Suspense>
