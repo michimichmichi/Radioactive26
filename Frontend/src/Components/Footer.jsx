@@ -203,6 +203,39 @@ const Footer = () => {
 
             </div>
 
+            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 hover:border-[#FF0990] hover:shadow-[0_0_20px_rgba(255,9,144,0.25)] transition-all mt-4">
+
+                <p className="text-xs uppercase tracking-[0.2em] text-[#FF0990] font-bold mb-5">
+                  Sponsorship
+                </p>
+
+                <div className="space-y-4">
+
+                  <a
+                    href="https://wa.me/6281366540106"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-3 text-gray-300 hover:text-[#FF0990] transition"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#FF0990]/10 flex items-center justify-center flex-shrink-0">
+                      <FaPhoneAlt className="text-[#FF0990] text-xs" />
+                    </div>
+
+                    <div>
+                      <p className="font-semibold text-white">
+                        Candice
+                      </p>
+                      <p className="text-sm break-words">
+                        +62 813-6654-0106
+                      </p>
+                    </div>
+                  </a>
+
+                </div>
+
+              </div>
+
+
           </div>
 
         </div>
