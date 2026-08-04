@@ -5,10 +5,10 @@ import competition from '../assets/competition/competition.webp';
 import radAnnouncing from '../assets/competition/radio announcing competition.png';
 import podcast from '../assets/competition/podcast competition.png';
 import register from '../assets/competition/register now.webp';
-import judge1 from '../assets/judgess/judge1.png';
-import judge2 from '../assets/judgess/judge2.JPEG';
-import judge3 from '../assets/judgess/judge3.jpg';
-import title from '../assets/judgess/judges.png';
+import judge1 from '../assets/judgess/judge1.webp';
+import judge2 from '../assets/judgess/judge2.webp';
+import judge3 from '../assets/judgess/judge3.webp';
+import title from '../assets/judgess/judges.webp';
 
 export default function Competition() {
     const navigate = useNavigate();
@@ -130,8 +130,8 @@ export default function Competition() {
                 <img 
                     src={title} 
                     alt="judges" 
-                    width={907}
-                    height={292}
+                    width={800}
+                    height={501}
                     loading="lazy"
                     decoding="async"
                     className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
@@ -146,6 +146,10 @@ export default function Competition() {
                 <img
                     src={judge1}
                     alt="Judge 1"
+                    width={720}
+                    height={768}
+                    loading="lazy"
+                    decoding="async"
                     className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
                 />
 
@@ -167,6 +171,10 @@ export default function Competition() {
                 <img
                     src={judge3}
                     alt="Judge 2"
+                    width={720}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
                     className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
                 />
 
@@ -188,6 +196,10 @@ export default function Competition() {
                 <img
                     src={judge2}
                     alt="Judge 3"
+                    width={703}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
                     className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
                 />
 
