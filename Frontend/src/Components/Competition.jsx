@@ -6,7 +6,7 @@ import radAnnouncing from '../assets/competition/radio announcing competition.pn
 import podcast from '../assets/competition/podcast competition.png';
 import register from '../assets/competition/register now.webp';
 import judge1 from '../assets/judgess/judge1.png';
-import judge2 from '../assets/judgess/judge2.jpg';
+import judge2 from '../assets/judgess/judge2.JPEG';
 import judge3 from '../assets/judgess/judge3.jpg';
 import title from '../assets/judgess/judges.png';
 
@@ -165,7 +165,7 @@ export default function Competition() {
         <div className="group flex flex-col items-center">
             <div className="relative overflow-hidden rounded-3xl">
                 <img
-                    src={judge2}
+                    src={judge3}
                     alt="Judge 2"
                     className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
                 />
@@ -186,7 +186,7 @@ export default function Competition() {
         <div className="group flex flex-col items-center">
             <div className="relative overflow-hidden rounded-3xl">
                 <img
-                    src={judge3}
+                    src={judge2}
                     alt="Judge 3"
                     className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
                 />
