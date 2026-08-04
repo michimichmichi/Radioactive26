@@ -5,6 +5,10 @@ import competition from '../assets/competition/competition.webp';
 import radAnnouncing from '../assets/competition/radio announcing competition.png';
 import podcast from '../assets/competition/podcast competition.png';
 import register from '../assets/competition/register now.webp';
+import judge1 from '../assets/judgess/judge1.png';
+import judge2 from '../assets/judgess/judge2.jpg';
+import judge3 from '../assets/judgess/judge3.jpg';
+import title from '../assets/judgess/judges.png';
 
 export default function Competition() {
     const navigate = useNavigate();
@@ -120,16 +124,88 @@ export default function Competition() {
 
         </div>
 
-        <div className="mt-8 mb-6 flex flex-col items-center">
-            <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em]  text-center uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)]">
-                Our judges will be officially revealed on 
-            </h3>
-             <h3 className="font-avril text-xl md:text-2xl tracking-[0.25em] uppercase text-[#FF0990] drop-shadow-[0_0_12px_rgba(255,9,144,0.8)] text-center">
-                5 august 2026
-            </h3>
-
+        {/* Judges */}
+        <div className="mt-12 md:mt-16 flex flex-col items-center z-20">
+            <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5 z-30">
+                <img 
+                    src={title} 
+                    alt="judges" 
+                    width={907}
+                    height={292}
+                    loading="lazy"
+                    decoding="async"
+                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                />
             </div>
 
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-[-50px] sm:mt-[-100px] px-4 md:px-8 z-20">
+
+        {/* Judge 1 */}
+        <div className="group flex flex-col items-center">
+            <div className="relative overflow-hidden rounded-3xl">
+                <img
+                    src={judge1}
+                    alt="Judge 1"
+                    className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 rounded-3xl ring-2 ring-[#FF0990]/70 shadow-[0_0_35px_rgba(255,9,144,0.45)]"></div>
+            </div>
+
+            <h3 className="mt-5 text-[#FF0990] text-xl md:text-2xl font-avril tracking-wider uppercase">
+                Nilover Judge
+            </h3>
+
+            <p className="text-white/80 text-center text-sm md:text-base mt-2 px-4">
+                Podcast Competition
+            </p>
+        </div>
+
+        {/* Judge 2 */}
+        <div className="group flex flex-col items-center">
+            <div className="relative overflow-hidden rounded-3xl">
+                <img
+                    src={judge2}
+                    alt="Judge 2"
+                    className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 rounded-3xl ring-2 ring-[#FF0990]/70 shadow-[0_0_35px_rgba(255,9,144,0.45)]"></div>
+            </div>
+
+            <h3 className="mt-5 text-[#FF0990] text-l md:text-xl font-avril tracking-wider uppercase text-center">
+                Raihan Pahlevi Fawwaz
+            </h3>
+
+            <p className="text-white/80 text-center text-sm md:text-base mt-2 px-4">
+                Radio Announcing Competition 
+            </p>
+        </div>
+
+        {/* Judge 3 */}
+        <div className="group flex flex-col items-center">
+            <div className="relative overflow-hidden rounded-3xl">
+                <img
+                    src={judge3}
+                    alt="Judge 3"
+                    className="w-[240px] md:w-[300px] aspect-[4/5] object-cover rounded-3xl transition duration-300 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 rounded-3xl ring-2 ring-[#FF0990]/70 shadow-[0_0_35px_rgba(255,9,144,0.45)]"></div>
+            </div>
+
+            <h3 className="mt-5 text-[#FF0990] text-xl md:text-2xl font-avril tracking-wider uppercase">
+                Eikel Barus
+            </h3>
+
+            <p className="text-white/80 text-center text-sm md:text-base mt-2 px-4">
+                Radio Announcing Competition
+            </p>
+        </div>
+
+    </div>
+
+</div>
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5">
             <button 
                 onClick={() => handleRegisterClick('podcast')} 
