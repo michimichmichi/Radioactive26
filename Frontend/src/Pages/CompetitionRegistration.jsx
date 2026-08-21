@@ -381,13 +381,13 @@ function CompetitionRegistrationPage() {
           </p>
 
           <p className="mt-1 font-mono text-lg font-bold tracking-widest">
-            4106128900
+            004106128900
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => navigator.clipboard.writeText("4106128900")}
+          onClick={() => navigator.clipboard.writeText("004106128900")}
           className="rounded-md bg-pink-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-pink-700"
         >
           Copy
