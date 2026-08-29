@@ -8,7 +8,7 @@ import { validateImageFile } from "../utils/fileValidation";
 const RAC_GUIDEBOOK_URL =
   "https://drive.google.com/uc?export=download&id=1g_PwDqTM62IuwucAvT2DyNtunxj0hR97";
 const PODCAST_GUIDEBOOK_URL =
-  "https://drive.google.com/uc?export=download&id=1Jlvc2T3qRPbOvH1CbUUm133Ee0zZ489z";
+  "https://drive.google.com/uc?export=download&id=1yP6t32jWi1I5r0aG5kiZ9jof74heA5kS";
 
 function CompetitionDropdown({ competitions, value, onChange }) {
   const dropdownRef = useRef(null);
