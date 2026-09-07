@@ -23,7 +23,7 @@ export default function Medpar() {
 ]
 
 return (
-    <div id="sponsor" className="relative w-full max-w-5xl mx-auto flex flex-col items-center justify-center overflow-visible select-none px-4 py-16 mt-[100px] md:mt-[200px] mb-24">
+    <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center justify-center overflow-visible select-none px-4 py-16 mt-[100px] md:mt-[200px] mb-24">
       
         {/* Keyframe Animasi Shake untuk Banner Utama */}
         <style>{`

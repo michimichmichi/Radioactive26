@@ -10,7 +10,7 @@ const Gallery = lazy(() => import('../Components/Gallery'));
 const Footer = lazy(() => import('../Components/Footer'));
 const Teaser = lazy(() => import('../Components/Teaser'))
 
-function DeferredSection({ children }) {
+function DeferredSection({ children, id }) {
   const sectionRef = useRef(null);
   const [shouldRender, setShouldRender] = useState(false);
 
@@ -33,13 +33,28 @@ function DeferredSection({ children }) {
   }, []);
 
   return (
-    <div ref={sectionRef} className="min-h-[160px]">
+    <div ref={sectionRef} id={id} className="min-h-[160px] scroll-mt-20">
       {shouldRender ? <Suspense fallback={null}>{children}</Suspense> : null}
     </div>
   );
 }
 
 function Hero() {
+  useEffect(() => {
+    const sectionId = window.location.hash.slice(1);
+    if (!sectionId) return undefined;
+
+    const scrollToSection = () => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    };
+
+    const frame = requestAnimationFrame(() => requestAnimationFrame(scrollToSection));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <main
       id="about"
@@ -61,11 +76,11 @@ function Hero() {
         <h1 className="sr-only">Radioactive 2026</h1>
         <OpeningTitle />
         <DeferredSection><Mascot /></DeferredSection>
-        <DeferredSection><Competition /></DeferredSection>
+        <DeferredSection id="competition"><Competition /></DeferredSection>
         <DeferredSection><Timeline /></DeferredSection>
-        <DeferredSection><Medpar /></DeferredSection>
+        <DeferredSection id="sponsor"><Medpar /></DeferredSection>
         <DeferredSection><Teaser /></DeferredSection>
-        <DeferredSection><Gallery /></DeferredSection>
+        <DeferredSection id="gallery"><Gallery /></DeferredSection>
         <DeferredSection><Footer /></DeferredSection>
       </div>
 

@@ -54,6 +54,26 @@ const Navbar = () => {
     }
   };
 
+  const handleSectionClick = (event, sectionId) => {
+    event.preventDefault();
+    setIsMenuOpen(false);
+
+    const scrollToSection = () => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
+
+    if (window.location.pathname === "/" || window.location.pathname === "/app") {
+      window.history.pushState(null, "", `${window.location.pathname}#${sectionId}`);
+      requestAnimationFrame(scrollToSection);
+      return;
+    }
+
+    navigate(`/#${sectionId}`);
+  };
+
   return (
     <div className="sticky top-0 z-50 w-full">
       <nav className="bg-[#FF0990] px-6 h-16 flex items-center justify-between text-white shadow-md">
@@ -66,10 +86,10 @@ const Navbar = () => {
 
         {/* DESKTOP NAVIGATION LINKS */}
         <ul className="hidden md:flex items-center gap-8 text-sm text-zinc-100 font-semibold">
-          <li><a href="#about" className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
-          <li><a href="#competition" className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
-          <li><a href="#sponsor" className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
-          <li><a href="#gallery" className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
+          <li><a href="#about" onClick={(event) => handleSectionClick(event, "about")} className="hover:text-white transition-colors tracking-wider">ABOUT</a></li>
+          <li><a href="#competition" onClick={(event) => handleSectionClick(event, "competition")} className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
+          <li><a href="#sponsor" onClick={(event) => handleSectionClick(event, "sponsor")} className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
+          <li><a href="#gallery" onClick={(event) => handleSectionClick(event, "gallery")} className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
         </ul>
 
         {/* ACTION CONTROLS / DROPDOWN CONTAINER */}
@@ -111,10 +131,10 @@ const Navbar = () => {
 
                   {/* MOBILE-ONLY NAVIGATION LINKS (Injected inside the menu wrapper) */}
                   <div className="md:hidden border-b border-zinc-100 py-1">
-                    <MenuLink to="/#about" label="About" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#competition" label="Competitions" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#sponsor" label="Sponsors" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#gallery" label="Gallery" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#about" label="About" onClick={(event) => handleSectionClick(event, "about")} />
+                    <MenuLink to="/#competition" label="Competitions" onClick={(event) => handleSectionClick(event, "competition")} />
+                    <MenuLink to="/#sponsor" label="Sponsors" onClick={(event) => handleSectionClick(event, "sponsor")} />
+                    <MenuLink to="/#gallery" label="Gallery" onClick={(event) => handleSectionClick(event, "gallery")} />
                   </div>
 
                   {/* USER CONTENT LINKS */}
@@ -176,10 +196,10 @@ const Navbar = () => {
                 
                 {isMenuOpen && (
                   <div className="absolute right-0 top-14 z-50 w-48 rounded-xl border border-zinc-100 bg-white text-zinc-900 shadow-2xl py-2">
-                    <MenuLink to="/#about" label="About" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#competition" label="Competitions" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#sponsor" label="Sponsors" onClick={() => setIsMenuOpen(false)} />
-                    <MenuLink to="/#gallery" label="Gallery" onClick={() => setIsMenuOpen(false)} />
+                    <MenuLink to="/#about" label="About" onClick={(event) => handleSectionClick(event, "about")} />
+                    <MenuLink to="/#competition" label="Competitions" onClick={(event) => handleSectionClick(event, "competition")} />
+                    <MenuLink to="/#sponsor" label="Sponsors" onClick={(event) => handleSectionClick(event, "sponsor")} />
+                    <MenuLink to="/#gallery" label="Gallery" onClick={(event) => handleSectionClick(event, "gallery")} />
                   </div>
                 )}
               </div>

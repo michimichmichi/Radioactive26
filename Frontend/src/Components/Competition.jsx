@@ -20,7 +20,7 @@ export default function Competition() {
     };
 
   return (
-    <div id="competition" className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible ">  
+    <div className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible">
         <style>{`
             @keyframes popShakePop {
             0%, 100% { 
