@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getApiErrorMessage } from "./utils/apiErrors";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
@@ -7,8 +8,14 @@ const API = axios.create({
 
 API.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  async (error) => {
+    if (error.response?.data instanceof Blob && error.response.data.type.includes("json")) {
+      try {
+        error.response.data = JSON.parse(await error.response.data.text());
+      } catch { /* Fall back to a status-specific message if the response is unreadable. */ }
+    }
+    error.userMessage = getApiErrorMessage(error);
+    if (error.response?.status === 401 && error.config?.url !== "/users/login") {
       localStorage.removeItem("user");
       window.dispatchEvent(new Event("auth-change"));
     }
@@ -24,10 +31,14 @@ export const openProtectedFile = async (value) => {
     return;
   }
 
-  const response = await API.get(value, { responseType: "blob" });
-  const objectUrl = URL.createObjectURL(response.data);
-  window.open(objectUrl, "_blank", "noopener,noreferrer");
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  try {
+    const response = await API.get(value, { responseType: "blob" });
+    const objectUrl = URL.createObjectURL(response.data);
+    window.open(objectUrl, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  } catch (error) {
+    window.alert(error.userMessage || "Unable to open the file. Please try again.");
+  }
 };
 
 export const authAPI = {

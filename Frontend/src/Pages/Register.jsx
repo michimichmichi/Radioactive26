@@ -67,7 +67,7 @@ function RegisterPage() {
       });
     } catch (err) {
       setError(
-        err.response?.data?.message || "Registration failed. Please try again.",
+        err.userMessage || "Registration failed. Please try again.",
       );
     } finally {
       setIsLoading(false);

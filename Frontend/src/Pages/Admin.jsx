@@ -295,7 +295,7 @@ function CompetitionsPanel() {
       const res = await competitionAPI.getAll();
       setCompetitions(res.data);
     } catch (err) {
-      console.log(err);
+      alert(err.userMessage || "Unable to load data. Please try again.");
     }
   };
 
@@ -321,7 +321,7 @@ function CompetitionsPanel() {
       resetForm();
       fetchCompetitions();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.userMessage || "The request could not be completed. Please try again.");
     }
   };
 
@@ -339,8 +339,12 @@ function CompetitionsPanel() {
   const deleteCompetition = async (id) => {
     if (!window.confirm("Delete competition?")) return;
 
-    await competitionAPI.delete(id);
-    fetchCompetitions();
+    try {
+      await competitionAPI.delete(id);
+      fetchCompetitions();
+    } catch (err) {
+      alert(err.userMessage || "Unable to delete this item. Please try again.");
+    }
   };
 
   return (
@@ -477,7 +481,7 @@ function UsersPanel() {
       const res = await userAPI.getAll();
       setUsers(res.data);
     } catch (err) {
-      console.log(err);
+      alert(err.userMessage || "Unable to load data. Please try again.");
     }
   };
 
@@ -508,7 +512,7 @@ function UsersPanel() {
       resetForm();
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.userMessage || "The request could not be completed. Please try again.");
     }
   };
 
@@ -530,8 +534,12 @@ function UsersPanel() {
   const deleteUser = async (id) => {
     if (!window.confirm("Delete user?")) return;
 
-    await userAPI.delete(id);
-    fetchUsers();
+    try {
+      await userAPI.delete(id);
+      fetchUsers();
+    } catch (err) {
+      alert(err.userMessage || "Unable to delete this item. Please try again.");
+    }
   };
 
   return (
@@ -768,7 +776,7 @@ function TeamsPanel() {
       setUsers(usersRes.data);
       setCompetitions(competitionsRes.data);
     } catch (err) {
-      console.log(err);
+      alert(err.userMessage || "Unable to load data. Please try again.");
     }
   };
 
@@ -811,7 +819,7 @@ function TeamsPanel() {
       resetForm();
       loadData();
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(err.userMessage || "The request could not be completed. Please try again.");
     }
   };
 
@@ -831,8 +839,12 @@ function TeamsPanel() {
   const deleteTeam = async (id) => {
     if (!window.confirm("Delete team?")) return;
 
-    await teamAPI.delete(id);
-    loadData();
+    try {
+      await teamAPI.delete(id);
+      loadData();
+    } catch (err) {
+      alert(err.userMessage || "Unable to delete this item. Please try again.");
+    }
   };
 
   const searchTeams = async (value) => {
@@ -843,8 +855,12 @@ function TeamsPanel() {
       return;
     }
 
-    const res = await teamAPI.search(value);
-    setTeams(res.data.teams);
+    try {
+      const res = await teamAPI.search(value);
+      setTeams(res.data.teams);
+    } catch (err) {
+      alert(err.userMessage || "Unable to search teams. Please try again.");
+    }
   };
 
   const filteredUsers = users.filter((u) => {
@@ -1133,10 +1149,9 @@ export default function Admin() {
       setTeams(t.data || []);
       setCompetitions(c.data || []);
     } catch (err) {
-      console.log(err);
       setAuthError(
-        err.response?.data?.message ||
-          "Unable to load admin data. Please login again with an admin account.",
+        err.userMessage ||
+          "Unable to load admin data. Please try again.",
       );
     }
   };

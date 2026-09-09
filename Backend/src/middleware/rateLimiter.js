@@ -39,7 +39,8 @@ export const rateLimiter = ({
 
         if (record.count >= maxRequests) {
             res.setHeader('Retry-After', Math.ceil((record.resetAt - now) / 1000));
-            return res.status(429).json({ message });
+            const retryAfterSeconds = Math.ceil((record.resetAt - now) / 1000);
+            return res.status(429).json({ message: `${message} Wait ${Math.ceil(retryAfterSeconds / 60)} minute(s) before trying again.`, retryAfterSeconds });
         }
 
         record.count += 1;

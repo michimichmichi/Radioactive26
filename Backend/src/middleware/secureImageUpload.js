@@ -61,7 +61,7 @@ export const createSecureImageUpload = (folderName) => {
             return;
         }
 
-        cb(new Error('Only JPG, JPEG, and PNG files are allowed'));
+        cb(Object.assign(new Error('Only JPG, JPEG, and PNG files are allowed'), { code: 'INVALID_IMAGE_TYPE' }));
     };
 
     const upload = multer({

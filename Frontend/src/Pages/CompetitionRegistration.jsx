@@ -140,7 +140,7 @@ function CompetitionRegistrationPage() {
         setCompetitions(competitionsRes.data || []);
       } catch (err) {
         setError(
-          err.response?.data?.message || "Unable to load registration data.",
+          err.userMessage || "Unable to load registration data.",
         );
       }
     };
@@ -183,7 +183,7 @@ function CompetitionRegistrationPage() {
       } catch (err) {
         setNimResults([]);
         setNimStatus(
-          err.response?.data?.message ||
+          err.userMessage ||
             "Participant search failed. Please try again.",
         );
       }
@@ -263,7 +263,7 @@ function CompetitionRegistrationPage() {
     navigate("/my-competitions");
   } catch (err) {
     setError(
-      err.response?.data?.message ||
+      err.userMessage ||
         "Unable to submit registration. Please try again."
     );
   } finally {

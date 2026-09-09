@@ -31,7 +31,7 @@ function LoginPage() {
       window.dispatchEvent(new Event("auth-change"));
       navigate(response.data.user?.role === "admin" ? "/admin" : "/");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(err.userMessage || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

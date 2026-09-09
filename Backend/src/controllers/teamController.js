@@ -1,3 +1,4 @@
+import { sendError } from '../middleware/errorHandler.js';
 import Team from "../models/Team.js";
 import User from "../models/User.js";
 import Competition from "../models/Competition.js";
@@ -107,17 +108,21 @@ export const createTeam = async (req, res) => {
         const normalizedTeamName = normalizeString(teamName, { max: 120, required: true });
         if (!normalizedTeamName || !isValidObjectId(competitionId)) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
-            return res.status(400).json({ message: "Invalid team data" });
+            return res.status(400).json({ message: !normalizedTeamName ? "Enter a team name (1 to 120 characters)." : "Select a valid competition. Refresh the page if it is no longer listed." });
         }
 
         const teamLeaderId = req.user?.role === "admin" ? leaderId : req.user.id;
         if (!isValidObjectId(teamLeaderId)) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
-            return res.status(400).json({ message: "Invalid team leader" });
+            return res.status(400).json({ message: "Select a registered user as the team leader." });
         }
         const teamMembers = normalizeMembers(members).filter(
             (memberId) => memberId !== teamLeaderId?.toString()
         );
+        if (teamMembers.some((id) => !isValidObjectId(id))) {
+            if (req.file) await deleteUploadedTransfer(req.file.filename);
+            return res.status(400).json({ message: 'One or more team members are invalid. Select registered users again.' });
+        }
         if (teamMembers.length > 50) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
             return res.status(400).json({ message: "A team cannot have more than 50 members" });
@@ -130,7 +135,7 @@ export const createTeam = async (req, res) => {
 
         if (!competition || participantCount !== participantIds.length) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
-            return res.status(400).json({ message: "Invalid competition or participant" });
+            return res.status(400).json({ message: !competition ? "This competition is no longer available. Refresh the page and select another competition." : "One or more participants no longer exist. Refresh the page and select registered users again." });
         }
         const conflictTeam = await findCompetitionConflict({
             competitionId,
@@ -169,15 +174,7 @@ export const createTeam = async (req, res) => {
             await deleteUploadedTransfer(req.file.filename);
         }
 
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: "Team name already exists"
-            });
-        }
-
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
         
     }
 };
@@ -197,7 +194,7 @@ export const getAllTeams = async (req, res) => {
 
         res.status(200).json(teams);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return sendError(error, req, res);
     }
 };
 
@@ -250,7 +247,7 @@ export const updateTeam = async (req, res) => {
 
         if (!nextTeamName || !isValidObjectId(nextCompetitionId) || !isValidObjectId(nextLeaderId) || nextMembers.some((id) => !isValidObjectId(id))) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
-            return res.status(400).json({ message: "Invalid team data" });
+            return res.status(400).json({ message: !nextTeamName ? "Enter a team name (1 to 120 characters)." : !isValidObjectId(nextCompetitionId) ? "Select a valid competition." : "Select valid registered users as the team leader and members." });
         }
 
         const participantIds = getParticipantIds(nextLeaderId, nextMembers);
@@ -261,7 +258,7 @@ export const updateTeam = async (req, res) => {
 
         if (!competition || participantCount !== participantIds.length) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
-            return res.status(400).json({ message: "Invalid competition or participant" });
+            return res.status(400).json({ message: !competition ? "This competition is no longer available. Refresh the page and select another competition." : "One or more participants no longer exist. Refresh the page and select registered users again." });
         }
         const conflictTeam = await findCompetitionConflict({
             competitionId: nextCompetitionId,
@@ -335,15 +332,7 @@ export const updateTeam = async (req, res) => {
             await deleteUploadedTransfer(req.file.filename);
         }
 
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: "Team name already exists"
-            });
-        }
-
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -375,7 +364,7 @@ export const deleteTeam = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return sendError(error, req, res);
     }
 };
 
@@ -385,7 +374,7 @@ export const searchTeams = async (req, res) => {
         const { query } = req.query;
 
         if (typeof query !== 'string' || !query.trim() || query.trim().length > 80) {
-            return res.status(400).json({ message: "Search query is required" });
+            return res.status(400).json({ message: "Enter a team name to search (1 to 80 characters)." });
         }
 
         const teams = await Team.find({
@@ -398,6 +387,6 @@ export const searchTeams = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return sendError(error, req, res);
     }
 };

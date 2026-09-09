@@ -9,7 +9,7 @@ function ProfilePage() {
   );
   const [error, setError] = useState("");
   const [ktmImage, setKtmImage] = useState("");
-  const [ktmError, setKtmError] = useState(false);
+  const [ktmError, setKtmError] = useState("");
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -18,7 +18,7 @@ function ProfilePage() {
         localStorage.setItem("user", JSON.stringify(response.data));
         setUser(response.data);
       } catch (err) {
-        setError(err.response?.data?.message || "Unable to load profile.");
+        setError(err.userMessage || "Unable to load profile.");
       }
     };
 
@@ -31,7 +31,7 @@ function ProfilePage() {
 
     const loadKtmImage = async () => {
       setKtmImage("");
-      setKtmError(false);
+      setKtmError("");
 
       if (!user?.ktm) return;
 
@@ -49,9 +49,9 @@ function ProfilePage() {
         } else {
           setKtmImage(objectUrl);
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) {
-          setKtmError(true);
+          setKtmError(err.userMessage || "Unable to load KTM image. Please try again.");
         }
       }
     };
@@ -112,7 +112,7 @@ function KtmField({ imageUrl, hasError }) {
         />
       ) : (
         <p className="mt-1 text-sm font-semibold text-zinc-800">
-          {hasError ? "Unable to load KTM image." : "-"}
+          {hasError || "-"}
         </p>
       )}
     </div>

@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { authAPI } from "../api";
 
 function ProtectedAdminRoute({ children }) {
+  const [error, setError] = useState("");
   const [status, setStatus] = useState("checking");
   const [user, setUser] = useState(null);
 
@@ -14,13 +15,25 @@ function ProtectedAdminRoute({ children }) {
         window.dispatchEvent(new Event("auth-change"));
         setUser(response.data);
         setStatus(response.data.role === "admin" ? "allowed" : "forbidden");
-      } catch {
-        setStatus("unauthenticated");
+      } catch (err) {
+        setError(err.userMessage || "Unable to verify your account. Please try again.");
+        setStatus(err.response?.status === 401 ? "unauthenticated" : "error");
       }
     };
 
     verifyAdmin();
   }, []);
+
+  if (status === "error") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
+        <div role="alert" className="max-w-xl rounded-lg border border-pink-400/30 p-6">
+          <p>{error}</p>
+          <button className="mt-4 rounded bg-pink-600 px-4 py-2" onClick={() => window.location.reload()}>Try again</button>
+        </div>
+      </main>
+    );
+  }
 
   if (status === "checking") {
     return (
@@ -37,7 +50,7 @@ function ProtectedAdminRoute({ children }) {
       <Navigate
         to="/login"
         replace
-        state={{ message: "Please login with an admin account first." }}
+        state={{ message: error || "Please login with an admin account first." }}
       />
     );
   }

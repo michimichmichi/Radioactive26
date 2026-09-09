@@ -1,3 +1,4 @@
+import { sendError } from '../middleware/errorHandler.js';
 import Competition from '../models/Competition.js';
 import { normalizeString, isValidObjectId } from '../utils/security.js';
 
@@ -12,7 +13,7 @@ export const createCompetition = async (req, res) => {
         const parsedTime = new Date(time);
 
         if (!normalizedName || !normalizedPlace || !normalizedTerms || Number.isNaN(parsedTime.getTime())) {
-            return res.status(400).json({ message: 'Invalid competition data' });
+            return res.status(400).json({ message: !normalizedName ? 'Enter a competition name (1 to 120 characters).' : !normalizedPlace ? 'Enter a location (1 to 200 characters).' : !normalizedTerms ? 'Enter terms and conditions (1 to 5,000 characters).' : 'Enter a valid competition date and time.' });
         }
 
         const newCompetition = await Competition.create({
@@ -24,7 +25,7 @@ export const createCompetition = async (req, res) => {
         res.status(201).json(newCompetition);
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return sendError(error, req, res);
     }
 }
 
@@ -35,7 +36,7 @@ export const getCompetition = async (req, res) => {
         res.status(200).json(comps);
 
     } catch (error) { 
-        res.status(500).json({ message: error.message });
+        return sendError(error, req, res);
     }
 }
 
@@ -67,7 +68,7 @@ export const updateCompetition = async (req, res) => {
         }
 
         if (!Object.keys(updateData).length || Object.values(updateData).some((value) => value === null || (value instanceof Date && Number.isNaN(value.getTime())))) {
-            return res.status(400).json({ message: 'Invalid competition data' });
+            return res.status(400).json({ message: !Object.keys(updateData).length ? 'Change at least one competition field before saving.' : updateData.competitionName === null ? 'Enter a competition name (1 to 120 characters).' : updateData.place === null ? 'Enter a location (1 to 200 characters).' : updateData.termsAndConditions === null ? 'Enter terms and conditions (1 to 5,000 characters).' : 'Enter a valid competition date and time.' });
         }
 
         const updatedComp = await Competition.findByIdAndUpdate(
@@ -80,7 +81,7 @@ export const updateCompetition = async (req, res) => {
         res.status(200).json(updatedComp);
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return sendError(error, req, res);
     }
 }
 
@@ -96,6 +97,6 @@ export const deleteCompetition = async (req, res) => {
         res.status(200).json({ message: 'Competition deleted successfully' });
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return sendError(error, req, res);
     }
 };

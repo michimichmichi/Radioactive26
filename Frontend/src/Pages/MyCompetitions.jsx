@@ -24,7 +24,7 @@ function MyCompetitionsPage() {
       setTeams(registeredTeams);
     } catch (err) {
       setError(
-        err.response?.data?.message ||
+        err.userMessage ||
           "Unable to load registered competitions.",
       );
     }

@@ -44,8 +44,8 @@ const Navbar = () => {
   const logout = async () => {
     try {
       await authAPI.logout();
-    } catch {
-      // Local cleanup still happens if the token is already expired.
+    } catch (err) {
+      window.alert(err.userMessage || "Logout could not be confirmed by the server. Please try again.");
     } finally {
       localStorage.removeItem("user");
       window.dispatchEvent(new Event("auth-change"));

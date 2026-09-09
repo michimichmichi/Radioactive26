@@ -1,3 +1,4 @@
+import { sendError } from '../middleware/errorHandler.js';
 import User from '../models/User.js'
 import fs from 'fs/promises';
 import path from 'path';
@@ -59,7 +60,13 @@ export const createUser = async (req, res) => {
 
         if (!name || !email || password.length < 8 || password.length > 128 || !university || !nim) {
             if (req.file) await deleteUploadedKtm(req.file.filename);
-            return res.status(400).json({ message: 'Invalid registration data' });
+            const errors = {};
+            if (!name) errors.name = 'Enter your name (1 to 120 characters).';
+            if (!email) errors.email = 'Enter a valid email address, such as name@example.com (up to 254 characters).';
+            if (password.length < 8 || password.length > 128) errors.password = 'Your password must contain 8 to 128 characters.';
+            if (!university) errors.university = 'Enter your university (1 to 160 characters).';
+            if (!nim) errors.nim = 'Enter your NIM (1 to 50 characters).';
+            return res.status(400).json({ message: Object.values(errors).join(' '), errors });
         }
 
         const ktm = req.file //upload ktm
@@ -73,7 +80,7 @@ export const createUser = async (req, res) => {
                 await deleteUploadedKtm(req.file.filename);
             }
             return res.status(400).json({
-                message: 'Invalid user role'
+                message: 'Choose a valid role: user or admin.'
             });
         }
 
@@ -84,7 +91,7 @@ export const createUser = async (req, res) => {
                 await deleteUploadedKtm(req.file.filename);
             }
             return res.status(400).json({
-                message: "Email already exists"
+                message: "This email address is already registered. Log in or use a different email address."
             });
         }
         const existingNim = await User.findOne({ nim });
@@ -93,7 +100,7 @@ export const createUser = async (req, res) => {
                 await deleteUploadedKtm(req.file.filename);
             }
             return res.status(400).json({
-                message: "NIM already exists"
+                message: "This NIM is already registered. Check your NIM or log in to your existing account."
             });
         }
 
@@ -116,23 +123,22 @@ export const createUser = async (req, res) => {
         if (req.file) {
             await deleteUploadedKtm(req.file.filename);
         }
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: "Email atau NIM sudah digunakan"
-            });
-        }
-        return res.status(400).json({ message: error.message });
+        return sendError(error, req, res);
     }
 };
 
 // LOGIN -- POST /api/users/login
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const email = normalizeEmail(req.body?.email);
+        const password = req.body?.password;
+        if (!email) return res.status(400).json({ message: 'Enter a valid email address, such as name@example.com.' });
+        if (typeof password !== 'string' || !password.length) return res.status(400).json({ message: 'Enter your password to log in.' });
+        if (password.length > 128) return res.status(400).json({ message: 'Your password must be 128 characters or fewer.' });
 
         const existingUser = await User.findOne({ email }).select('+password');
 
-        if (!existingUser) return res.status(401).json({ message: 'Invalid credentials' });
+        if (!existingUser) return res.status(401).json({ message: 'The email address or password is incorrect. Check both and try again.' });
 
         const isPasswordValid = await bcrypt.compare(
             password,
@@ -141,7 +147,7 @@ export const loginUser = async (req, res) => {
 
         if (!isPasswordValid) {
             return res.status(401).json({
-                message: 'Invalid credentials'
+                message: 'The email address or password is incorrect. Check both and try again.'
             });
         }
 
@@ -154,9 +160,7 @@ export const loginUser = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -176,9 +180,7 @@ export const logoutUser = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -196,9 +198,7 @@ export const getCurrentUser = async (req, res) => {
         return res.status(200).json(user);
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -212,9 +212,7 @@ export const getUser = async (req, res) => {
         return res.status(200).json(users);
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -273,9 +271,7 @@ export const getParticipants = async (req, res) => {
         return res.status(200).json(users);
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -298,9 +294,7 @@ export const getUserById = async (req, res) => {
         return res.status(200).json(foundUser);
 
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -338,7 +332,8 @@ export const updateUser = async (req, res) => {
 
         if (Object.values(updateData).some((value) => value === null)) {
             if (req.file) await deleteUploadedKtm(req.file.filename);
-            return res.status(400).json({ message: 'Invalid user data' });
+            const hints = { name: 'Name must contain 1 to 120 characters.', email: 'Enter a valid email address up to 254 characters.', university: 'University must contain 1 to 160 characters.', nim: 'NIM must contain 1 to 50 characters.', password: 'Password must contain 8 to 128 characters.', role: 'Choose a valid role: user or admin.' };
+            return res.status(400).json({ message: Object.keys(updateData).filter((key) => updateData[key] === null).map((key) => hints[key]).join(' ') });
         }
 
         if (req.file) { //kalau user upload ktm baru
@@ -362,7 +357,7 @@ export const updateUser = async (req, res) => {
             }
 
             return res.status(400).json({
-                message: "Invalid user role"
+                message: "Choose a valid role: user or admin."
             });
         }
 
@@ -407,15 +402,7 @@ export const updateUser = async (req, res) => {
             await deleteUploadedKtm(req.file.filename);
         }
 
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: "Email or NIM is already used"
-            });
-        }
-
-        return res.status(400).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -442,8 +429,6 @@ export const deleteUser = async (req, res) => {
             message: "User deleted successfully"
         });
     } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        });
+        return sendError(error, req, res);
     }
 };

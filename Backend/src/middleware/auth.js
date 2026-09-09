@@ -1,3 +1,4 @@
+import { sendError } from './errorHandler.js';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
@@ -71,7 +72,7 @@ export const verifyToken = async (req, res, next) => {
 
         if (!token) {
             return res.status(401).json({
-                message: 'Access denied. No token provided.'
+                message: 'Please log in to continue.'
             });
         }
 
@@ -83,13 +84,13 @@ export const verifyToken = async (req, res, next) => {
 
         if (!user) {
             return res.status(401).json({
-                message: 'Invalid token. User no longer exists.'
+                message: 'This account is no longer available. Contact the organizers for help.'
             });
         }
 
         if ((decoded.tokenVersion || 0) !== (user.tokenVersion || 0)) {
             return res.status(401).json({
-                message: 'Token has been revoked. Please log in again.'
+                message: 'Your session has ended. Please log in again.'
             });
         }
 
@@ -104,19 +105,14 @@ export const verifyToken = async (req, res, next) => {
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
-                message: 'Token expired. Please log in again.'
+                message: 'Your session has expired. Please log in again.'
             });
         }
 
-        if (error.message === 'JWT_SECRET is not configured') {
-            return res.status(500).json({
-                message: 'Authentication is not configured'
-            });
+        if (['JsonWebTokenError', 'NotBeforeError', 'URIError'].includes(error.name)) {
+            return res.status(401).json({ message: 'Your session is invalid. Please log in again.' });
         }
-
-        return res.status(401).json({
-            message: 'Invalid token'
-        });
+        return sendError(error, req, res);
     }
 };
 
@@ -154,13 +150,13 @@ export const requireRole = (...roles) => {
     return (req, res, next) => {
         if (!req.user) {
             return res.status(401).json({
-                message: 'Authentication required'
+                message: 'Please log in to continue.'
             });
         }
 
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({
-                message: 'Forbidden. Insufficient permissions.'
+                message: 'Your account does not have permission to do this. Please use an admin account.'
             });
         }
 

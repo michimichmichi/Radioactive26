@@ -1,4 +1,6 @@
 import express from 'express';
+import { requestLogger } from './src/middleware/requestLogger.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
 import cors from 'cors';
 import dotenv from 'dotenv';    
 import connectDB from './src/config/db.js';
@@ -35,6 +37,7 @@ const authLimiter = rateLimiter({
 });
 
 app.set('trust proxy', TRUST_PROXY);
+app.use(requestLogger);
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || CLIENT_ORIGINS.has(origin)) {
@@ -43,7 +46,8 @@ app.use(cors({
         }
         callback(new Error('Origin is not allowed'));
     },
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['X-Request-ID', 'Retry-After']
 })); 
 app.disable('x-powered-by');
 app.use((req, res, next) => {
@@ -64,6 +68,10 @@ app.use((req, res, next) => {
 });
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb', parameterLimit: 100 }));
+app.use((req, res, next) => {
+    req.body ||= {};
+    next();
+});
 app.use(apiLimiter);
 app.use('/uploads', fileRoutes);
 app.use('/users/login', authLimiter);
@@ -72,33 +80,8 @@ app.use("/teams", teamRoutes);
 app.use("/competitions", competitionRoutes);
 app.use("/users", userRoutes);
 
-app.use((err, req, res, next) => {
-    if (!err) {
-        next();
-        return;
-    }
-
-    const uploadErrorCodes = [
-        'LIMIT_FILE_SIZE',
-        'LIMIT_FILE_COUNT',
-        'LIMIT_UNEXPECTED_FILE'
-    ];
-    const status = uploadErrorCodes.includes(err.code) ? 400 : 400;
-
-    if (err.message === 'Origin is not allowed') {
-        return res.status(403).json({ message: 'Request origin is not allowed' });
-    }
-
-    return res.status(status).json({
-        message: err.code === 'LIMIT_FILE_SIZE'
-            ? 'Uploaded file must be 5MB or smaller'
-            : err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE'
-                ? 'Invalid upload'
-                : process.env.NODE_ENV === 'production'
-                    ? 'Request could not be completed'
-                    : err.message || 'Request could not be completed'
-    });
-});
+app.use((req, res) => res.status(404).json({ message: 'This endpoint was not found. Refresh the page and try again.' }));
+app.use(errorHandler);
 
 app.listen(PORT, '127.0.0.1', () => {
     console.log(`Server is running on port ${PORT}`);
