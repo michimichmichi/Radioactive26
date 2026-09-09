@@ -4,6 +4,8 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 export const validateImageFile = (file) => {
   if (!file) return "";
 
+  if (!file.size) return "This image is empty. Select a valid JPG, JPEG, or PNG image.";
+
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return "Only JPG, JPEG, and PNG files are allowed.";
   }

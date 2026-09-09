@@ -20,6 +20,5 @@ export const getApiErrorMessage = (error) => {
     : fallbacks[status] || (status >= 500
       ? 'The server is temporarily unavailable. Please try again in a few minutes.'
       : 'The request could not be completed. Refresh the page and try again.');
-  const requestId = data?.requestId || error.response.headers?.['x-request-id'];
-  return requestId ? `${message} (Reference: ${requestId})` : message;
+  return message;
 };

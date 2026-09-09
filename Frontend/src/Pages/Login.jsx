@@ -1,3 +1,4 @@
+import { validateLogin } from "../utils/authValidation";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
@@ -23,6 +24,11 @@ function LoginPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    const validationError = validateLogin(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -64,7 +70,7 @@ function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <form noValidate onSubmit={handleSubmit} className="mt-6 space-y-5">
             <label className="block">
               <span className="text-sm font-semibold text-zinc-800">Email</span>
               <input
@@ -72,7 +78,7 @@ function LoginPage() {
                 name="email"
                 value={form.email}
                 onChange={updateField}
-                required
+                aria-required="true"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="you@example.com"
               />
@@ -85,8 +91,8 @@ function LoginPage() {
                 name="password"
                 value={form.password}
                 onChange={updateField}
-                required
-                minLength={6}
+                aria-required="true"
+                minLength={8}
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="Your password"
               />

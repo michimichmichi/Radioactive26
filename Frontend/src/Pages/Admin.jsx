@@ -143,7 +143,7 @@ function Select(props) {
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
-        aria-required={rest.required}
+        aria-required={rest["aria-required"]}
         onClick={() => setIsOpen((current) => !current)}
         onKeyDown={handleKeyDown}
         className={`admin-field flex w-full items-center justify-between px-4 py-3 text-left transition ${
@@ -363,7 +363,7 @@ function CompetitionsPanel() {
           </Button>
         </div>
 
-        <form
+        <form noValidate
           onSubmit={submitHandler}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
@@ -373,21 +373,21 @@ function CompetitionsPanel() {
             onChange={(e) =>
               setForm({ ...form, competitionName: e.target.value })
             }
-            required
+            aria-required="true"
           />
 
           <Input
             type="datetime-local"
             value={form.time}
             onChange={(e) => setForm({ ...form, time: e.target.value })}
-            required
+            aria-required="true"
           />
 
           <Input
             placeholder="place"
             value={form.place}
             onChange={(e) => setForm({ ...form, place: e.target.value })}
-            required
+            aria-required="true"
           />
 
           <Textarea
@@ -399,7 +399,7 @@ function CompetitionsPanel() {
                 termsAndConditions: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
 
           <Button
@@ -558,7 +558,7 @@ function UsersPanel() {
           </Button>
         </div>
 
-        <form
+        <form noValidate
           ref={formRef}
           onSubmit={submitHandler}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -572,7 +572,7 @@ function UsersPanel() {
                 name: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
 
           <Input
@@ -585,7 +585,7 @@ function UsersPanel() {
                 email: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
 
           <Input
@@ -622,7 +622,7 @@ function UsersPanel() {
                 university: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
           <Input
             placeholder="nim"
@@ -633,7 +633,7 @@ function UsersPanel() {
                 nim: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
 
           <div className="md:col-span-2">
@@ -890,7 +890,7 @@ function TeamsPanel() {
           </Button>
         </div>
 
-        <form
+        <form noValidate
           ref={formRef}
           onSubmit={submitHandler}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -904,7 +904,7 @@ function TeamsPanel() {
                 teamName: e.target.value,
               })
             }
-            required
+            aria-required="true"
           />
 
           <Input
@@ -949,7 +949,7 @@ function TeamsPanel() {
                 leaderId: e.target.value,
               })
             }
-            required
+            aria-required="true"
           >
             <option value="">Select Leader</option>
 
@@ -968,7 +968,7 @@ function TeamsPanel() {
                 competitionId: e.target.value,
               })
             }
-            required
+            aria-required="true"
           >
             <option value="">Select Competition</option>
 

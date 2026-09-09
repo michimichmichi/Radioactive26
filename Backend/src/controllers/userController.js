@@ -58,7 +58,7 @@ export const createUser = async (req, res) => {
         const university = normalizeString(req.body.university, { max: 160, required: true });
         const nim = normalizeString(req.body.nim, { max: 50, required: true });
 
-        if (!name || !email || password.length < 8 || password.length > 128 || !university || !nim) {
+        if (!name || !email || password.length < 8 || password.length > 128 || !university || !nim || (req.user?.role !== 'admin' && !req.file)) {
             if (req.file) await deleteUploadedKtm(req.file.filename);
             const errors = {};
             if (!name) errors.name = 'Enter your name (1 to 120 characters).';
@@ -66,6 +66,7 @@ export const createUser = async (req, res) => {
             if (password.length < 8 || password.length > 128) errors.password = 'Your password must contain 8 to 128 characters.';
             if (!university) errors.university = 'Enter your university (1 to 160 characters).';
             if (!nim) errors.nim = 'Enter your NIM (1 to 50 characters).';
+            if (req.user?.role !== 'admin' && !req.file) errors.ktm = 'Upload your KTM (student ID) as a JPG, JPEG, or PNG image up to 5 MB.';
             return res.status(400).json({ message: Object.values(errors).join(' '), errors });
         }
 
@@ -340,6 +341,8 @@ export const updateUser = async (req, res) => {
             updateData.ktm = `/uploads/ktm/${req.file.filename}`;
         }
 
+        // An empty optional password means keep the existing password.
+        if (updateData.password === '') delete updateData.password;
         const shouldRevokeTokens = Boolean(updateData.password);
 
         if (updateData.password && (typeof updateData.password !== 'string' || updateData.password.length < 8 || updateData.password.length > 128)) {
@@ -351,7 +354,7 @@ export const updateUser = async (req, res) => {
             updateData.password = await bcrypt.hash(updateData.password, 12);
         }
 
-        if (updateData.role && !["user", "admin"].includes(updateData.role)) {
+        if (updateData.role !== undefined && !["user", "admin"].includes(updateData.role)) {
             if (req.file) {
                 await deleteUploadedKtm(req.file.filename);
             }

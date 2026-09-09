@@ -16,7 +16,7 @@ export const sendError = (error, req, res) => {
         stack: error.stack?.split('\n').slice(1).filter((line) => /^\s+at /.test(line)).join('\n'),
     };
     let status = 500;
-    let message = 'The server could not complete your request. Please try again later. If this continues, contact the organizers with the reference below.';
+    let message = 'The server could not complete your request. Please try again later. If this continues, contact the organizers for help.';
     if (error.code === 11000) {
         status = 409;
         const field = Object.keys(error.keyPattern || error.keyValue || {}).find((key) => labels[key]);
@@ -36,6 +36,9 @@ export const sendError = (error, req, res) => {
     } else if (error.type === 'entity.parse.failed') {
         status = 400;
         message = 'The submitted data could not be read. Refresh the page and submit the form again.';
+    } else if (['Unexpected end of form', 'Unexpected end of file', 'Multipart: Boundary not found', 'Malformed part header'].includes(error.message)) {
+        status = 400;
+        message = 'The file upload was incomplete or could not be read. Select your image again and resubmit the form.';
     } else if (error.message === 'Origin is not allowed') {
         status = 403;
         message = 'This website is not allowed to access the server. Open the official Radioactive website and try again.';

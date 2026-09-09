@@ -10,7 +10,7 @@ export const createCompetition = async (req, res) => {
         const normalizedName = normalizeString(competitionName, { max: 120, required: true });
         const normalizedPlace = normalizeString(place, { max: 200, required: true });
         const normalizedTerms = normalizeString(termsAndConditions, { max: 5000, required: true });
-        const parsedTime = new Date(time);
+        const parsedTime = new Date(typeof time === 'string' && time.trim() ? time : NaN);
 
         if (!normalizedName || !normalizedPlace || !normalizedTerms || Number.isNaN(parsedTime.getTime())) {
             return res.status(400).json({ message: !normalizedName ? 'Enter a competition name (1 to 120 characters).' : !normalizedPlace ? 'Enter a location (1 to 200 characters).' : !normalizedTerms ? 'Enter terms and conditions (1 to 5,000 characters).' : 'Enter a valid competition date and time.' });
@@ -64,7 +64,7 @@ export const updateCompetition = async (req, res) => {
             updateData.termsAndConditions = normalizeString(updateData.termsAndConditions, { max: 5000, required: true });
         }
         if (updateData.time !== undefined) {
-            updateData.time = new Date(updateData.time);
+            updateData.time = new Date(typeof updateData.time === 'string' && updateData.time.trim() ? updateData.time : NaN);
         }
 
         if (!Object.keys(updateData).length || Object.values(updateData).some((value) => value === null || (value instanceof Date && Number.isNaN(value.getTime())))) {

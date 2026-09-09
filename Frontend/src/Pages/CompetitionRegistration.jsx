@@ -305,7 +305,7 @@ function CompetitionRegistrationPage() {
             </div>
           )}
 
-          <form ref={formRef} onSubmit={submitRegistration} className="mt-6 grid gap-5">
+          <form noValidate ref={formRef} onSubmit={submitRegistration} className="mt-6 grid gap-5">
             <div className="grid gap-5 md:grid-cols-2">
               <label className="block">
                 <span className="text-sm font-semibold text-zinc-800">
@@ -317,7 +317,7 @@ function CompetitionRegistrationPage() {
                   onChange={(event) =>
                     setForm({ ...form, teamName: event.target.value })
                   }
-                  required
+                  aria-required="true"
                   className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                   placeholder="Your team name"
                 />

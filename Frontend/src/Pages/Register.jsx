@@ -1,3 +1,4 @@
+import { validateRegistration } from "../utils/authValidation";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
@@ -46,6 +47,11 @@ function RegisterPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    const validationError = validateRegistration(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -97,7 +103,7 @@ function RegisterPage() {
             </div>
           )}
 
-          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
+          <form noValidate ref={formRef} onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
             <label className="block md:col-span-2">
               <span className="text-sm font-semibold text-zinc-800">Name</span>
               <input
@@ -105,7 +111,7 @@ function RegisterPage() {
                 name="name"
                 value={form.name}
                 onChange={updateField}
-                required
+                aria-required="true"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="Full name"
               />
@@ -118,7 +124,7 @@ function RegisterPage() {
                 name="email"
                 value={form.email}
                 onChange={updateField}
-                required
+                aria-required="true"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="you@example.com"
               />
@@ -131,8 +137,8 @@ function RegisterPage() {
                 name="password"
                 value={form.password}
                 onChange={updateField}
-                required
-                minLength={6}
+                aria-required="true"
+                minLength={8}
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="Create a password"
               />
@@ -147,7 +153,7 @@ function RegisterPage() {
                 name="university"
                 value={form.university}
                 onChange={updateField}
-                required
+                aria-required="true"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="University name"
               />
@@ -160,17 +166,18 @@ function RegisterPage() {
                 name="nim"
                 value={form.nim}
                 onChange={updateField}
-                required
+                aria-required="true"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
                 placeholder="Student number"
               />
             </label>
 
             <label className="block md:col-span-2">
-              <span className="text-sm font-semibold text-zinc-800">KTM</span>
+              <span className="text-sm font-semibold text-zinc-800">KTM (required)</span>
               <input
                 type="file"
                 name="ktm"
+                aria-required="true"
                 onChange={updateField}
                 accept="image/jpeg,image/jpg,image/png"
                 className="mt-2 w-full rounded-md border border-zinc-300 px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200"

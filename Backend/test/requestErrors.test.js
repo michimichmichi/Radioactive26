@@ -8,6 +8,8 @@ import { generateToken, verifyToken } from '../src/middleware/auth.js';
 import User from '../src/models/User.js';
 import { rateLimiter } from '../src/middleware/rateLimiter.js';
 import { getApiErrorMessage } from '../../Frontend/src/utils/apiErrors.js';
+import { validateLogin, validateRegistration } from '../../Frontend/src/utils/authValidation.js';
+import uploadKtm from '../src/middleware/uploadKtm.js';
 
 test('requests produce actionable errors and one correlated, safe log each', async (t) => {
     const logs = [];
@@ -16,7 +18,7 @@ test('requests produce actionable errors and one correlated, safe log each', asy
     app.use(requestLogger);
     app.use(express.json({ limit: '1kb' }));
     const router = express.Router();
-    router.post('/register', createUser);
+    router.post('/register', uploadKtm.single('ktm'), createUser);
     router.post('/login', loginUser);
     router.get('/me', verifyToken, (req, res) => res.json({ ok: true }));
     app.use('/users', router);
@@ -54,6 +56,14 @@ test('requests produce actionable errors and one correlated, safe log each', asy
     await request('/success?token=query-secret', 200);
     await request('/users/register', 400, /name.*email.*password.*university.*NIM/i, post({}));
     assert.equal(logs.at(-1).route, '/users/register');
+    const registration = { name: 'Student', email: 'student@example.com', password: 'valid-password', university: 'University', nim: '123456' };
+    const missingKtm = await request('/users/register', 400, /Upload your KTM/, post(registration));
+    assert.ok(missingKtm.errors.ktm);
+    const multipart = new FormData();
+    for (const [key, value] of Object.entries(registration)) multipart.append(key, value);
+    await request('/users/register', 400, /Upload your KTM/, { method: 'POST', body: multipart });
+    multipart.append('ktm', new Blob(['not an image'], { type: 'application/pdf' }), 'student.pdf');
+    await request('/users/register', 400, /file type is not supported/, { method: 'POST', body: multipart });
     await request('/users/login', 400, /valid email/, post({ email: { $ne: null }, password: 'secret' }));
     await request('/users/login', 400, /Enter your password/, post({ email: 'a@b.com' }));
     t.mock.method(User, 'findOne', (query) => {
@@ -90,10 +100,27 @@ test('requests produce actionable errors and one correlated, safe log each', asy
     }
 });
 
+test('form validation replaces browser popups and requires a usable KTM', () => {
+    const valid = { name: 'Student', email: 'student@example.com', password: 'valid-password', university: 'University', nim: '123456', ktm: { type: 'image/png', size: 100 } };
+    assert.equal(validateRegistration(valid), '');
+    for (const [field, value, pattern] of [
+        ['name', ' ', /name/], ['email', 'invalid', /email/],
+        ['password', '', /password/], ['password', 'short', /8 to 128/],
+        ['university', ' ', /university/], ['nim', ' ', /NIM/],
+        ['ktm', '', /Upload your KTM/],
+        ['ktm', { type: 'image/png', size: 0 }, /empty/],
+        ['ktm', { type: 'application/pdf', size: 100 }, /JPG, JPEG, and PNG/],
+        ['ktm', { type: 'image/png', size: 5 * 1024 * 1024 + 1 }, /5MB/],
+    ]) assert.match(validateRegistration({ ...valid, [field]: value }), pattern);
+    assert.match(validateLogin({ email: '', password: '' }), /email/);
+    assert.match(validateLogin({ email: valid.email, password: '' }), /password/);
+    assert.equal(validateLogin(valid), '');
+});
+
 test('frontend explains network, timeout, proxy, and backend errors', () => {
     assert.match(getApiErrorMessage({}), /internet connection/);
     assert.match(getApiErrorMessage({ code: 'ECONNABORTED' }), /too long/);
     assert.match(getApiErrorMessage({ response: { status: 502, data: '<html>Bad Gateway</html>' } }), /temporarily unavailable/);
     assert.match(getApiErrorMessage({ response: { status: 413 } }), /5 MB/);
-    assert.equal(getApiErrorMessage({ response: { status: 400, data: { message: 'Enter your NIM.', requestId: 'abc' } } }), 'Enter your NIM. (Reference: abc)');
+    assert.equal(getApiErrorMessage({ response: { status: 400, data: { message: 'Enter your NIM.', requestId: 'abc' } } }), 'Enter your NIM.');
 });
