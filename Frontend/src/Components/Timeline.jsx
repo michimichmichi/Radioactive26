@@ -6,7 +6,7 @@ const events = [
   {
     id: 1,
     title: "Open Registration",
-    description: "27 July - 11 September 2026",
+    description: "27 July - 20 September 2026",
   },
   {
     id: 2,
