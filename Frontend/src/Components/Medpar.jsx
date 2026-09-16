@@ -1,4 +1,8 @@
 import React from 'react';
+import poster1 from '../assets/medpar/poster1.png';
+import poster2 from '../assets/medpar/poster2.png';
+import poster3 from '../assets/medpar/poster3.png';
+
 import sponsor from '../assets/sponsor.webp';
 import media from '../assets/media partners.webp';
 import comfest from '../assets/medpar/comfest.webp';
@@ -15,6 +19,31 @@ import teen from '../assets/medpar/teensound.png';
 import ulti from '../assets/medpar/ultimagz.png';
 
 export default function Medpar() {
+  // 3 Guest Stars Data (easy to customize images, names, and tags)
+  const guestStars = [
+    {
+      img: poster1,
+      tag: 'HEADLINER',
+      name: 'GUEST STAR 01',
+      tilt: '-rotate-2',
+      tapeColor: 'bg-[#f995cc]',
+    },
+    {
+      img: poster2,
+      tag: 'SPECIAL GUEST',
+      name: 'GUEST STAR 02',
+      tilt: 'rotate-2 md:-translate-y-3', // Slightly elevated middle poster
+      tapeColor: 'bg-[#ffb9df]',
+    },
+    {
+      img: poster3,
+      tag: 'SPECIAL GUEST',
+      name: 'GUEST STAR 03',
+      tilt: '-rotate-1',
+      tapeColor: 'bg-[#f995cc]',
+    },
+  ];
+
   const medparLogos = [
     comfest,
     death,
@@ -37,7 +66,7 @@ export default function Medpar() {
   const carouselItems = [...medparLogos, ...medparLogos, ...medparLogos];
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center justify-center overflow-visible select-none px-4 py-16 mt-[100px] md:mt-[200px] mb-24">
+    <div className="relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center overflow-visible select-none px-4 py-16 mt-[80px] md:mt-[140px] mb-24">
       
       {/* Custom Keyframe Animations */}
       <style>{`
@@ -69,7 +98,53 @@ export default function Medpar() {
         }
       `}</style>
 
-      {/* SECTION 1: SPONSORS */}
+      {/* ========================================================================= */}
+      {/* SECTION 0: 3 GUEST STAR CONCERT POSTERS (ON TOP OF SPONSOR)              */}
+      {/* ========================================================================= */}
+      <section className="relative w-full flex flex-col items-center mb-36 sm:mb-44 md:mb-52">
+        
+        {/* Title Header Badge */}
+       
+
+        {/* 3 Posters Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 lg:gap-8 w-full max-w-5xl mt-[-200px] justify-items-center items-center">
+          {guestStars.map((guest, idx) => (
+            <div
+              key={idx}
+              className={`group relative w-full max-w-xs bg-[#120317] border-4 border-[#FF0990] p-3 sm:p-4 shadow-[10px_10px_0px_0px_rgba(255,9,144,0.85)] ${guest.tilt} hover:rotate-0 hover:scale-105 hover:z-20 hover:shadow-[14px_14px_0px_0px_rgba(255,9,144,1)] transition-all duration-300`}
+            >
+             
+
+              {/* Poster Image Container */}
+              <div className="relative w-full aspect-[3/4] overflow-hidden bg-black border-2 border-white/20">
+                <img
+                  src={guest.img}
+                  alt={guest.name}
+                  width={1200}
+                  height={1600}
+                  className="w-full h-full object-cover filter contrast-110 brightness-100 group-hover:contrast-125 group-hover:scale-105 transition-all duration-300"
+                />
+
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+
+          
+             
+              </div>
+
+             
+
+            </div>
+          ))}
+        </div>
+
+      </section>
+
+
+      {/* ========================================================================= */}
+      {/* SECTION 1: SPONSORS                                                       */}
+      {/* ========================================================================= */}
       <section className="relative w-full flex flex-col items-center md:mb-56 sm:mb-48 mb-32 pt-12">
         {/* Main Box Container (Sponsor) */}
         <div className="relative w-full max-w-4xl bg-[#0d0210] border-2 border-[#FF0990] rounded-none p-6 pt-20 md:pt-24 md:p-12 shadow-[8px_8px_0px_0px_rgba(255,9,144,0.8)] -rotate-1">
@@ -82,7 +157,7 @@ export default function Medpar() {
               height={607}
               loading="lazy"
               decoding="async"
-              className="w-[400px] sm:w-[400px] md:w-[600px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110 "
+              className="w-[400px] sm:w-[400px] md:w-[600px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
             />
           </div>
           
@@ -114,7 +189,9 @@ export default function Medpar() {
         </div>
       </section>
 
-      {/* SECTION 2: MEDIA PARTNERS (FILM ROLL CAROUSEL) */}
+      {/* ========================================================================= */}
+      {/* SECTION 2: MEDIA PARTNERS (FILM ROLL CAROUSEL)                            */}
+      {/* ========================================================================= */}
       <section className="relative w-full flex flex-col items-center">
         
         {/* Media Partners Header Banner */}
