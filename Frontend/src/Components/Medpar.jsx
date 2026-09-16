@@ -7,50 +7,82 @@ import medic from '../assets/medpar/medic.png';
 import mufomic from '../assets/medpar/mufomic.png';
 import Cen from '../assets/sponsor/Cen.png';
 import roti from '../assets/sponsor/roti.webp';
-
+import events from '../assets/medpar/event.png';
+import mercu from '../assets/medpar/mercu.PNG';
+import rtc from '../assets/medpar/rtc.png';
+import starlight from '../assets/medpar/starlight.png';
+import teen from '../assets/medpar/teensound.png';
+import ulti from '../assets/medpar/ultimagz.png';
 
 export default function Medpar() {
-    const medparLogos = [
+  const medparLogos = [
     comfest,
     death,
     medic,
     mufomic,
-    ];
+    events,
+    mercu,
+    rtc,
+    starlight,
+    teen,
+    ulti,
+  ];
 
-    const sponsorLogos = [
-        Cen, 
-        roti
-]
+  const sponsorLogos = [
+    Cen, 
+    roti
+  ];
 
-return (
+  // 3x duplication for a completely seamless infinite film reel loop
+  const carouselItems = [...medparLogos, ...medparLogos, ...medparLogos];
+
+  return (
     <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center justify-center overflow-visible select-none px-4 py-16 mt-[100px] md:mt-[200px] mb-24">
       
-        {/* Keyframe Animasi Shake untuk Banner Utama */}
-        <style>{`
-            @keyframes rockTiltCenter {
-            0%, 100% { transform: translateX(-50%) rotate(-3deg) scale(1); }
-            50% { transform: translateX(-50%) rotate(2deg) scale(1.02); }
-            }
-            .animate-rock-center {
-            animation: rockTiltCenter 3.5s ease-in-out infinite;
-            }
-        `}</style>
+      {/* Custom Keyframe Animations */}
+      <style>{`
+        @keyframes rockTiltCenter {
+          0%, 100% { transform: translateX(-50%) rotate(-3deg) scale(1); }
+          50% { transform: translateX(-50%) rotate(2deg) scale(1.02); }
+        }
+        @keyframes rockTiltInline {
+          0%, 100% { transform: rotate(-3deg) scale(1); }
+          50% { transform: rotate(2deg) scale(1.02); }
+        }
+        @keyframes filmRoll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.333%); }
+        }
+        .animate-rock-center {
+          animation: rockTiltCenter 3.5s ease-in-out infinite;
+        }
+        .animate-rock-inline {
+          animation: rockTiltInline 3.5s ease-in-out infinite;
+        }
+        .animate-film-roll {
+          display: flex;
+          width: max-content;
+          animation: filmRoll 30s linear infinite;
+        }
+        .animate-film-roll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
 
-        {/* SECTION 1: SPONSORS */}
+      {/* SECTION 1: SPONSORS */}
       <section className="relative w-full flex flex-col items-center md:mb-56 sm:mb-48 mb-32 pt-12">
-        
         {/* Main Box Container (Sponsor) */}
         <div className="relative w-full max-w-4xl bg-[#0d0210] border-2 border-[#FF0990] rounded-none p-6 pt-20 md:pt-24 md:p-12 shadow-[8px_8px_0px_0px_rgba(255,9,144,0.8)] -rotate-1">
           
           <div className="absolute -top-32 sm:-top-32 md:-top-48 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-rock-center w-full flex justify-center">
             <img
-                src={sponsor}
+              src={sponsor}
               alt="Sponsors"
               width={1105}
               height={607}
               loading="lazy"
               decoding="async"
-              className="w-[400px] sm:w-[400px] md:w-[600px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
+              className="w-[400px] sm:w-[400px] md:w-[600px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110 "
             />
           </div>
           
@@ -69,65 +101,95 @@ return (
               >
                 {/* Individual Tape */}
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-[#ffb9df] border border-zinc-600/50 -rotate-3" />
-                    <img
-                    src={logo}
-                    alt={`Sponsor ${index + 1}`}
-                    width={3164}
-                    height={3446}
-                    className="h-16 sm:h-20 md:h-24 w-auto object-contain filter brightness-90 contrast-125 group-hover:brightness-100 transition-all"
-                    />
-                </div>
+                <img
+                  src={logo}
+                  alt={`Sponsor ${index + 1}`}
+                  width={3164}
+                  height={3446}
+                  className="h-16 sm:h-20 md:h-24 w-auto object-contain filter brightness-90 contrast-125 group-hover:brightness-100 transition-all"
+                />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SECTION 2: MEDIA PARTNERS */}
-      <section className="relative w-full flex flex-col items-center pt-12">
+      {/* SECTION 2: MEDIA PARTNERS (FILM ROLL CAROUSEL) */}
+      <section className="relative w-full flex flex-col items-center">
         
-        {/* Main Box Container (Media Partners) */}
-        <div className="relative w-full max-w-4xl bg-[#0d0210] border-2 border-[#FF0990] rounded-none p-6 pt-20 md:pt-24 md:p-12 shadow-[-8px_8px_0px_0px_rgba(255,9,144,0.8)] rotate-1">
-          
-          <div className="absolute -top-36 sm:-top-36 md:-top-56 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-rock-center w-full flex justify-center">
-            <img
-                src={media}
-              alt="Media Partners"
-              width={1183}
-              height={796}
-              loading="lazy"
-              decoding="async"
-              className="w-[350px] sm:w-[360px] md:w-[500px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
-            />
-          </div>
-
-          {/* Tapes */}
-          <div className="absolute -top-3 -left-4 w-16 h-6 bg-[#f995cc] border border-zinc-700 rotate-[-25deg] shadow-md z-20" />
-          <div className="absolute -top-3 -right-4 w-16 h-6 bg-[#f995cc] border border-zinc-700 rotate-[35deg] shadow-md z-20" />
-
-          {/* Medpars Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 items-center justify-items-center">
-            {medparLogos.map((logo, index) => {
-              const tilts = ['-rotate-3', 'rotate-2', '-rotate-2', 'rotate-3'];
-              return (
-                <div
-                  key={index}
-                  className={`group relative w-full h-24 sm:h-28 md:h-32 p-3 bg-[#17031c] border-2 border-white/20 hover:border-[#FF0990] transition-all duration-200 hover:scale-105 hover:z-10 ${tilts[index % tilts.length]} flex items-center justify-center`}
-                >
-                  {/* medpar pins */}
-                  <div className="absolute -top-1.5 left-2 w-3 h-3 bg-[#FF0990] rounded-full shadow-[0_0_8px_#FF0990]" />
-                  
-                  <img
-                    src={logo}
-                    alt={`Medpar ${index + 1}`}
-                    width={4500}
-                    height={4500}
-                    className="max-h-full max-w-full object-contain filter contrast-125 brightness-90 group-hover:brightness-110 transition-all duration-200"
-                  />
-                </div>
-              );
-            })}
-          </div>
+        {/* Media Partners Header Banner */}
+        <div className="z-30 pointer-events-none animate-rock-inline mb-[-80px] flex justify-center">
+          <img
+            src={media}
+            alt="Media Partners"
+            width={1183}
+            height={796}
+            loading="lazy"
+            decoding="async"
+            className="w-[350px] sm:w-[380px] md:w-[500px] object-contain filter drop-shadow-[0_0_20px_rgba(255,9,144,0.9)] brightness-110"
+          />
         </div>
+
+        {/* FILM STRIP CONTAINER */}
+        <div className="relative w-full -rotate-1 shadow-[0_10px_30px_rgba(0,0,0,0.8)] border-y-2 border-[#FF0990]/50 bg-[#08010b]">
+          
+          {/* Subtle edge fade overlays */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#0d0210] to-transparent z-30" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#0d0210] to-transparent z-30" />
+
+          {/* Continuous Film Reel Marquee */}
+          <div className="w-full overflow-hidden">
+            <div className="animate-film-roll flex items-center">
+              {carouselItems.map((logo, index) => {
+                const frameNumber = ((index % medparLogos.length) + 1).toString().padStart(2, '0');
+                
+                return (
+                  <div
+                    key={index}
+                    className="group relative shrink-0 flex flex-col bg-[#0f0214] border-r-4 border-black/80 hover:bg-[#1a0324] transition-colors duration-300 cursor-pointer"
+                  >
+                    {/* TOP SPROCKET PERFORATION HOLES */}
+                    <div className="w-full h-7 sm:h-8 bg-black/90 flex items-center justify-between px-3 border-b border-white/10">
+                      <div className="w-3.5 h-4 sm:w-4 sm:h-4.5 bg-[#08010b] rounded-[3px] border border-white/20 shadow-inner" />
+                      <span className="text-[9px] font-mono text-[#FF0990]/80 tracking-widest uppercase select-none">
+                        35mm • ISO 800
+                      </span>
+                      <div className="w-3.5 h-4 sm:w-4 sm:h-4.5 bg-[#08010b] rounded-[3px] border border-white/20 shadow-inner" />
+                    </div>
+
+                    {/* FILM FRAME NEGATIVE CELL (Logo Area) */}
+                    <div className="relative w-48 sm:w-56 md:w-64 h-28 sm:h-32 md:h-36 mx-2 my-2 bg-[#17031e]/90 border-2 border-white/15 group-hover:border-[#FF0990] group-hover:shadow-[0_0_15px_rgba(255,9,144,0.5)] transition-all duration-300 flex items-center justify-center p-4">
+                      {/* Inner film frame corner ticks */}
+                      <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-white/30" />
+                      <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-white/30" />
+                      <div className="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-white/30" />
+                      <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-white/30" />
+
+                      {/* Partner Logo */}
+                      <img
+                        src={logo}
+                        alt={`Medpar ${frameNumber}`}
+                        className="max-h-full max-w-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] contrast-125 brightness-105 group-hover:scale-110 group-hover:drop-shadow-[0_0_16px_#FF0990] group-hover:brightness-125 transition-all duration-300"
+                      />
+                    </div>
+
+                    {/* BOTTOM SPROCKET PERFORATION HOLES */}
+                    <div className="w-full h-7 sm:h-8 bg-black/90 flex items-center justify-between px-3 border-t border-white/10">
+                      <div className="w-3.5 h-4 sm:w-4 sm:h-4.5 bg-[#08010b] rounded-[3px] border border-white/20 shadow-inner" />
+                      <span className="text-[10px] font-mono text-[#FF0990] font-bold tracking-wider select-none flex items-center gap-1">
+                        ▲ {frameNumber}A
+                      </span>
+                      <div className="w-3.5 h-4 sm:w-4 sm:h-4.5 bg-[#08010b] rounded-[3px] border border-white/20 shadow-inner" />
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+
       </section>
 
     </div>
