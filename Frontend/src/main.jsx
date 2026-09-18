@@ -6,6 +6,7 @@ import App from './App.jsx'
 import ProtectedAdminRoute from './Components/ProtectedAdminRoute.jsx'
 import ProtectedUserRoute from './Components/ProtectedUserRoute.jsx'
 
+
 const lazyWithRetry = (importer, chunkName) => lazy(async () => {
   try {
     return await importer();
@@ -29,6 +30,7 @@ const RegisterPage = lazyWithRetry(() => import('./Pages/Register.jsx'), 'regist
 const CompetitionRegistrationPage = lazyWithRetry(() => import('./Pages/CompetitionRegistration.jsx'), 'competition-registration')
 const ProfilePage = lazyWithRetry(() => import('./Pages/Profile.jsx'), 'profile')
 const MyCompetitionsPage = lazyWithRetry(() => import('./Pages/MyCompetitions.jsx'), 'my-competitions')
+const FunRunPage = lazyWithRetry(() => import('./Pages/FunRun.jsx'), 'fun-run')
 
 function PageLoader() {
   return (
@@ -81,6 +83,7 @@ createRoot(document.getElementById('root')).render(
               </ProtectedAdminRoute>
             }
           />
+          <Route path="/fun-run" element={<FunRunPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
