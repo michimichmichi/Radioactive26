@@ -90,6 +90,7 @@ const Navbar = () => {
           <li><a href="#competition" onClick={(event) => handleSectionClick(event, "competition")} className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
           <li><a href="#sponsor" onClick={(event) => handleSectionClick(event, "sponsor")} className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
           <li><a href="#gallery" onClick={(event) => handleSectionClick(event, "gallery")} className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
+          <li><Link to="/fun-run" className="hover:text-white transition-colors tracking-wider">FUN RUN</Link></li>
         </ul>
 
         {/* ACTION CONTROLS / DROPDOWN CONTAINER */}
@@ -135,6 +136,7 @@ const Navbar = () => {
                     <MenuLink to="/#competition" label="Competitions" onClick={(event) => handleSectionClick(event, "competition")} />
                     <MenuLink to="/#sponsor" label="Sponsors" onClick={(event) => handleSectionClick(event, "sponsor")} />
                     <MenuLink to="/#gallery" label="Gallery" onClick={(event) => handleSectionClick(event, "gallery")} />
+                    <MenuLink to="/fun-run" label="Fun Run" onClick={() => setIsMenuOpen(false)} />
                   </div>
 
                   {/* USER CONTENT LINKS */}
@@ -200,6 +202,7 @@ const Navbar = () => {
                     <MenuLink to="/#competition" label="Competitions" onClick={(event) => handleSectionClick(event, "competition")} />
                     <MenuLink to="/#sponsor" label="Sponsors" onClick={(event) => handleSectionClick(event, "sponsor")} />
                     <MenuLink to="/#gallery" label="Gallery" onClick={(event) => handleSectionClick(event, "gallery")} />
+                    <MenuLink to="/fun-run" label="Fun Run" onClick={() => setIsMenuOpen(false)} />
                   </div>
                 )}
               </div>
