@@ -1,28 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Navbar from '../Components/NavigationBar';
 import Footer from '../Components/Footer';
+import eventlogo from "../assets/funrun/funrun.png";
+import foto1 from "../assets/funrun/foto1.png";
+import foto2 from "../assets/funrun/foto2.png";
+import foto3 from "../assets/funrun/foto3.png";
+import foto4 from "../assets/funrun/foto4.png";
+import foto5 from "../assets/funrun/foto5.JPG"
 
-// ── 1. OTOMATISASI ASSETS / DATA INPUT ──
-// Opsi Vite Glob: membaca otomatis folder lokal. Jika kosong, gunakan array fallback URL/placeholder.
-const localImages = Object.values(
-  import.meta.glob('../assets/gallery/optimized/*.{jpg,jpeg,png,webp}', {
-    eager: true,
-    import: 'default',
-  })
-);
+const rawImages = [
+  foto1, 
+  foto2, 
+  foto3,
+  foto4,
+  foto5
+];
 
-// Jika folder lokal belum diisi foto asli, gunakan placeholder rockstar sementara
-const placeholderPhotos = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  url: `https://picsum.photos/seed/rockrun${i + 1}/600/800`,
-  title: `STAGE MOMENT #${String(i + 1).padStart(2, '0')}`,
+const myPhotos = rawImages.map((src, index) => ({
+  id: index + 1,
+  url: src,
+  title: `STAGE MOMENT #${String(index + 1).padStart(2, '0')}`,
 }));
-
-// Gunakan gambar lokal jika ada; jika tidak, gunakan placeholder
-const initialPhotos = localImages.length > 0 
-  ? localImages.map((src, i) => ({ id: i + 1, url: src, title: `ROLL #${String(i + 1).padStart(2, '0')}` }))
-  : placeholderPhotos;
 
 const tilts = [
   '-rotate-2 hover:rotate-0',
@@ -82,7 +80,7 @@ function Lightbox({ photo, index, total, onClose, onPrev, onNext }) {
 }
 
 export default function FunRun() {
-  const [photoList] = useState(initialPhotos);
+  const [photoList] = useState(myPhotos);
   const [lightbox, setLightbox] = useState(null);
 
   const openLightbox  = (i) => setLightbox(i);
@@ -90,12 +88,18 @@ export default function FunRun() {
   const prevPhoto     = ()  => setLightbox((i) => (i - 1 + photoList.length) % photoList.length);
   const nextPhoto     = ()  => setLightbox((i) => (i + 1) % photoList.length);
 
-  const handleKeyDown = (e) => {
+
+  useEffect(() => {
     if (lightbox === null) return;
-    if (e.key === 'ArrowLeft')  prevPhoto();
-    if (e.key === 'ArrowRight') nextPhoto();
-    if (e.key === 'Escape')     closeLightbox();
-  };
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft')  prevPhoto();
+      if (e.key === 'ArrowRight') nextPhoto();
+      if (e.key === 'Escape')     closeLightbox();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightbox]);
 
   return (
     <main
@@ -104,35 +108,20 @@ export default function FunRun() {
         backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, transparent 1px)',
         backgroundSize: '5px 5px',
       }}
-      onKeyDown={handleKeyDown}
-      tabIndex={-1}
     >
       <div className="fixed top-0 left-0 w-full z-50">
         <Navbar />
       </div>
 
       <div className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-
         {/* HERO SECTION */}
         <section className="relative flex flex-col items-center text-center mb-16 overflow-visible">
-          <div className="w-28 h-7 bg-[#f995cc] border border-zinc-700 rotate-[4deg] shadow-md -mb-4 z-20" />
-          <div className="relative bg-[#0d0210] border-4 border-[#FF0990] px-6 sm:px-12 py-5 shadow-[8px_8px_0px_0px_rgba(255,9,144,0.85)] -rotate-1">
-            <h1 className="font-black text-[clamp(2.8rem,9vw,6.5rem)] leading-none tracking-tight uppercase text-white drop-shadow-[0_0_25px_rgba(255,9,144,0.8)]">
-              FUN RUN '26
-            </h1>
-            <span className="absolute -bottom-3 right-4 bg-[#FF0990] text-black font-black text-[10px] sm:text-xs px-2 py-0.5 tracking-widest uppercase rotate-2">
-              OFFICIAL ROLL
-            </span>
-          </div>
-
-          <p className="mt-8 max-w-xl text-zinc-300 text-xs sm:text-sm md:text-base font-medium tracking-wider leading-relaxed px-2">
-            DOCUMENTATION OF RADIOACTIVE'S FUN RUN EVENT
-          </p>
-
-          <div className="mt-8 flex flex-wrap justify-center items-center gap-3 text-[11px] font-mono tracking-widest uppercase">
-            <span className="bg-[#1a0322] border-2 border-[#FF0990]/60 text-[#FF0990] px-3 py-1 shadow-[3px_3px_0px_#FF0990]">
-              ⚡ {photoList.length} TOTAL CAPTURES
-            </span>
+          <div className="relative flex items-center justify-center">
+            <img
+              src={eventlogo}
+              alt="Event Logo"
+              className="h-64 sm:h-64 md:h-72 w-auto max-w-[85vw] object-contain drop-shadow-[0_0_25px_rgba(255,9,144,0.7)] mb-[-60px]"
+            />
           </div>
         </section>
 
@@ -145,7 +134,7 @@ export default function FunRun() {
 
               return (
                 <button
-                  key={item.id || i}
+                  key={item.id}
                   type="button"
                   onClick={() => openLightbox(i)}
                   className={`group relative bg-[#0f0214] border-2 border-white/20 p-2 sm:p-2.5 flex flex-col focus:outline-none transition-transform hover:-translate-y-2 hover:border-[#FF0990] hover:shadow-[6px_6px_0px_#FF0990] ${tiltClass}`}
@@ -157,10 +146,6 @@ export default function FunRun() {
                       loading="lazy"
                       decoding="async"
                       className="w-full h-full object-cover filter contrast-105 brightness-95 group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        // Fallback jika file gambar rusak/tidak ditemukan
-                        e.target.src = 'https://via.placeholder.com/600x800/0d0210/FF0990?text=RADIOACTIVE+FRAME';
-                      }}
                     />
                     <div className="absolute inset-0 bg-[#FF0990]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <span className="text-3xl text-white drop-shadow-[0_0_12px_#FF0990]">+</span>
