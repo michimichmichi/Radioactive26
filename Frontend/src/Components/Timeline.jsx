@@ -1,6 +1,6 @@
 import { useState } from "react";
 import timeline from "../assets/timeline/timeline.webp";
-import star from "../assets/gallery/Star 6.png";
+import star from "../assets/gallery/Star 6.webp";
 
 const events = [
   {

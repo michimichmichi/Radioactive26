@@ -1,7 +1,7 @@
 import React from 'react';
 
 import gallery from '../assets/gallery/gallery.webp';
-import star from '../assets/gallery/Star 6.png';
+import star from '../assets/gallery/Star 6.webp';
 import kamera from '../assets/gallery/kamera 1.webp';
 
 // These gallery copies are resized for their 200px display size. The originals

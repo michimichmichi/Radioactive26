@@ -1,7 +1,7 @@
 import React from 'react';
 
 import vinyl from '../assets/opening/vinyl.webp';
-import star7 from '../assets/opening/Star 7.png'; 
+import star7 from '../assets/opening/Star 7.webp';
 import logo from '../assets/LogoRadioactive.webp';
 
 export default function OpeningTitle() {

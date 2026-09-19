@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import competition from '../assets/competition/competition.webp'; 
-import radAnnouncing from '../assets/competition/radio announcing competition.png';
-import podcast from '../assets/competition/podcast competition.png';
+import radAnnouncing from '../assets/competition/radio announcing competition.webp';
+import podcast from '../assets/competition/podcast competition.webp';
 import register from '../assets/competition/register now.webp';
 import judge1 from '../assets/judgess/judge1.webp';
 import judge2 from '../assets/judgess/judge2.webp';

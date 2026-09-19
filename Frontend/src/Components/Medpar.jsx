@@ -1,22 +1,22 @@
 import React from 'react';
-import poster1 from '../assets/medpar/poster1.png';
-import poster2 from '../assets/medpar/poster2.png';
-import poster3 from '../assets/medpar/poster3.png';
+import poster1 from '../assets/medpar/poster1.webp';
+import poster2 from '../assets/medpar/poster2.webp';
+import poster3 from '../assets/medpar/poster3.webp';
 
 import sponsor from '../assets/sponsor.webp';
 import media from '../assets/media partners.webp';
 import comfest from '../assets/medpar/comfest.webp';
 import death from '../assets/medpar/deathrockstar.webp';
-import medic from '../assets/medpar/medic.png';
-import mufomic from '../assets/medpar/mufomic.png';
-import Cen from '../assets/sponsor/Cen.png';
+import medic from '../assets/medpar/medic.webp';
+import mufomic from '../assets/medpar/mufomic.webp';
+import Cen from '../assets/sponsor/Cen.webp';
 import roti from '../assets/sponsor/roti.webp';
-import events from '../assets/medpar/event.png';
-import mercu from '../assets/medpar/mercu.PNG';
-import rtc from '../assets/medpar/rtc.png';
-import starlight from '../assets/medpar/starlight.png';
-import teen from '../assets/medpar/teensound.png';
-import ulti from '../assets/medpar/ultimagz.png';
+import events from '../assets/medpar/event.webp';
+import mercu from '../assets/medpar/mercu.webp';
+import rtc from '../assets/medpar/rtc.webp';
+import starlight from '../assets/medpar/starlight.webp';
+import teen from '../assets/medpar/teensound.webp';
+import ulti from '../assets/medpar/ultimagz.webp';
 
 export default function Medpar() {
   // 3 Guest Stars Data (easy to customize images, names, and tags)

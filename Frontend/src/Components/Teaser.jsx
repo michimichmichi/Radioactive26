@@ -1,5 +1,5 @@
 import React from "react";
-import teaser from "../assets/archive-originals/teaser.png";
+import teaser from "../assets/teaser.webp";
 
 export default function Teaser() {
   return (

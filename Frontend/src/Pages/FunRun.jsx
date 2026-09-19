@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../Components/NavigationBar';
 import Footer from '../Components/Footer';
-import eventlogo from "../assets/funrun/funrun.png";
-import foto1 from "../assets/funrun/foto1.png";
-import foto2 from "../assets/funrun/foto2.png";
-import foto3 from "../assets/funrun/foto3.png";
-import foto4 from "../assets/funrun/foto4.png";
-import foto5 from "../assets/funrun/foto5.JPG"
+import eventlogo from "../assets/funrun/funrun.webp";
+import foto1 from "../assets/funrun/foto1.webp";
+import foto2 from "../assets/funrun/foto2.webp";
+import foto3 from "../assets/funrun/foto3.webp";
+import foto4 from "../assets/funrun/foto4.webp";
+import foto5 from "../assets/funrun/foto5.webp"
 
 const rawImages = [
   foto1, 
