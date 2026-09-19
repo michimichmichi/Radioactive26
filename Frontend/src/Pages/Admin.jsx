@@ -14,6 +14,11 @@ import {
   ChevronDown,
   Home,
   Check,
+  Ticket,
+  QrCode,
+  Mail,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { validateImageFile } from "../utils/fileValidation";
 
@@ -1128,6 +1133,181 @@ function TeamsPanel() {
 
 
 
+function EncoriansPanel() {
+  const [encorians, setEncorians] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fetchEncorians = async () => {
+    setLoading(true);
+    try {
+      const res = await API.get("/admin/encorians", {
+        params: statusFilter ? { status: statusFilter } : {},
+      });
+      setEncorians(res.data);
+    } catch (err) {
+      alert(err.userMessage || "Unable to load data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEncorians();
+  }, [statusFilter]);
+
+  const handleApprove = async (id) => {
+    if (!window.confirm("Approve this ticket registration?")) return;
+    try {
+      const res = await API.patch(`/admin/encorians/${id}/approve`);
+      if (res.status === 207) {
+        alert(res.data.message || "Approved, but email sending failed.");
+      }
+      fetchEncorians();
+    } catch (err) {
+      alert(err.userMessage || "Error approving registration.");
+    }
+  };
+
+  const handleReject = async (id) => {
+    if (!window.confirm("Reject this ticket registration?")) return;
+    try {
+      await API.patch(`/admin/encorians/${id}/reject`);
+      fetchEncorians();
+    } catch (err) {
+      alert(err.userMessage || "Error rejecting registration.");
+    }
+  };
+
+  const handleResend = async (id) => {
+    try {
+      await API.patch(`/admin/encorians/${id}/resend-email`);
+      alert("Email resent successfully.");
+    } catch (err) {
+      alert(err.userMessage || "Error resending email.");
+    }
+  };
+
+  const filters = [
+    { label: "All", value: "" },
+    { label: "Pending", value: "pending" },
+    { label: "Approved", value: "approved" },
+    { label: "Rejected", value: "rejected" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <SectionCard>
+        <div className="flex gap-3 mb-6">
+          {filters.map((f) => (
+            <button
+              key={f.label}
+              onClick={() => setStatusFilter(f.value)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                statusFilter === f.value
+                  ? "bg-pink-500 text-white"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-pink-500/20"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="overflow-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-pink-100">
+                <th className="text-left py-4">Name</th>
+                <th className="text-left py-4">Email</th>
+                <th className="text-left py-4">Phone</th>
+                <th className="text-left py-4">Status</th>
+                <th className="text-left py-4">Transfer Proof</th>
+                <th className="text-left py-4">Date</th>
+                <th className="text-right py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="py-4 text-center">
+                    Loading...
+                  </td>
+                </tr>
+              ) : (
+                encorians.map((e) => (
+                  <tr key={e._id} className="border-b border-pink-50">
+                    <td className="py-4">{e.name}</td>
+                    <td>{e.email}</td>
+                    <td>{e.phone}</td>
+                    <td>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          e.status === "pending"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : e.status === "approved"
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {e.status}
+                      </span>
+                    </td>
+                    <td>
+                      {e.buktiTransfer ? (
+                        <button
+                          onClick={() => openProtectedFile(e.buktiTransfer)}
+                          className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700"
+                        >
+                          <FileText size={16} /> View
+                        </button>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td>{new Date(e.createdAt).toLocaleDateString()}</td>
+                    <td className="text-right space-x-3">
+                      {e.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(e._id)}
+                            className="text-green-500"
+                            title="Approve"
+                          >
+                            <CheckCircle2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleReject(e._id)}
+                            className="text-red-500"
+                            title="Reject"
+                          >
+                            <XCircle size={18} />
+                          </button>
+                        </>
+                      )}
+                      {e.status === "approved" && (
+                        <button
+                          onClick={() => handleResend(e._id)}
+                          className="text-pink-600"
+                          title="Resend Email"
+                        >
+                          <Mail size={18} />
+                        </button>
+                      )}
+                      {e.status === "rejected" && "-"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+    </div>
+  );
+}
+
+
+
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
   const [authError, setAuthError] = useState("");
@@ -1181,6 +1361,11 @@ export default function Admin() {
       label: "Users",
       icon: ShieldAlert,
     },
+    {
+      id: "encorians",
+      label: "The Encore",
+      icon: Ticket,
+    },
   ];
 
   const renderPage = () => {
@@ -1202,6 +1387,9 @@ export default function Admin() {
 
       case "users":
         return <UsersPanel />;
+
+      case "encorians":
+        return <EncoriansPanel />;
 
       default:
         return null;
@@ -1238,8 +1426,16 @@ export default function Admin() {
         </div>
 
         <Link
-          to="/"
+          to="/admin/scanner"
           className="mt-8 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
+        >
+          <QrCode size={20} />
+          Ticket Scanner
+        </Link>
+
+        <Link
+          to="/"
+          className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
         >
           <Home size={20} />
           Back to homepage

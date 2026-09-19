@@ -48,4 +48,15 @@ export const authAPI = {
   logout: () => API.post("/users/logout"),
 };
 
+export const encorianAPI = {
+  submit: (data) => API.post('/encorians', data),
+  getAll: (status) => API.get('/admin/encorians', { params: status ? { status } : {} }),
+  getById: (id) => API.get(`/admin/encorians/${id}`),
+  approve: (id) => API.patch(`/admin/encorians/${id}/approve`),
+  reject: (id) => API.patch(`/admin/encorians/${id}/reject`),
+  resendEmail: (id) => API.patch(`/admin/encorians/${id}/resend-email`),
+  lookupTicket: (ticketCode) => API.get(`/admin/encorians/ticket/${encodeURIComponent(ticketCode)}`),
+  checkIn: (ticketCode) => API.patch('/admin/encorians/check-in', { ticketCode }),
+};
+
 export default API;
