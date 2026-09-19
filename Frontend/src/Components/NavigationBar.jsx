@@ -90,7 +90,7 @@ const Navbar = () => {
           <li><a href="#competition" onClick={(event) => handleSectionClick(event, "competition")} className="hover:text-white transition-colors tracking-wider">COMPETITION</a></li>
           <li><a href="#sponsor" onClick={(event) => handleSectionClick(event, "sponsor")} className="hover:text-white transition-colors tracking-wider">SPONSOR</a></li>
           <li><a href="#gallery" onClick={(event) => handleSectionClick(event, "gallery")} className="hover:text-white transition-colors tracking-wider">GALLERY</a></li>
-          <li><Link to="/fun-run" className="hover:text-white transition-colors tracking-wider">FUN RUN</Link></li>
+          <li><Link to="/fun-run" className="hover:text-white transition-colors tracking-wider">RUNDIOACTIVE</Link></li>
         </ul>
 
         {/* ACTION CONTROLS / DROPDOWN CONTAINER */}
