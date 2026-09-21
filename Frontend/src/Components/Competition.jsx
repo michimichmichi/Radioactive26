@@ -1,24 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 import competition from '../assets/competition/competition.webp'; 
 import radAnnouncing from '../assets/competition/radio announcing competition.webp';
 import podcast from '../assets/competition/podcast competition.webp';
-import register from '../assets/competition/register now.webp';
 import judge1 from '../assets/judgess/judge1.webp';
 import judge2 from '../assets/judgess/judge2.webp';
 import judge3 from '../assets/judgess/judge3.webp';
 import title from '../assets/judgess/judges.webp';
 
 export default function Competition() {
-    const navigate = useNavigate();
-    const [clickedId, setClickedId] = useState(null);
-    const handleRegisterClick = (id) => {
-        setClickedId(id);
-        setTimeout(() => setClickedId(null), 150);
-        navigate('/competition-registration');
-    };
-
   return (
     <div className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible">
         <style>{`
@@ -219,23 +209,9 @@ export default function Competition() {
 
 </div>
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5">
-            <button 
-                onClick={() => handleRegisterClick('podcast')} 
-                className={`transition-all duration-100 mb-0 md:mb-2
-                  ${clickedId === 'podcast' 
-                    ? 'scale-90 brightness-75 drop-shadow-none' 
-                    : 'hover:scale-110 active:scale-95'
-                  }`} >   
-                  <img 
-                    src={register} 
-                    alt="Register Now" 
-                    width={907}
-                    height={292}
-                    loading="lazy"
-                    decoding="async"
-                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
-                />
-            </button>
+            <p className="rounded-2xl border-2 border-[#FF0990] bg-black/70 px-8 py-4 text-center font-avril text-xl uppercase tracking-wide text-[#FF0990] md:text-3xl">
+                Registration Closed
+            </p>
         </div>
        
     </div>
