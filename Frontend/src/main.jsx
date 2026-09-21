@@ -31,6 +31,8 @@ const CompetitionRegistrationPage = lazyWithRetry(() => import('./Pages/Competit
 const ProfilePage = lazyWithRetry(() => import('./Pages/Profile.jsx'), 'profile')
 const MyCompetitionsPage = lazyWithRetry(() => import('./Pages/MyCompetitions.jsx'), 'my-competitions')
 const FunRunPage = lazyWithRetry(() => import('./Pages/FunRun.jsx'), 'fun-run')
+const TheEncorePage = lazyWithRetry(() => import('./Pages/TheEncore.jsx'), 'the-encore')
+const ScannerPage = lazyWithRetry(() => import('./Pages/Scanner.jsx'), 'scanner')
 
 function PageLoader() {
   return (
@@ -51,6 +53,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/app" element={<App />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/the-encore" element={<TheEncorePage />} />
           <Route
             path="/competition-registration"
             element={
@@ -82,6 +85,14 @@ createRoot(document.getElementById('root')).render(
             }
           />
           <Route path="/fun-run" element={<FunRunPage />} />
+          <Route
+            path="/admin/scanner"
+            element={
+              <ProtectedAdminRoute>
+                <ScannerPage />
+              </ProtectedAdminRoute>
+            }
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>

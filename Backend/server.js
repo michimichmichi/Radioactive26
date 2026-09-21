@@ -8,6 +8,8 @@ import teamRoutes from "./src/routes/teamRoutes.js";
 import competitionRoutes from "./src/routes/competitionRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
+import encorianRoutes from "./src/routes/encorianRoutes.js";
+import adminEncorianRoutes from "./src/routes/adminEncorianRoutes.js";
 import { rateLimiter } from './src/middleware/rateLimiter.js';
 
 dotenv.config(); 
@@ -79,6 +81,8 @@ app.use('/users/register', authLimiter);
 app.use("/teams", teamRoutes);
 app.use("/competitions", competitionRoutes);
 app.use("/users", userRoutes);
+app.use("/encorians", encorianRoutes);
+app.use("/admin/encorians", adminEncorianRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'This endpoint was not found. Refresh the page and try again.' }));
 app.use(errorHandler);
