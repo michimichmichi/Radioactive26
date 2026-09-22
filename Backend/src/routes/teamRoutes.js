@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    createTeam,
     getAllTeams,
     updateTeam,
     searchTeams,
@@ -10,10 +11,7 @@ import { verifyToken, requireRole } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Reject new registrations before authentication or payment-proof uploads.
-router.post("/", (_req, res) => res.status(403).json({
-    message: "Competition registration is closed. Existing registrations can still be viewed.",
-}));
+router.post("/", verifyToken, requireRole('admin', 'user'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, createTeam);
 router.get("/", verifyToken, getAllTeams);
 router.get("/search", verifyToken, requireRole('admin'), searchTeams);
 router.delete("/:id", verifyToken, requireRole('admin'), deleteTeam);

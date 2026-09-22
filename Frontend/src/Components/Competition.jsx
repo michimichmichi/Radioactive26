@@ -1,26 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import competition from '../assets/competition/competition.webp'; 
+import competition from '../assets/competition/competition.webp';
 import radAnnouncing from '../assets/competition/radio announcing competition.webp';
 import podcast from '../assets/competition/podcast competition.webp';
+import register from '../assets/competition/register now.webp';
 import judge1 from '../assets/judgess/judge1.webp';
 import judge2 from '../assets/judgess/judge2.webp';
 import judge3 from '../assets/judgess/judge3.webp';
 import title from '../assets/judgess/judges.webp';
 
 export default function Competition() {
+    const navigate = useNavigate();
+    const [clickedId, setClickedId] = useState(null);
+    const handleRegisterClick = (id) => {
+        setClickedId(id);
+        setTimeout(() => setClickedId(null), 150);
+        navigate('/competition-registration');
+    };
+
   return (
     <div className="relative w-full max-w-4xl mx-auto h-auto items-center justify-center overflow-visible">
         <style>{`
             @keyframes popShakePop {
-            0%, 100% { 
-                transform: scale(1); 
-                opacity: 1; 
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
             }
-            
+
             /* 2. POP UP (Explodes outward quickly) */
-            10% { 
-                transform: scale(1.2); 
+            10% {
+                transform: scale(1.2);
             }
 
             /* 3. SHAKE (Aggressive horizontal shifts) */
@@ -30,8 +40,8 @@ export default function Competition() {
             46% { transform: translateX(4px) rotate(2deg); }
             54% { transform: translateX(0) rotate(0); }
 
-            75% { 
-                transform: scale(1); 
+            75% {
+                transform: scale(1);
             }
 
             .animate-pop-shake {
@@ -40,29 +50,29 @@ export default function Competition() {
         `}</style>
 
 
-        <div className="right-[4%] relative w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible animate-pop-shake">  
-            <img 
-                src={competition} 
-                alt="Competition" 
+        <div className="right-[4%] relative w-full max-w-4xl mx-auto flex items-center justify-center overflow-visible animate-pop-shake">
+            <img
+                src={competition}
+                alt="Competition"
                 width={1692}
                 height={954}
                 loading="lazy"
                 decoding="async"
-                className="w-full max-w-[700px] md:max-w-[1000px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                className="w-full max-w-[700px] md:max-w-[1000px] h-auto object-contain drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
             />
         </div>
 
         {/* Radio Announcing Competition */}
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-10 md:mt-18">
             <div className="relative w-full max-w-4xl mx-auto mb-5 md:mb-10 flex items-center justify-center overflow-visible">
-                <img 
-                    src={radAnnouncing} 
-                    alt="Radio Announcing Competition" 
+                <img
+                    src={radAnnouncing}
+                    alt="Radio Announcing Competition"
                     width={1185}
                     height={107}
                     loading="lazy"
                     decoding="async"
-                    className=" transform w-full max-w-[300px] md:max-w-[600px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                    className=" transform w-full max-w-[300px] md:max-w-[600px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
                 />
             </div>
             <div>
@@ -81,18 +91,18 @@ export default function Competition() {
                 </a>
             </div>
         </div>
-                
+
         {/* Podcast Competition */}
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-10 md:mt-20">
             <div className="relative left-[2%] w-full max-w-4xl mx-auto mb-5 md:mb-10 flex items-center justify-center overflow-visible">
-                <img 
-                    src={podcast} 
-                    alt="Podcast Competition" 
+                <img
+                    src={podcast}
+                    alt="Podcast Competition"
                     width={797}
                     height={99}
                     loading="lazy"
                     decoding="async"
-                    className=" transform w-full max-w-[250px] md:max-w-[500px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                    className=" transform w-full max-w-[250px] md:max-w-[500px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
                 />
             </div>
             <div>
@@ -110,21 +120,21 @@ export default function Competition() {
                     Download Guidebook ➔
                 </a>
             </div>
-            
+
 
         </div>
 
         {/* Judges */}
         <div className="mt-12 md:mt-16 flex flex-col items-center z-20">
             <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5 z-30">
-                <img 
-                    src={title} 
-                    alt="judges" 
+                <img
+                    src={title}
+                    alt="judges"
                     width={800}
                     height={501}
                     loading="lazy"
                     decoding="async"
-                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]" 
+                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
                 />
             </div>
 
@@ -176,7 +186,7 @@ export default function Competition() {
             </h3>
 
             <p className="text-white/80 text-center text-sm md:text-base mt-2 px-4">
-                Radio Announcing Competition 
+                Radio Announcing Competition
             </p>
         </div>
 
@@ -209,11 +219,25 @@ export default function Competition() {
 
 </div>
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center overflow-visible mt-5">
-            <p className="rounded-2xl border-2 border-[#FF0990] bg-black/70 px-8 py-4 text-center font-avril text-xl uppercase tracking-wide text-[#FF0990] md:text-3xl">
-                Registration Closed
-            </p>
+            <button
+                onClick={() => handleRegisterClick('podcast')}
+                className={`transition-all duration-100 mb-0 md:mb-2
+                  ${clickedId === 'podcast'
+                    ? 'scale-90 brightness-75 drop-shadow-none'
+                    : 'hover:scale-110 active:scale-95'
+                  }`} >
+                  <img
+                    src={register}
+                    alt="Register Now"
+                    width={907}
+                    height={292}
+                    loading="lazy"
+                    decoding="async"
+                    className="transform w-full max-w-[200px] md:max-w-[400px] h-auto drop-shadow-[0_0_15px_rgba(255,9,144,0.3)]"
+                />
+            </button>
         </div>
-       
+
     </div>
   );
 }

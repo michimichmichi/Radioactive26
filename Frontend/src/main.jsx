@@ -57,7 +57,9 @@ createRoot(document.getElementById('root')).render(
           <Route
             path="/competition-registration"
             element={
-              <CompetitionRegistrationPage />
+              <ProtectedUserRoute>
+                <CompetitionRegistrationPage />
+              </ProtectedUserRoute>
             }
           />
           <Route
