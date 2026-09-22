@@ -7,13 +7,23 @@ import foto2 from "../assets/funrun/foto2.webp";
 import foto3 from "../assets/funrun/foto3.webp";
 import foto4 from "../assets/funrun/foto4.webp";
 import foto5 from "../assets/funrun/foto5.webp"
+import foto6 from "../assets/funrun/foto6.webp";
+import foto7 from "../assets/funrun/foto7.webp";
+import foto8 from "../assets/funrun/foto8.webp";
+import foto9 from "../assets/funrun/foto9.webp";
+import foto10 from "../assets/funrun/foto10.webp";
 
 const rawImages = [
   foto1, 
   foto2, 
   foto3,
   foto4,
-  foto5
+  foto5,
+  foto6,
+  foto7,
+  foto8,
+  foto9,
+  foto10
 ];
 
 const myPhotos = rawImages.map((src, index) => ({
