@@ -12,6 +12,50 @@ import foto7 from "../assets/funrun/foto7.webp";
 import foto8 from "../assets/funrun/foto8.webp";
 import foto9 from "../assets/funrun/foto9.webp";
 import foto10 from "../assets/funrun/foto10.webp";
+import foto11 from "../assets/funrun/foto11.webp";
+import foto12 from "../assets/funrun/foto12.webp";
+import foto13 from "../assets/funrun/foto13.webp";
+import foto14 from "../assets/funrun/foto14.webp";
+import foto15 from "../assets/funrun/foto15.webp";
+import foto16 from "../assets/funrun/foto16.webp";
+import foto17 from "../assets/funrun/foto17.webp";
+import foto18 from "../assets/funrun/foto18.webp";
+import foto19 from "../assets/funrun/foto19.webp";
+import foto20 from "../assets/funrun/foto20.webp";
+import foto21 from "../assets/funrun/foto21.webp";
+import foto22 from "../assets/funrun/foto22.webp";
+import foto23 from "../assets/funrun/foto23.webp";
+import foto24 from "../assets/funrun/foto24.webp";
+import foto25 from "../assets/funrun/foto25.webp";
+import foto26 from "../assets/funrun/foto26.webp";
+import foto27 from "../assets/funrun/foto27.webp";
+import foto28 from "../assets/funrun/foto28.webp";
+import foto29 from "../assets/funrun/foto29.webp";
+import foto30 from "../assets/funrun/foto30.webp";
+import foto31 from "../assets/funrun/foto31.webp";
+import foto32 from "../assets/funrun/foto32.webp";
+import foto33 from "../assets/funrun/foto33.webp";
+import foto34 from "../assets/funrun/foto34.webp";
+import foto35 from "../assets/funrun/foto35.webp";
+import foto36 from "../assets/funrun/foto36.webp";
+import foto37 from "../assets/funrun/foto37.webp";
+import foto38 from "../assets/funrun/foto38.webp";
+import foto39 from "../assets/funrun/foto39.webp";
+import foto40 from "../assets/funrun/foto40.webp";
+import foto41 from "../assets/funrun/foto41.webp";
+import foto42 from "../assets/funrun/foto42.webp";
+import foto43 from "../assets/funrun/foto43.webp";
+import foto44 from "../assets/funrun/foto44.webp";
+import foto45 from "../assets/funrun/foto45.webp";
+import foto46 from "../assets/funrun/foto46.webp";
+import foto47 from "../assets/funrun/foto47.webp";
+import foto48 from "../assets/funrun/foto48.webp";
+import foto49 from "../assets/funrun/foto49.webp";
+import foto50 from "../assets/funrun/foto50.webp";
+import foto51 from "../assets/funrun/foto51.webp";
+import oob1 from "../assets/funrun/oob1.png";
+import oob2 from "../assets/funrun/oob2.png";
+import oob3 from "../assets/funrun/oob3.png";
 
 const rawImages = [
   foto1, 
@@ -23,8 +67,51 @@ const rawImages = [
   foto7,
   foto8,
   foto9,
-  foto10
+  foto10,
+  foto11,
+  foto12,
+  foto13,
+  foto14,
+  foto15,
+  foto16,
+  foto17,
+  foto18,
+  foto19,
+  foto20,
+  foto21,
+  foto22,
+  foto23,
+  foto24,
+  foto25,
+  foto26,
+  foto27,
+  foto28,
+  foto29,
+  foto30,
+  foto31,
+  foto32,
+  foto33,
+  foto34,
+  foto35,
+  foto36,
+  foto37,
+  foto38,
+  foto39,
+  foto40,
+  foto41,
+  foto42,
+  foto43,
+  foto44,
+  foto45,
+  foto46,
+  foto47,
+  foto48,
+  foto49,
+  foto50,
+  foto51
 ];
+
+const sponsorImages = [oob1, oob2, oob3];
 
 const myPhotos = rawImages.map((src, index) => ({
   id: index + 1,
@@ -39,6 +126,9 @@ const tilts = [
   'rotate-2 hover:rotate-0',
   '-rotate-3 hover:rotate-0',
 ];
+
+const INITIAL_COUNT = 15;
+const LOAD_STEP = 15;
 
 function Lightbox({ photo, index, total, onClose, onPrev, onNext }) {
   return (
@@ -92,11 +182,16 @@ function Lightbox({ photo, index, total, onClose, onPrev, onNext }) {
 export default function FunRun() {
   const [photoList] = useState(myPhotos);
   const [lightbox, setLightbox] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+
+  const visiblePhotos = photoList.slice(0, visibleCount);
+  const hasMore = visibleCount < photoList.length;
 
   const openLightbox  = (i) => setLightbox(i);
   const closeLightbox = ()  => setLightbox(null);
   const prevPhoto     = ()  => setLightbox((i) => (i - 1 + photoList.length) % photoList.length);
   const nextPhoto     = ()  => setLightbox((i) => (i + 1) % photoList.length);
+  const loadMore      = ()  => setVisibleCount((c) => Math.min(c + LOAD_STEP, photoList.length));
 
 
   useEffect(() => {
@@ -135,10 +230,30 @@ export default function FunRun() {
           </div>
         </section>
 
+        {/* OOB SECTION */}
+        <section className="mb-16">
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {sponsorImages.map((src, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-center h-16 sm:h-16 md:h-20 px-4"
+              >
+                <img
+                  src={src}
+                  alt={`Sponsor ${i + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="max-h-full w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* PHOTO GRID */}
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-            {photoList.map((item, i) => {
+            {visiblePhotos.map((item, i) => {
               const tiltClass = tilts[i % tilts.length];
               const frameTag = `00${i + 1}`.slice(-2);
 
@@ -170,6 +285,18 @@ export default function FunRun() {
               );
             })}
           </div>
+
+          {hasMore && (
+            <div className="flex justify-center mt-10">
+              <button
+                type="button"
+                onClick={loadMore}
+                className="px-8 py-3 border-2 border-[#FF0990] bg-[#0f0214] text-[#FF0990] font-mono text-xs uppercase tracking-widest hover:bg-[#FF0990] hover:text-white transition-colors"
+              >
+                Load More
+              </button>
+            </div>
+          )}
         </section>
       </div>
 
