@@ -31,7 +31,6 @@ import foto26 from "../assets/funrun/foto26.webp";
 import foto27 from "../assets/funrun/foto27.webp";
 import foto28 from "../assets/funrun/foto28.webp";
 import foto29 from "../assets/funrun/foto29.webp";
-import foto30 from "../assets/funrun/foto30.webp";
 import foto31 from "../assets/funrun/foto31.webp";
 import foto32 from "../assets/funrun/foto32.webp";
 import foto33 from "../assets/funrun/foto33.webp";
@@ -87,7 +86,6 @@ const rawImages = [
   foto27,
   foto28,
   foto29,
-  foto30,
   foto31,
   foto32,
   foto33,
