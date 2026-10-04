@@ -185,12 +185,20 @@ export const getAllTeams = async (req, res) => {
         const query = req.user.role === 'admin'
             ? {}
             : { $or: [{ leaderId: req.user.id }, { members: req.user.id }] };
+        const competitionId = req.query?.competitionId;
+        if (competitionId !== undefined) {
+            if (typeof competitionId !== 'string' || !isValidObjectId(competitionId)) {
+                return res.status(400).json({ message: "Select a valid competition to filter teams." });
+            }
+            query.competitionId = competitionId;
+        }
         const userFields = req.user.role === 'admin' ? "name email university nim" : "name university nim";
         const teams = await Team.find(query)
             .limit(500)
             .populate("leaderId", userFields)
             .populate("members", userFields)
-            .populate("competitionId", "competitionName time place");
+            .populate("competitionId", "competitionName time place")
+            .lean();
 
         res.status(200).json(teams);
     } catch (error) {
@@ -371,15 +379,28 @@ export const deleteTeam = async (req, res) => {
 //Search Team Name (Admin)
 export const searchTeams = async (req, res) => {
     try {
-        const { query } = req.query;
+        const { query, competitionId } = req.query;
 
         if (typeof query !== 'string' || !query.trim() || query.trim().length > 80) {
             return res.status(400).json({ message: "Enter a team name to search (1 to 80 characters)." });
         }
 
-        const teams = await Team.find({
+        const filter = {
             teamName: { $regex: escapeRegex(query.trim()), $options: "i" }
-        }).limit(100).select('teamName leaderId members competitionId buktiTransfer');
+        };
+        if (competitionId !== undefined) {
+            if (typeof competitionId !== 'string' || !isValidObjectId(competitionId)) {
+                return res.status(400).json({ message: "Select a valid competition to filter teams." });
+            }
+            filter.competitionId = competitionId;
+        }
+
+        const teams = await Team.find(filter).limit(100)
+            .select('teamName leaderId members competitionId buktiTransfer')
+            .populate("leaderId", "name email university nim")
+            .populate("members", "name email university nim")
+            .populate("competitionId", "competitionName time place")
+            .lean();
 
         res.status(200).json({
             count: teams.length,

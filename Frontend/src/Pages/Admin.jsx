@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import API, { openProtectedFile } from "../api";
 import {
@@ -21,25 +21,22 @@ import {
   XCircle,
 } from "lucide-react";
 import { validateImageFile } from "../utils/fileValidation";
+import useAdminData from "../hooks/useAdminData";
+import { buildTeamFormData } from "../utils/adminForms";
 
 
 const competitionAPI = {
-  getAll: () => API.get("/competitions"),
   create: (data) => API.post("/competitions", data),
   update: (id, data) => API.put(`/competitions/${id}`, data),
   delete: (id) => API.delete(`/competitions/${id}`),
 };
 
 const teamAPI = {
-  getAll: () => API.get("/teams"),
-  search: (query) => API.get(`/teams/search?query=${query}`),
-  create: (data) => API.post("/teams", data),
   update: (id, data) => API.put(`/teams/${id}`, data),
   delete: (id) => API.delete(`/teams/${id}`),
 };
 
 const userAPI = {
-  getAll: () => API.get("/users"),
   create: (data) => API.post("/users", data),
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
@@ -66,23 +63,6 @@ const buildUserFormData = (form, { includeEmptyPassword = true } = {}) => {
   return formData;
 };
 
-const buildTeamFormData = (form) => {
-  const formData = new FormData();
-  formData.append("teamName", form.teamName);
-  formData.append("leaderId", form.leaderId);
-  formData.append("competitionId", form.competitionId);
-
-  form.members.forEach((memberId) => {
-    formData.append("members", memberId);
-  });
-
-  if (isFile(form.buktiTransfer)) {
-    formData.append("buktiTransfer", form.buktiTransfer);
-  }
-
-  return formData;
-};
-
 
 
 function SectionCard({ children }) {
@@ -91,6 +71,42 @@ function SectionCard({ children }) {
       {children}
     </div>
   );
+}
+
+function DataStatus({ loading, error, empty, emptyMessage = "No records found.", onRefresh }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div role={error ? "alert" : "status"} className="text-sm text-pink-200">
+        {loading ? "Loading data…" : error || (empty ? emptyMessage : "")}
+      </div>
+      <button
+        type="button"
+        onClick={onRefresh}
+        disabled={loading}
+        className="inline-flex items-center gap-2 rounded-xl bg-pink-500/15 px-4 py-2 text-sm font-semibold text-pink-200 disabled:opacity-50"
+      >
+        <RefreshCcw size={16} className={loading ? "animate-spin" : ""} />
+        {error ? "Retry" : "Refresh"}
+      </button>
+    </div>
+  );
+}
+
+function useAdminAction() {
+  const locked = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const runAction = useCallback(async (action) => {
+    if (locked.current) return;
+    locked.current = true;
+    setBusy(true);
+    try {
+      await action();
+    } finally {
+      locked.current = false;
+      setBusy(false);
+    }
+  }, []);
+  return { busy, runAction };
 }
 
 function Input(props) {
@@ -145,6 +161,7 @@ function Select(props) {
       <button
         type="button"
         role="combobox"
+        aria-label={rest["aria-label"]}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
@@ -221,7 +238,7 @@ function Button({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`px-4 py-3 rounded-2xl font-semibold transition-all duration-300 ${className}`}
+      className={`px-4 py-3 rounded-2xl font-semibold transition-all duration-300 disabled:cursor-wait disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -230,30 +247,33 @@ function Button({ children, className = "", ...props }) {
 
 
 
-function DashboardPanel({ users, teams, competitions }) {
+function DashboardPanel() {
+  const { data: stats, loading, error, refresh } = useAdminData("/admin/stats", { initialData: null });
   const cards = [
     {
       title: "Users",
-      value: users.length,
+      value: stats?.users ?? "…",
       icon: ShieldAlert,
       color: "bg-pink-500",
     },
     {
       title: "Teams",
-      value: teams.length,
+      value: stats?.teams ?? "…",
       icon: Users,
       color: "bg-fuchsia-500",
     },
     {
       title: "Competitions",
-      value: competitions.length,
+      value: stats?.competitions ?? "…",
       icon: Trophy,
       color: "bg-rose-500",
     },
   ];
 
   return (
-    <div className=" grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <DataStatus loading={loading} error={error} onRefresh={refresh} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {cards.map((card, i) => {
         const Icon = card.icon;
 
@@ -277,6 +297,7 @@ function DashboardPanel({ users, teams, competitions }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -284,6 +305,7 @@ function DashboardPanel({ users, teams, competitions }) {
 
 
 function CompetitionsPanel() {
+  const { busy, runAction } = useAdminAction();
   const emptyForm = {
     competitionName: "",
     time: "",
@@ -291,22 +313,9 @@ function CompetitionsPanel() {
     termsAndConditions: "",
   };
 
-  const [competitions, setCompetitions] = useState([]);
+  const { data: competitions, loading, error, refresh: fetchCompetitions } = useAdminData("/competitions");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-
-  const fetchCompetitions = async () => {
-    try {
-      const res = await competitionAPI.getAll();
-      setCompetitions(res.data);
-    } catch (err) {
-      alert(err.userMessage || "Unable to load data. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    fetchCompetitions();
-  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -362,6 +371,8 @@ function CompetitionsPanel() {
 
           <Button
             onClick={resetForm}
+            disabled={busy}
+            aria-label="Reset competition form"
             className="bg-pink-100 hover:bg-pink-200 text-pink-600"
           >
             <RefreshCcw size={18} />
@@ -369,9 +380,10 @@ function CompetitionsPanel() {
         </div>
 
         <form noValidate
-          onSubmit={submitHandler}
+          onSubmit={(event) => { event.preventDefault(); runAction(() => submitHandler(event)); }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
+          <fieldset disabled={busy} className="contents">
           <Input
             placeholder="competitionName"
             value={form.competitionName}
@@ -409,14 +421,17 @@ function CompetitionsPanel() {
 
           <Button
             type="submit"
+            disabled={busy}
             className="bg-pink-500 hover:bg-pink-600 text-white md:col-span-2"
           >
-            {editingId ? "Update Competition" : "Create Competition"}
+            {busy ? "Saving…" : editingId ? "Update Competition" : "Create Competition"}
           </Button>
+          </fieldset>
         </form>
       </SectionCard>
 
       <SectionCard>
+        <DataStatus loading={loading} error={error} empty={competitions.length === 0} onRefresh={fetchCompetitions} />
         <div className="overflow-auto">
           <table className="w-full">
             <thead>
@@ -439,6 +454,8 @@ function CompetitionsPanel() {
 
                   <td className="text-right space-x-3">
                     <button
+                      disabled={busy}
+                      aria-label={`Edit ${comp.competitionName}`}
                       onClick={() => editCompetition(comp)}
                       className="text-pink-600"
                     >
@@ -446,7 +463,9 @@ function CompetitionsPanel() {
                     </button>
 
                     <button
-                      onClick={() => deleteCompetition(comp._id)}
+                      disabled={busy}
+                      aria-label={`Delete ${comp.competitionName}`}
+                      onClick={() => runAction(() => deleteCompetition(comp._id))}
                       className="text-red-500"
                     >
                       <Trash2 size={18} />
@@ -465,6 +484,7 @@ function CompetitionsPanel() {
 
 
 function UsersPanel() {
+  const { busy, runAction } = useAdminAction();
   const emptyForm = {
     name: "",
     email: "",
@@ -475,24 +495,11 @@ function UsersPanel() {
     ktm: "",
   };
 
-  const [users, setUsers] = useState([]);
+  const { data: users, loading, error, refresh: fetchUsers } = useAdminData("/users");
   const formRef = useRef(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [currentKtm, setCurrentKtm] = useState("");
-
-  const fetchUsers = async () => {
-    try {
-      const res = await userAPI.getAll();
-      setUsers(res.data);
-    } catch (err) {
-      alert(err.userMessage || "Unable to load data. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -557,6 +564,8 @@ function UsersPanel() {
 
           <Button
             onClick={resetForm}
+            disabled={busy}
+            aria-label="Reset user form"
             className="bg-pink-100 hover:bg-pink-200 text-pink-600"
           >
             <RefreshCcw size={18} />
@@ -565,9 +574,10 @@ function UsersPanel() {
 
         <form noValidate
           ref={formRef}
-          onSubmit={submitHandler}
+          onSubmit={(event) => { event.preventDefault(); runAction(() => submitHandler(event)); }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
+          <fieldset disabled={busy} className="contents">
           <Input
             placeholder="name"
             value={form.name}
@@ -670,16 +680,24 @@ function UsersPanel() {
   />
 </div>
 
+          {editingId && currentKtm && (
+            <button type="button" onClick={() => openProtectedFile(currentKtm)} className="text-sm font-semibold text-pink-200">
+              View current KTM
+            </button>
+          )}
           <Button
             type="submit"
+            disabled={busy}
             className="bg-pink-500 hover:bg-pink-600 text-white md:col-span-2"
           >
-            {editingId ? "Update User" : "Create User"}
+            {busy ? "Saving…" : editingId ? "Update User" : "Create User"}
           </Button>
+          </fieldset>
         </form>
       </SectionCard>
 
       <SectionCard>
+        <DataStatus loading={loading} error={error} empty={users.length === 0} onRefresh={fetchUsers} />
         <div className="overflow-auto">
           <table className="w-full">
             <thead>
@@ -724,6 +742,8 @@ function UsersPanel() {
 
                   <td className="text-right space-x-3">
                     <button
+                      disabled={busy}
+                      aria-label={`Edit ${u.name}`}
                       onClick={() => editUser(u)}
                       className="text-pink-600"
                     >
@@ -731,7 +751,9 @@ function UsersPanel() {
                     </button>
 
                     <button
-                      onClick={() => deleteUser(u._id)}
+                      disabled={busy}
+                      aria-label={`Delete ${u.name}`}
+                      onClick={() => runAction(() => deleteUser(u._id))}
                       className="text-red-500"
                     >
                       <Trash2 size={18} />
@@ -750,6 +772,7 @@ function UsersPanel() {
 
 
 function TeamsPanel() {
+  const { busy, runAction } = useAdminAction();
   const emptyForm = {
     teamName: "",
     leaderId: "",
@@ -758,36 +781,28 @@ function TeamsPanel() {
     buktiTransfer: "",
   };
 
-  const [teams, setTeams] = useState([]);
   const formRef = useRef(null);
-  const [users, setUsers] = useState([]);
-  const [competitions, setCompetitions] = useState([]);
   const [search, setSearch] = useState("");
+  const [competitionFilter, setCompetitionFilter] = useState("");
+  const query = search.trim();
+  const searchParams = new URLSearchParams();
+  if (query) searchParams.set("query", query);
+  if (competitionFilter) searchParams.set("competitionId", competitionFilter);
+  const teamUrl = `${query ? "/teams/search" : "/teams"}${searchParams.size ? `?${searchParams}` : ""}`;
+  const { data: teamData, loading, error, refresh } = useAdminData(
+    teamUrl,
+    { delay: query ? 300 : 0 },
+  );
+  const teams = query ? teamData.teams || [] : teamData;
+  const userData = useAdminData("/users");
+  const competitionData = useAdminData("/competitions");
+  const users = userData.data;
+  const competitions = competitionData.data;
   const [memberSearch, setMemberSearch] = useState("");
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [currentTransfer, setCurrentTransfer] = useState("");
-
-  const loadData = async () => {
-    try {
-      const [teamsRes, usersRes, competitionsRes] = await Promise.all([
-        teamAPI.getAll(),
-        userAPI.getAll(),
-        competitionAPI.getAll(),
-      ]);
-
-      setTeams(teamsRes.data);
-      setUsers(usersRes.data);
-      setCompetitions(competitionsRes.data);
-    } catch (err) {
-      alert(err.userMessage || "Unable to load data. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -817,12 +832,10 @@ function TeamsPanel() {
     try {
       if (editingId) {
         await teamAPI.update(editingId, buildTeamFormData(form));
-      } else {
-        await teamAPI.create(buildTeamFormData(form));
       }
 
       resetForm();
-      loadData();
+      refresh();
     } catch (err) {
       alert(err.userMessage || "The request could not be completed. Please try again.");
     }
@@ -846,25 +859,9 @@ function TeamsPanel() {
 
     try {
       await teamAPI.delete(id);
-      loadData();
+      refresh();
     } catch (err) {
       alert(err.userMessage || "Unable to delete this item. Please try again.");
-    }
-  };
-
-  const searchTeams = async (value) => {
-    setSearch(value);
-
-    if (!value.trim()) {
-      loadData();
-      return;
-    }
-
-    try {
-      const res = await teamAPI.search(value);
-      setTeams(res.data.teams);
-    } catch (err) {
-      alert(err.userMessage || "Unable to search teams. Please try again.");
     }
   };
 
@@ -884,22 +881,31 @@ function TeamsPanel() {
       <SectionCard>
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold text-pink-600">
-            {editingId ? "Edit Team" : "Create Team"}
+            {editingId ? "Edit Team" : "Team Details"}
           </h2>
 
           <Button
             onClick={resetForm}
+            disabled={busy}
+            aria-label="Reset team form"
             className="bg-pink-100 hover:bg-pink-200 text-pink-600"
           >
             <RefreshCcw size={18} />
           </Button>
         </div>
 
+        {!editingId && <p className="mb-4 text-sm text-pink-200">Competition registration is closed. Select Edit on an existing team to update its details.</p>}
+        <DataStatus
+          loading={userData.loading || competitionData.loading}
+          error={userData.error || competitionData.error}
+          onRefresh={() => { userData.refresh(); competitionData.refresh(); }}
+        />
         <form noValidate
           ref={formRef}
-          onSubmit={submitHandler}
+          onSubmit={(event) => { event.preventDefault(); if (editingId) runAction(() => submitHandler(event)); }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
+          <fieldset disabled={busy || !editingId || userData.loading || competitionData.loading || Boolean(userData.error || competitionData.error)} className="contents">
           <Input
             placeholder="teamName"
             value={form.teamName}
@@ -1039,30 +1045,55 @@ function TeamsPanel() {
             type="submit"
             className="bg-pink-500 hover:bg-pink-600 text-white md:col-span-2"
           >
-            {editingId ? "Update Team" : "Create Team"}
+            {busy ? "Saving…" : editingId ? "Update Team" : "Select a team to edit"}
           </Button>
+          </fieldset>
         </form>
       </SectionCard>
 
       <SectionCard>
-        <div className="flex justify-between items-center mb-5">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-5">
           <h2 className="text-2xl font-bold text-pink-600">Teams</h2>
 
-          <div className="relative w-80">
-            <Search
-              className="absolute left-3 top-3 text-pink-400"
-              size={18}
-            />
-
-            <input
-              value={search}
-              onChange={(e) => searchTeams(e.target.value)}
-              placeholder="Search team..."
-              className="w-full border border-pink-200 rounded-2xl py-3 pl-10 pr-4 bg-pink-50"
-            />
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="w-full sm:w-64">
+              <Select
+                value={competitionFilter}
+                onChange={(event) => setCompetitionFilter(event.target.value)}
+                aria-label="Filter teams by competition"
+              >
+                <option value="">All competitions</option>
+                {competitions.map((competition) => (
+                  <option key={competition._id} value={competition._id}>
+                    {competition.competitionName}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="relative w-full sm:w-80">
+              <Search
+                className="absolute left-3 top-3 text-pink-400"
+                size={18}
+              />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                maxLength={80}
+                aria-label="Search teams by name"
+                placeholder="Search team..."
+                className="w-full border border-pink-200 rounded-2xl py-3 pl-10 pr-4 bg-pink-50"
+              />
+            </div>
           </div>
         </div>
 
+        <DataStatus
+          loading={loading}
+          error={error}
+          empty={teams.length === 0}
+          emptyMessage={query || competitionFilter ? "No teams match your filters." : "No teams registered."}
+          onRefresh={refresh}
+        />
         <div className="grid md:grid-cols-2 gap-6">
           {teams.map((team) => (
             <div
@@ -1082,6 +1113,8 @@ function TeamsPanel() {
 
                 <div className="flex gap-2">
                   <button
+                    disabled={busy}
+                    aria-label={`Edit ${team.teamName}`}
                     onClick={() => editTeam(team)}
                     className="text-pink-600"
                   >
@@ -1089,7 +1122,9 @@ function TeamsPanel() {
                   </button>
 
                   <button
-                    onClick={() => deleteTeam(team._id)}
+                    disabled={busy}
+                    aria-label={`Delete ${team.teamName}`}
+                    onClick={() => runAction(() => deleteTeam(team._id))}
                     className="text-red-500"
                   >
                     <Trash2 size={18} />
@@ -1134,27 +1169,11 @@ function TeamsPanel() {
 
 
 function EncoriansPanel() {
-  const [encorians, setEncorians] = useState([]);
+  const { busy, runAction } = useAdminAction();
   const [statusFilter, setStatusFilter] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const fetchEncorians = async () => {
-    setLoading(true);
-    try {
-      const res = await API.get("/admin/encorians", {
-        params: statusFilter ? { status: statusFilter } : {},
-      });
-      setEncorians(res.data);
-    } catch (err) {
-      alert(err.userMessage || "Unable to load data. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEncorians();
-  }, [statusFilter]);
+  const { data: encorians, loading, error, refresh: fetchEncorians } = useAdminData(
+    statusFilter ? `/admin/encorians?status=${statusFilter}` : "/admin/encorians",
+  );
 
   const handleApprove = async (id) => {
     if (!window.confirm("Approve this ticket registration?")) return;
@@ -1213,6 +1232,8 @@ function EncoriansPanel() {
             </button>
           ))}
         </div>
+        <DataStatus loading={loading} error={error} empty={encorians.length === 0} onRefresh={fetchEncorians} />
+        {busy && <p role="status" className="mb-4 text-sm text-pink-200">Processing ticket action…</p>}
         <div className="overflow-auto">
           <table className="w-full">
             <thead>
@@ -1269,14 +1290,18 @@ function EncoriansPanel() {
                       {e.status === "pending" && (
                         <>
                           <button
-                            onClick={() => handleApprove(e._id)}
+                            disabled={busy}
+                            aria-label={`Approve ticket for ${e.name}`}
+                            onClick={() => runAction(() => handleApprove(e._id))}
                             className="text-green-500"
                             title="Approve"
                           >
                             <CheckCircle2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleReject(e._id)}
+                            disabled={busy}
+                            aria-label={`Reject ticket for ${e.name}`}
+                            onClick={() => runAction(() => handleReject(e._id))}
                             className="text-red-500"
                             title="Reject"
                           >
@@ -1286,7 +1311,9 @@ function EncoriansPanel() {
                       )}
                       {e.status === "approved" && (
                         <button
-                          onClick={() => handleResend(e._id)}
+                          disabled={busy}
+                          aria-label={`Resend ticket email to ${e.name}`}
+                          onClick={() => runAction(() => handleResend(e._id))}
                           className="text-pink-600"
                           title="Resend Email"
                         >
@@ -1310,35 +1337,6 @@ function EncoriansPanel() {
 
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
-  const [authError, setAuthError] = useState("");
-
-  const [users, setUsers] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [competitions, setCompetitions] = useState([]);
-
-  const loadDashboard = async () => {
-    try {
-      setAuthError("");
-      const [u, t, c] = await Promise.all([
-        userAPI.getAll(),
-        teamAPI.getAll(),
-        competitionAPI.getAll(),
-      ]);
-
-      setUsers(u.data || []);
-      setTeams(t.data || []);
-      setCompetitions(c.data || []);
-    } catch (err) {
-      setAuthError(
-        err.userMessage ||
-          "Unable to load admin data. Please try again.",
-      );
-    }
-  };
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
 
   const menu = [
     {
@@ -1372,11 +1370,7 @@ export default function Admin() {
     switch (tab) {
       case "dashboard":
         return (
-          <DashboardPanel
-            users={users}
-            teams={teams}
-            competitions={competitions}
-          />
+          <DashboardPanel />
         );
 
       case "competitions":
@@ -1453,11 +1447,6 @@ export default function Admin() {
 
         {renderPage()}
 
-        {authError && (
-          <div className="mt-6 rounded-lg border border-pink-200 bg-white px-5 py-4 text-sm font-semibold text-pink-700 shadow-xl">
-            {authError}
-          </div>
-        )}
       </div>
     </div>
   );
