@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import poster1 from '../assets/medpar/poster1.webp';
 import poster2 from '../assets/medpar/poster2.webp';
 import poster3 from '../assets/medpar/poster3.webp';
@@ -141,6 +142,17 @@ export default function Medpar() {
 
       </section>
 
+      {/* ========================================================================= */}
+      {/* SECTION 0.5: REGISTER NOW BUTTON                                          */}
+      {/* ========================================================================= */}
+      <section id="sponsor" className="relative w-full flex flex-col items-center justify-center -mt-24 sm:-mt-32 md:-mt-36 mb-32 sm:mb-40 md:mb-48 scroll-mt-24">
+        <Link
+          to="/the-encore"
+          className="rounded-2xl border-2 border-[#FF0990] bg-black/70 px-8 py-4 text-center font-avril text-xl uppercase tracking-wide text-[#FF0990] md:text-3xl hover:bg-[#FF0990] hover:text-black transition-all duration-200 shadow-[4px_4px_0px_0px_#FF0990] active:scale-95"
+        >
+          Buy Tickets
+        </Link>
+      </section>
 
       {/* ========================================================================= */}
       {/* SECTION 1: SPONSORS                                                       */}
