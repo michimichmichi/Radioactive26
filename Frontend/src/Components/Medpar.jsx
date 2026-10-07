@@ -18,6 +18,20 @@ import rtc from '../assets/medpar/rtc.webp';
 import starlight from '../assets/medpar/starlight.webp';
 import teen from '../assets/medpar/teensound.webp';
 import ulti from '../assets/medpar/ultimagz.webp';
+import audio from '../assets/medpar/Audio+.jpeg';
+import eventt from '../assets/medpar/eventterus.png'
+import aces from '../assets/medpar/Logo ACES.png'
+import isfest from '../assets/medpar/Logo ISFEST.jpeg'
+import lsr from '../assets/medpar/LOGO LSR WHITE 2.png'
+import pojok from '../assets/medpar/logo Medpar-Pojok Event-04.png'
+import milvy from '../assets/medpar/Logo milvy mid 2026 color.png'
+import mister from '../assets/medpar/Logo mister miss (glow).png'
+import sound from '../assets/medpar/LOGO SOUNDLANE.png'
+import ufest from '../assets/medpar/LOGO UFEST.png'
+import ultigraph from '../assets/medpar/LOGO ULTIGRAPH 2026.png'
+
+
+
 
 export default function Medpar() {
   // 3 Guest Stars Data (easy to customize images, names, and tags)
@@ -56,6 +70,17 @@ export default function Medpar() {
     starlight,
     teen,
     ulti,
+    audio,
+    eventt,
+    aces,
+    isfest,
+    lsr,
+    pojok,
+    milvy,
+    mister,
+    sound,
+    ufest,
+    ultigraph
   ];
 
   const sponsorLogos = [
@@ -258,7 +283,7 @@ export default function Medpar() {
                       <img
                         src={logo}
                         alt={`Medpar ${frameNumber}`}
-                        className="max-h-full max-w-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] contrast-125 brightness-105 group-hover:scale-110 group-hover:drop-shadow-[0_0_16px_#FF0990] group-hover:brightness-125 transition-all duration-300"
+                        className="max-h-full max-w-full object-contain filter  contrast-125 brightness-105 group-hover:scale-110 group-hover:drop-shadow-[0_0_16px_#FF0990] group-hover:brightness-125 transition-all duration-300"
                       />
                     </div>
 
