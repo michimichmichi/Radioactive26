@@ -20,15 +20,15 @@ import teen from '../assets/medpar/teensound.webp';
 import ulti from '../assets/medpar/ultimagz.webp';
 import audio from '../assets/medpar/Audio+.jpeg';
 import eventt from '../assets/medpar/eventterus.png'
-import aces from '../assets/medpar/Logo ACES.png'
-import isfest from '../assets/medpar/Logo ISFEST.jpeg'
-import lsr from '../assets/medpar/LOGO LSR WHITE 2.png'
-import pojok from '../assets/medpar/logo Medpar-Pojok Event-04.png'
-import milvy from '../assets/medpar/Logo milvy mid 2026 color.png'
-import mister from '../assets/medpar/Logo mister miss (glow).png'
-import sound from '../assets/medpar/LOGO SOUNDLANE.png'
-import ufest from '../assets/medpar/LOGO UFEST.png'
-import ultigraph from '../assets/medpar/LOGO ULTIGRAPH 2026.png'
+import aces from '../assets/medpar/aces.png'
+import isfest from '../assets/medpar/isfest.jpeg'
+import lsr from '../assets/medpar/lsr.png'
+import pojok from '../assets/medpar/pojok.png'
+import milvy from '../assets/medpar/milvy.png'
+import mister from '../assets/medpar/mrms.png'
+import sound from '../assets/medpar/lane.png'
+import ufest from '../assets/medpar/ufest.png'
+import ultigraph from '../assets/medpar/ultigraph.png'
 
 
 
