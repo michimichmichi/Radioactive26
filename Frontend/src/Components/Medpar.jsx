@@ -150,7 +150,7 @@ export default function Medpar() {
           to="/the-encore"
           className="rounded-2xl border-2 border-[#FF0990] bg-black/70 px-8 py-4 text-center font-avril text-xl uppercase tracking-wide text-[#FF0990] md:text-3xl hover:bg-[#FF0990] hover:text-black transition-all duration-200 shadow-[4px_4px_0px_0px_#FF0990] active:scale-95"
         >
-          Register Now
+          Buy Tickets
         </Link>
       </section>
 
