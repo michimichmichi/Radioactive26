@@ -78,7 +78,7 @@ function Hero() {
         <DeferredSection><Mascot /></DeferredSection>
         <DeferredSection id="competition"><Competition /></DeferredSection>
         <DeferredSection><Timeline /></DeferredSection>
-        <DeferredSection id="sponsor"><Medpar /></DeferredSection>
+        <DeferredSection id="the-encore"><Medpar /></DeferredSection>
         <DeferredSection><Teaser /></DeferredSection>
         <DeferredSection id="gallery"><Gallery /></DeferredSection>
         <DeferredSection><Footer /></DeferredSection>
