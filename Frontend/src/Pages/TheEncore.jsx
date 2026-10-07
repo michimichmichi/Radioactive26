@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Navbar from '../Components/NavigationBar';
-import Footer from '../Components/Footer';
 import { encorianAPI } from '../api';
 import { validateImageFile } from '../utils/fileValidation';
 import qris from '../assets/encore/qris.jpeg';
@@ -135,7 +134,7 @@ export default function TheEncore() {
         </div>
       </main>
       
-      <Footer />
+
     </div>
   );
 }
