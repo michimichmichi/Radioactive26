@@ -63,6 +63,9 @@ export default function TheEncore() {
                 <p className="text-pink-400 text-xs text-center mb-3 leading-relaxed">
                   Scan QRIS untuk pembayaran, lalu upload bukti transfer di samping.
                 </p>
+                <p className="text-2xl font-bold text-pink-400 text-center mb-3">
+                  Rp35.000
+                </p>
                 <img
                   src={qris}
                   alt="QRIS Payment"
