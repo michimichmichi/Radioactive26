@@ -1,5 +1,14 @@
 import mongoose from 'mongoose'
 
+const attendanceSchema = new mongoose.Schema({
+    present: { type: Boolean, required: true },
+    checkedInAt: { type: Date, default: null },
+    updatedAt: { type: Date, required: true },
+    updatedBy: { type: String, required: true },
+    version: { type: Number, required: true },
+    sourceId: { type: String, default: '' }
+}, { _id: false });
+
 const teamSchema = new mongoose.Schema({
     teamName: {
         type: String,
@@ -27,6 +36,12 @@ const teamSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Competition',
         required: true
+    },
+    racAttendance: {
+        type: Map,
+        of: attendanceSchema,
+        default: () => ({}),
+        select: false
     },
     buktiTransfer: {
         type: String,

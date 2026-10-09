@@ -23,6 +23,8 @@ import {
 import { validateImageFile } from "../utils/fileValidation";
 import useAdminData from "../hooks/useAdminData";
 import { buildTeamFormData } from "../utils/adminForms";
+import useRacAttendance from "../hooks/useRacAttendance";
+import RacAttendancePanel, { AttendanceNotifications } from "../Components/RacAttendancePanel";
 
 
 const competitionAPI = {
@@ -1337,6 +1339,7 @@ function EncoriansPanel() {
 
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
+  const attendance = useRacAttendance();
 
   const menu = [
     {
@@ -1353,6 +1356,11 @@ export default function Admin() {
       id: "teams",
       label: "Teams",
       icon: Users,
+    },
+    {
+      id: "rac-attendance",
+      label: "RAC Attendance",
+      icon: CheckCircle2,
     },
     {
       id: "users",
@@ -1382,6 +1390,9 @@ export default function Admin() {
       case "users":
         return <UsersPanel />;
 
+      case "rac-attendance":
+        return <RacAttendancePanel attendance={attendance} />;
+
       case "encorians":
         return <EncoriansPanel />;
 
@@ -1391,14 +1402,14 @@ export default function Admin() {
   };
 
   return (
-    <div className="admin-page flex min-h-screen">
+    <div className="admin-page flex min-h-screen flex-col md:flex-row">
       {/* SIDEBAR */}
-      <div className="w-72 bg-gradient-to-b bg-black text-pink-600 p-6 shadow-2xl">
+      <div className="w-full bg-gradient-to-b bg-black p-6 text-pink-600 shadow-2xl md:w-72 md:shrink-0">
         <h1 className="text-4xl font-extrabold mb-10">
           ADMIN
         </h1>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3 md:block md:space-y-3">
           {menu.map((item) => {
             const Icon = item.icon;
 
@@ -1437,10 +1448,10 @@ export default function Admin() {
       </div>
 
       {/* CONTENT */}
-      <div className="flex-1 p-8">
+      <div className="min-w-0 flex-1 p-4 sm:p-8">
         <div className="mb-8">
-          <h1 className="text-5xl font-bold capitalize text-pink-600">
-            {tab}
+          <h1 className="text-3xl font-bold capitalize text-pink-600 sm:text-5xl">
+            {menu.find((item) => item.id === tab)?.label}
           </h1>
 
         </div>
@@ -1448,6 +1459,7 @@ export default function Admin() {
         {renderPage()}
 
       </div>
+      <AttendanceNotifications notifications={attendance.notifications} dismiss={attendance.dismiss} />
     </div>
   );
 }
