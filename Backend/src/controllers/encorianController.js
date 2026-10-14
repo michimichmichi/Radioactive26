@@ -1,5 +1,6 @@
 import { sendError } from '../middleware/errorHandler.js';
 import Encorian from '../models/Encorian.js';
+import ReferralCode from '../models/ReferralCode.js';
 import Ticket from '../models/Ticket.js';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
@@ -44,6 +45,22 @@ export const createEncorian = async (req, res) => {
             return res.status(400).json({ message: Object.values(errors).join(' '), errors });
         }
 
+        let validReferralCode = null;
+        if (req.body.referralCode && typeof req.body.referralCode === 'string') {
+            const rawRef = req.body.referralCode.trim().toUpperCase();
+            if (rawRef) {
+                const refDoc = await ReferralCode.findOne({ code: rawRef, isActive: true });
+                if (!refDoc) {
+                    if (req.file) await deleteUploadedTransfer(req.file.filename);
+                    return res.status(400).json({
+                        message: `The referral code "${rawRef}" is invalid or inactive.`,
+                        errors: { referralCode: 'Referral code is invalid or inactive.' }
+                    });
+                }
+                validReferralCode = refDoc.code;
+            }
+        }
+
         const buktiTransfer = `/uploads/transfer/${req.file.filename}`;
 
         const newEncorian = await Encorian.create({
@@ -51,7 +68,8 @@ export const createEncorian = async (req, res) => {
             email,
             phone,
             buktiTransfer,
-            status: 'pending'
+            status: 'pending',
+            referralCode: validReferralCode
         });
 
         return res.status(201).json({
@@ -62,6 +80,7 @@ export const createEncorian = async (req, res) => {
                 email: newEncorian.email,
                 phone: newEncorian.phone,
                 status: newEncorian.status,
+                referralCode: newEncorian.referralCode,
                 createdAt: newEncorian.createdAt
             }
         });
@@ -76,14 +95,18 @@ export const createEncorian = async (req, res) => {
 export const getEncorians = async (req, res) => {
     try {
         const query = {};
-        const { status } = req.query;
+        const { status, referralCode } = req.query;
 
         if (status && ['pending', 'approved', 'rejected'].includes(status)) {
             query.status = status;
         }
 
+        if (referralCode && typeof referralCode === 'string' && referralCode.trim() !== '') {
+            query.referralCode = referralCode.trim().toUpperCase();
+        }
+
         const encorians = await Encorian.find(query)
-            .select('name email phone status buktiTransfer createdAt')
+            .select('name email phone status buktiTransfer referralCode createdAt')
             .sort({ createdAt: -1 })
             .limit(1000);
 

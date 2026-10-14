@@ -29,6 +29,12 @@ const encorianSchema = new mongoose.Schema({
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending',
         required: true
+    },
+    referralCode: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: null
     }
 }, { timestamps: true });
 

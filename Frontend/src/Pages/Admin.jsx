@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import API, { openProtectedFile } from "../api";
+import API, { openProtectedFile, referralCodeAPI } from "../api";
 import {
   Trophy,
   Users,
@@ -19,6 +19,12 @@ import {
   Mail,
   CheckCircle2,
   XCircle,
+  Tag,
+  Copy,
+  Plus,
+  ExternalLink,
+  Award,
+  Share2,
 } from "lucide-react";
 import { validateImageFile } from "../utils/fileValidation";
 import useAdminData from "../hooks/useAdminData";
@@ -1239,6 +1245,7 @@ function EncoriansPanel() {
             <thead>
               <tr className="border-b border-pink-100">
                 <th className="text-left py-4">Name</th>
+                <th className="text-left py-4">Ref Code</th>
                 <th className="text-left py-4">Email</th>
                 <th className="text-left py-4">Phone</th>
                 <th className="text-left py-4">Status</th>
@@ -1250,7 +1257,7 @@ function EncoriansPanel() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="py-4 text-center">
+                  <td colSpan="8" className="py-4 text-center">
                     Loading...
                   </td>
                 </tr>
@@ -1258,6 +1265,15 @@ function EncoriansPanel() {
                 encorians.map((e) => (
                   <tr key={e._id} className="border-b border-pink-50">
                     <td className="py-4">{e.name}</td>
+                    <td>
+                      {e.referralCode ? (
+                        <span className="px-2 py-0.5 rounded-md text-xs font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                          {e.referralCode}
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-xs">-</span>
+                      )}
+                    </td>
                     <td>{e.email}</td>
                     <td>{e.phone}</td>
                     <td>
@@ -1335,6 +1351,405 @@ function EncoriansPanel() {
 
 
 
+function ReferralCodesPanel() {
+  const { busy, runAction } = useAdminAction();
+  const { data: referralCodes, loading, error, refresh: fetchReferralCodes } = useAdminData(
+    "/admin/referral-codes"
+  );
+  const [search, setSearch] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [form, setForm] = useState({ panitiaName: "", targetQuota: 10, code: "" });
+  const [copiedCodeId, setCopiedCodeId] = useState(null);
+  const [copiedLinkId, setCopiedLinkId] = useState(null);
+
+  const generateRandomCode = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let rand = "";
+    for (let i = 0; i < 5; i++) {
+      rand += chars[Math.floor(Math.random() * chars.length)];
+    }
+    setForm((prev) => ({ ...prev, code: `RAC-${rand}` }));
+  };
+
+  const handleOpenModal = () => {
+    setForm({ panitiaName: "", targetQuota: 10, code: "" });
+    generateRandomCode();
+    setModalOpen(true);
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!form.panitiaName.trim()) {
+      alert("Committee member name is required.");
+      return;
+    }
+    try {
+      await referralCodeAPI.create(form);
+      setModalOpen(false);
+      fetchReferralCodes();
+    } catch (err) {
+      alert(err.userMessage || "Failed to create referral code.");
+    }
+  };
+
+  const handleDelete = async (id, code, name) => {
+    if (!window.confirm(`Delete referral code ${code} for committee member ${name}?`)) return;
+    try {
+      await referralCodeAPI.delete(id);
+      fetchReferralCodes();
+    } catch (err) {
+      alert(err.userMessage || "Failed to delete referral code.");
+    }
+  };
+
+  const handleToggleActive = async (id, currentStatus) => {
+    try {
+      await referralCodeAPI.update(id, { isActive: !currentStatus });
+      fetchReferralCodes();
+    } catch (err) {
+      alert(err.userMessage || "Failed to update referral code status.");
+    }
+  };
+
+  const copyCode = (code, id) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCodeId(id);
+    setTimeout(() => setCopiedCodeId(null), 2000);
+  };
+
+  const copyShareLink = (code, id) => {
+    const origin = window.location.origin;
+    const url = `${origin}/the-encore?ref=${encodeURIComponent(code)}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLinkId(id);
+    setTimeout(() => setCopiedLinkId(null), 2000);
+  };
+
+  const items = referralCodes || [];
+  const filtered = items.filter((item) => {
+    const q = search.toLowerCase();
+    return (
+      item.panitiaName?.toLowerCase().includes(q) ||
+      item.code?.toLowerCase().includes(q)
+    );
+  });
+
+  const totalQuota = items.reduce((acc, c) => acc + (c.targetQuota || 0), 0);
+  const totalApproved = items.reduce((acc, c) => acc + (c.approvedCount || 0), 0);
+  const totalPending = items.reduce((acc, c) => acc + (c.pendingCount || 0), 0);
+  const overallPercent = totalQuota > 0 ? Math.min(100, Math.round((totalApproved / totalQuota) * 100)) : 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-pink-500">Committee Sales Quotas — The Encore</h2>
+          <p className="text-sm text-pink-200">Manage committee ticket sales quotas and monitor real-time sales progress.</p>
+        </div>
+        <button
+          onClick={handleOpenModal}
+          className="inline-flex items-center gap-2 rounded-xl bg-pink-600 hover:bg-pink-500 px-5 py-2.5 text-sm font-bold text-white transition-all shadow-lg shadow-pink-600/30"
+        >
+          <Plus size={18} /> Add Committee Member
+        </button>
+      </div>
+
+      {/* METRIC CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
+          <p className="text-xs font-semibold text-pink-300 uppercase tracking-wider">Total Committee Members</p>
+          <p className="text-3xl font-extrabold text-white mt-1">{items.length}</p>
+          <p className="text-xs text-pink-200/60 mt-1">Registered with referral codes</p>
+        </div>
+
+        <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
+          <p className="text-xs font-semibold text-pink-300 uppercase tracking-wider">Total Target Quota</p>
+          <p className="text-3xl font-extrabold text-white mt-1">{totalQuota} <span className="text-sm font-normal text-pink-300">tickets</span></p>
+          <p className="text-xs text-pink-200/60 mt-1">Cumulative quota across all members</p>
+        </div>
+
+        <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
+          <p className="text-xs font-semibold text-green-400 uppercase tracking-wider">Sold (Approved)</p>
+          <p className="text-3xl font-extrabold text-green-400 mt-1">{totalApproved} <span className="text-sm font-normal text-green-300">tickets</span></p>
+          <div className="w-full bg-black/40 rounded-full h-1.5 mt-2 overflow-hidden border border-green-500/20">
+            <div className="bg-green-500 h-full rounded-full transition-all duration-500" style={{ width: `${overallPercent}%` }}></div>
+          </div>
+          <p className="text-xs text-green-300/70 mt-1">{overallPercent}% of total target achieved</p>
+        </div>
+
+        <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
+          <p className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">Pending Review</p>
+          <p className="text-3xl font-extrabold text-yellow-400 mt-1">{totalPending} <span className="text-sm font-normal text-yellow-300">tickets</span></p>
+          <p className="text-xs text-yellow-200/60 mt-1">Awaiting transfer approval</p>
+        </div>
+      </div>
+
+      {/* TABLE PANEL */}
+      <SectionCard>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400/60" />
+            <input
+              type="text"
+              placeholder="Search member name or code..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="admin-field w-full pl-10 pr-4 py-2.5 text-sm"
+            />
+          </div>
+          <DataStatus loading={loading} error={error} empty={filtered.length === 0} onRefresh={fetchReferralCodes} />
+        </div>
+
+        <div className="overflow-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-pink-100/20 text-xs text-pink-300 uppercase tracking-wider">
+                <th className="text-left py-3.5">Committee Member</th>
+                <th className="text-left py-3.5">Referral Code</th>
+                <th className="text-left py-3.5">Share Link</th>
+                <th className="text-center py-3.5">Target</th>
+                <th className="text-left py-3.5 min-w-[160px]">Sales Progress</th>
+                <th className="text-center py-3.5">Pending</th>
+                <th className="text-center py-3.5">Remaining Target</th>
+                <th className="text-center py-3.5">Status</th>
+                <th className="text-right py-3.5">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-pink-500/10 text-sm">
+              {loading ? (
+                <tr>
+                  <td colSpan="9" className="py-8 text-center text-pink-300">
+                    Loading referral data...
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="py-8 text-center text-pink-300/60">
+                    {search ? "No committee members found matching your search." : "No committee referral codes created yet."}
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((item) => {
+                  const shareUrl = `${window.location.origin}/the-encore?ref=${encodeURIComponent(item.code)}`;
+                  return (
+                    <tr key={item._id} className="hover:bg-pink-500/5 transition-colors">
+                      <td className="py-4 font-semibold text-white">
+                        {item.panitiaName}
+                      </td>
+                      <td>
+                        <div className="inline-flex items-center gap-1.5">
+                          <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                            {item.code}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => copyCode(item.code, item._id)}
+                            className="p-1 rounded hover:bg-pink-500/20 text-pink-400 transition-colors"
+                            title="Copy Code"
+                          >
+                            {copiedCodeId === item._id ? (
+                              <Check size={14} className="text-green-400" />
+                            ) : (
+                              <Copy size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="inline-flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => copyShareLink(item.code, item._id)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-white/5 hover:bg-pink-500/20 text-pink-200 border border-pink-500/20 transition-colors"
+                            title="Copy Registration Link"
+                          >
+                            {copiedLinkId === item._id ? (
+                              <>
+                                <Check size={12} className="text-green-400" />
+                                <span className="text-green-400">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Share2 size={12} />
+                                <span>Copy Link</span>
+                              </>
+                            )}
+                          </button>
+                          <a
+                            href={shareUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-pink-400 hover:text-pink-300 p-1"
+                            title="Open Registration Page"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        </div>
+                      </td>
+                      <td className="text-center font-bold text-white">
+                        {item.targetQuota}
+                      </td>
+                      <td>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="font-semibold text-green-400">{item.approvedCount} sold</span>
+                            <span className="text-pink-300/70">{item.progressPercentage}%</span>
+                          </div>
+                          <div className="w-full bg-black/40 rounded-full h-2 overflow-hidden border border-pink-500/20">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                item.progressPercentage >= 100 ? "bg-green-400" : "bg-pink-500"
+                              }`}
+                              style={{ width: `${item.progressPercentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        {item.pendingCount > 0 ? (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                            {item.pendingCount}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500 text-xs">0</span>
+                        )}
+                      </td>
+                      <td className="text-center">
+                        {item.remainingToTarget > 0 ? (
+                          <span className="text-pink-200 text-xs font-medium">
+                            {item.remainingToTarget} tickets
+                          </span>
+                        ) : (
+                          <span className="text-xs font-bold text-green-400 flex items-center justify-center gap-1">
+                            <Check size={12} /> Target Reached!
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(item._id, item.isActive)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
+                            item.isActive
+                              ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                              : "bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
+                          }`}
+                          title="Click to toggle status"
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="text-right">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => handleDelete(item._id, item.code, item.panitiaName)}
+                          className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {/* CREATE REFERRAL CODE MODAL */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="account-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-pink-500/30 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <h3 className="text-2xl font-bold text-pink-500 mb-2">Add Committee Member Quota</h3>
+            <p className="text-xs text-pink-200/70 mb-6">
+              Create a dedicated referral code for committee members to track The Encore ticket sales targets.
+            </p>
+
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label className="account-label block mb-2">Committee Member Name / Division</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Sarah Putri (Public Relations)"
+                  className="admin-field w-full px-4 py-3"
+                  value={form.panitiaName}
+                  onChange={(e) => setForm({ ...form, panitiaName: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="account-label block mb-2">Target Quota (Number of Tickets)</label>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  className="admin-field w-full px-4 py-3"
+                  value={form.targetQuota}
+                  onChange={(e) => setForm({ ...form, targetQuota: Number(e.target.value) })}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="account-label">Referral Code</label>
+                  <button
+                    type="button"
+                    onClick={generateRandomCode}
+                    className="text-xs font-semibold text-pink-400 hover:text-pink-300 underline"
+                  >
+                    Regenerate
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="RAC-XXXXX"
+                    className="admin-field flex-1 px-4 py-3 uppercase tracking-wider font-mono font-bold"
+                    value={form.code}
+                    onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                  />
+                  <button
+                    type="button"
+                    onClick={generateRandomCode}
+                    className="px-4 py-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 font-semibold text-xs border border-pink-500/30"
+                  >
+                    Auto-generate
+                  </button>
+                </div>
+                <p className="text-xs text-pink-300/60 mt-1">
+                  Prefix with RAC- followed by 5 unique characters (customizable).
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-pink-500/20">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl border border-pink-500/30 text-pink-200 text-sm font-semibold hover:bg-pink-500/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="px-6 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-sm font-bold shadow-lg shadow-pink-600/30"
+                >
+                  Save & Create Code
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Admin() {
   const [tab, setTab] = useState("dashboard");
 
@@ -1364,6 +1779,11 @@ export default function Admin() {
       label: "The Encore",
       icon: Ticket,
     },
+    {
+      id: "referral-codes",
+      label: "Committee Quotas",
+      icon: Tag,
+    },
   ];
 
   const renderPage = () => {
@@ -1384,6 +1804,9 @@ export default function Admin() {
 
       case "encorians":
         return <EncoriansPanel />;
+
+      case "referral-codes":
+        return <ReferralCodesPanel />;
 
       default:
         return null;

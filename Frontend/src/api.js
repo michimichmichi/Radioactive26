@@ -59,4 +59,12 @@ export const encorianAPI = {
   checkIn: (ticketCode) => API.patch('/admin/encorians/check-in', { ticketCode }),
 };
 
+export const referralCodeAPI = {
+  verify: (code) => API.get(`/encorians/verify-code/${encodeURIComponent(code)}`),
+  getAll: () => API.get('/admin/referral-codes'),
+  create: (data) => API.post('/admin/referral-codes', data),
+  update: (id, data) => API.patch(`/admin/referral-codes/${id}`, data),
+  delete: (id) => API.delete(`/admin/referral-codes/${id}`),
+};
+
 export default API;
