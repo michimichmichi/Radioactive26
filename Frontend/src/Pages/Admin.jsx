@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import API, { openProtectedFile, referralCodeAPI } from "../api";
+import API, { openProtectedFile, referralCodeAPI, otsTicketAPI } from "../api";
 import {
   Trophy,
   Users,
@@ -25,12 +25,19 @@ import {
   ExternalLink,
   Award,
   Share2,
+  Menu,
+  X,
+  Banknote,
+  DollarSign,
+  Wallet,
+  CreditCard,
 } from "lucide-react";
 import { validateImageFile } from "../utils/fileValidation";
 import useAdminData from "../hooks/useAdminData";
 import { buildTeamFormData } from "../utils/adminForms";
 import useRacAttendance from "../hooks/useRacAttendance";
 import RacAttendancePanel, { AttendanceNotifications } from "../Components/RacAttendancePanel";
+import OtsTicketsPanel from "../Components/OtsTicketsPanel";
 
 
 const competitionAPI = {
@@ -73,9 +80,9 @@ const buildUserFormData = (form, { includeEmptyPassword = true } = {}) => {
 
 
 
-function SectionCard({ children }) {
+function SectionCard({ children, className = "" }) {
   return (
-    <div className="account-panel rounded-3xl p-6">
+    <div className={`account-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 ${className}`}>
       {children}
     </div>
   );
@@ -440,8 +447,8 @@ function CompetitionsPanel() {
 
       <SectionCard>
         <DataStatus loading={loading} error={error} empty={competitions.length === 0} onRefresh={fetchCompetitions} />
-        <div className="overflow-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-pink-100">
                 <th className="text-left py-4">competitionName</th>
@@ -453,7 +460,7 @@ function CompetitionsPanel() {
 
             <tbody>
               {competitions.map((comp) => (
-                <tr key={comp._id} className="border-b border-pink-50">
+                <tr key={comp._id} className="border-b border-pink-50 whitespace-nowrap">
                   <td className="py-4">{comp.competitionName}</td>
 
                   <td>{new Date(comp.time).toLocaleString()}</td>
@@ -706,8 +713,8 @@ function UsersPanel() {
 
       <SectionCard>
         <DataStatus loading={loading} error={error} empty={users.length === 0} onRefresh={fetchUsers} />
-        <div className="overflow-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-pink-100">
                 <th className="text-left py-4">name</th>
@@ -722,7 +729,7 @@ function UsersPanel() {
 
             <tbody>
               {users.map((u) => (
-                <tr key={u._id} className="border-b border-pink-50">
+                <tr key={u._id} className="border-b border-pink-50 whitespace-nowrap">
                   <td className="py-4">{u.name}</td>
 
                   <td>{u.email}</td>
@@ -1003,7 +1010,7 @@ function TeamsPanel() {
     Members
   </h3>
 
-  {/* Search box */}
+
   <div className="relative mb-4">
     <Search
       className="absolute left-3 top-3 text-pink-400"
@@ -1019,8 +1026,8 @@ function TeamsPanel() {
     />
   </div>
 
-  {/* Members */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-72 overflow-y-auto">
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 max-h-72 overflow-y-auto">
     {filteredUsers.length > 0 ? (
       filteredUsers.map((u) => (
         <label
@@ -1225,7 +1232,7 @@ function EncoriansPanel() {
   return (
     <div className="space-y-6">
       <SectionCard>
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
           {filters.map((f) => (
             <button
               key={f.label}
@@ -1242,8 +1249,8 @@ function EncoriansPanel() {
         </div>
         <DataStatus loading={loading} error={error} empty={encorians.length === 0} onRefresh={fetchEncorians} />
         {busy && <p role="status" className="mb-4 text-sm text-pink-200">Processing ticket action…</p>}
-        <div className="overflow-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-pink-100">
                 <th className="text-left py-4">Name</th>
@@ -1265,7 +1272,7 @@ function EncoriansPanel() {
                 </tr>
               ) : (
                 encorians.map((e) => (
-                  <tr key={e._id} className="border-b border-pink-50">
+                  <tr key={e._id} className="border-b border-pink-50 whitespace-nowrap">
                     <td className="py-4">{e.name}</td>
                     <td>
                       {e.referralCode ? (
@@ -1444,10 +1451,7 @@ function ReferralCodesPanel() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-pink-500">Committee Sales Quotas — The Encore</h2>
-          <p className="text-sm text-pink-200">Manage committee ticket sales quotas and monitor real-time sales progress.</p>
-        </div>
+       
         <button
           onClick={handleOpenModal}
           className="inline-flex items-center gap-2 rounded-xl bg-pink-600 hover:bg-pink-500 px-5 py-2.5 text-sm font-bold text-white transition-all shadow-lg shadow-pink-600/30"
@@ -1456,7 +1460,7 @@ function ReferralCodesPanel() {
         </button>
       </div>
 
-      {/* METRIC CARDS */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
           <p className="text-xs font-semibold text-pink-300 uppercase tracking-wider">Total Committee Members</p>
@@ -1486,7 +1490,7 @@ function ReferralCodesPanel() {
         </div>
       </div>
 
-      {/* TABLE PANEL */}
+
       <SectionCard>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="relative flex-1 min-w-[240px] max-w-md">
@@ -1502,8 +1506,8 @@ function ReferralCodesPanel() {
           <DataStatus loading={loading} error={error} empty={filtered.length === 0} onRefresh={fetchReferralCodes} />
         </div>
 
-        <div className="overflow-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-pink-100/20 text-xs text-pink-300 uppercase tracking-wider">
                 <th className="text-left py-3.5">Committee Member</th>
@@ -1534,7 +1538,7 @@ function ReferralCodesPanel() {
                 filtered.map((item) => {
                   const shareUrl = `${window.location.origin}/the-encore?ref=${encodeURIComponent(item.code)}`;
                   return (
-                    <tr key={item._id} className="hover:bg-pink-500/5 transition-colors">
+                    <tr key={item._id} className="hover:bg-pink-500/5 transition-colors whitespace-nowrap">
                       <td className="py-4 font-semibold text-white">
                         {item.panitiaName}
                       </td>
@@ -1661,7 +1665,7 @@ function ReferralCodesPanel() {
         </div>
       </SectionCard>
 
-      {/* CREATE REFERRAL CODE MODAL */}
+
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="account-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-pink-500/30 shadow-2xl animate-in fade-in zoom-in duration-200">
@@ -1753,7 +1757,14 @@ function ReferralCodesPanel() {
 }
 
 export default function Admin() {
-  const [tab, setTab] = useState("dashboard");
+  const [tab, setTab] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search).get("tab");
+      if (p) return p;
+    }
+    return "dashboard";
+  });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const attendance = useRacAttendance();
 
   const menu = [
@@ -1792,7 +1803,22 @@ export default function Admin() {
       label: "Committee Quotas",
       icon: Tag,
     },
+    {
+      id: "ots-tickets",
+      label: "OTS Tickets",
+      icon: Banknote,
+    },
   ];
+
+  const currentTab = menu.find((item) => item.id === tab);
+
+  const handleSelectTab = (tabId) => {
+    setTab(tabId);
+    setMobileMenuOpen(false);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const renderPage = () => {
     switch (tab) {
@@ -1819,6 +1845,9 @@ export default function Admin() {
       case "referral-codes":
         return <ReferralCodesPanel />;
 
+      case "ots-tickets":
+        return <OtsTicketsPanel />;
+
       default:
         return null;
     }
@@ -1826,8 +1855,88 @@ export default function Admin() {
 
   return (
     <div className="admin-page flex min-h-screen flex-col md:flex-row">
-      {/* SIDEBAR */}
-      <div className="w-full bg-gradient-to-b bg-black p-6 text-pink-600 shadow-2xl md:w-72 md:shrink-0">
+
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-pink-500/25 bg-black/95 px-4 py-3 backdrop-blur-md md:hidden">
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-extrabold text-pink-500 tracking-wider">
+            ADMIN
+          </span>
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 truncate max-w-[130px]">
+            {currentTab?.label}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            to="/admin/scanner"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold shadow-md shadow-pink-600/30 transition-all"
+          >
+            <QrCode size={15} />
+            Scanner
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
+            className="p-2 rounded-xl bg-pink-500/15 text-pink-300 hover:bg-pink-500/25 border border-pink-500/25 transition-colors"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+
+      {mobileMenuOpen && (
+        <div className="fixed inset-x-0 top-[53px] bottom-0 z-30 flex flex-col bg-black/95 backdrop-blur-xl p-4 overflow-y-auto border-b border-pink-500/30 md:hidden animate-in fade-in slide-in-from-top-4 duration-200">
+          <p className="text-xs font-semibold text-pink-400 uppercase tracking-wider mb-2 px-1">
+            Navigation
+          </p>
+          <div className="space-y-1.5">
+            {menu.map((item) => {
+              const Icon = item.icon;
+              const isActive = tab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectTab(item.id)}
+                  className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-left font-semibold text-sm transition-all ${
+                    isActive
+                      ? "bg-pink-600 text-white shadow-lg shadow-pink-600/30"
+                      : "text-pink-200 hover:bg-pink-500/15"
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-pink-500/20 space-y-2">
+            <Link
+              to="/admin/scanner"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex w-full items-center gap-3 rounded-2xl border border-pink-500/40 bg-pink-500/10 px-4 py-3 text-sm font-bold text-pink-200"
+            >
+              <QrCode size={18} className="text-pink-400" />
+              Ticket Scanner
+            </Link>
+
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex w-full items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-sm font-semibold text-zinc-300 hover:text-white"
+            >
+              <Home size={18} />
+              Back to homepage
+            </Link>
+          </div>
+        </div>
+      )}
+
+
+      <div className="hidden md:flex md:flex-col md:w-72 md:shrink-0 bg-gradient-to-b bg-black p-6 text-pink-600 shadow-2xl md:min-h-screen md:sticky md:top-0">
         <h1 className="text-4xl font-extrabold mb-10">
           ADMIN
         </h1>
@@ -1839,7 +1948,7 @@ export default function Admin() {
             return (
               <button
                 key={item.id}
-                onClick={() => setTab(item.id)}
+                onClick={() => handleSelectTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all duration-300 ${
                   tab === item.id
                     ? "bg-white text-pink-600 shadow-lg"
@@ -1870,7 +1979,7 @@ export default function Admin() {
         </Link>
       </div>
 
-      {/* CONTENT */}
+
       <div className="min-w-0 flex-1 p-4 sm:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold capitalize text-pink-600 sm:text-5xl">

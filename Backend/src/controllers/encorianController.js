@@ -9,7 +9,6 @@ import path from 'path';
 import { sendTicketEmail } from '../services/emailService.js';
 import { isValidObjectId, normalizeEmail, normalizeString } from '../utils/security.js';
 
-// Helper to delete uploaded bukti transfer if validation fails
 const deleteUploadedTransfer = async (filename) => {
     if (!filename || !/^(?:\d{10,}-)?[a-f\d-]{16,}\.(?:jpg|jpeg|png)$/i.test(filename)) return;
 
@@ -28,7 +27,6 @@ const deleteUploadedTransfer = async (filename) => {
     }
 };
 
-// CREATE ENCORIAN -- POST /encorians
 export const createEncorian = async (req, res) => {
     try {
         const name = normalizeString(req.body.name, { max: 120, required: true });
@@ -91,7 +89,6 @@ export const createEncorian = async (req, res) => {
     }
 };
 
-// LIST ENCORIANS -- GET /admin/encorians
 export const getEncorians = async (req, res) => {
     try {
         const query = {};
@@ -117,7 +114,6 @@ export const getEncorians = async (req, res) => {
     }
 };
 
-// GET ENCORIAN BY ID -- GET /admin/encorians/:id
 export const getEncorianById = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -137,7 +133,6 @@ export const getEncorianById = async (req, res) => {
     }
 };
 
-// APPROVE ENCORIAN -- PATCH /admin/encorians/:id/approve
 export const approveEncorian = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -158,16 +153,13 @@ export const approveEncorian = async (req, res) => {
             return res.status(409).json({ message: 'This ticket request has been rejected and cannot be approved.' });
         }
 
-        // Idempotency: check if a ticket already exists for this encorian
         const existingTicket = await Ticket.findOne({ encorianId: encorian._id });
         if (existingTicket) {
             return res.status(409).json({ message: 'A ticket has already been created for this request.' });
         }
 
-        // Generate unique ticket code
         const ticketCode = `ENC-${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
 
-        // Generate QR code as base64 data URL (contains only ticketCode, no sensitive data)
         let qrCode;
         try {
             qrCode = await QRCode.toDataURL(ticketCode, {
@@ -180,7 +172,6 @@ export const approveEncorian = async (req, res) => {
             return res.status(500).json({ message: 'Failed to generate QR code. Please try again.' });
         }
 
-        // Create ticket
         const ticket = await Ticket.create({
             encorianId: encorian._id,
             ticketCode,
@@ -188,11 +179,9 @@ export const approveEncorian = async (req, res) => {
             status: 'valid'
         });
 
-        // Update encorian status to approved
         encorian.status = 'approved';
         await encorian.save();
 
-        // Send email with QR code
         try {
             await sendTicketEmail(encorian, ticket);
         } catch (emailError) {
@@ -221,7 +210,6 @@ export const approveEncorian = async (req, res) => {
     }
 };
 
-// REJECT ENCORIAN -- PATCH /admin/encorians/:id/reject
 export const rejectEncorian = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -250,7 +238,6 @@ export const rejectEncorian = async (req, res) => {
     }
 };
 
-// RESEND TICKET EMAIL -- PATCH /admin/encorians/:id/resend-email
 export const resendEmail = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -281,7 +268,6 @@ export const resendEmail = async (req, res) => {
     }
 };
 
-// LOOKUP TICKET -- GET /admin/encorians/ticket/:ticketCode
 export const lookupTicket = async (req, res) => {
     try {
         const { ticketCode } = req.params;
@@ -311,7 +297,6 @@ export const lookupTicket = async (req, res) => {
     }
 };
 
-// CHECK-IN TICKET -- PATCH /admin/encorians/check-in
 export const checkInTicket = async (req, res) => {
     try {
         const { ticketCode } = req.body;
