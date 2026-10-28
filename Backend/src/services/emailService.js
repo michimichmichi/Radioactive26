@@ -30,7 +30,7 @@ const createTransporter = () => {
 
 export const generateTicketImage = async (ticketCode) => {
     try {
-        // Resolve path relative to this file, or fallback to cwd
+
         let templatePath = path.join(__dirname, '..', 'assets', 'the-encore-template.jpg');
         if (!fs.existsSync(templatePath)) {
             templatePath = path.join(process.cwd(), 'src', 'assets', 'the-encore-template.jpg');
@@ -92,10 +92,10 @@ export const sendTicketEmail = async (encorian, ticket) => {
 
     const from = process.env.SMTP_FROM || process.env.SMTP_USER;
 
-    // Generate full styled ticket image
+
     const ticketImageBuffer = await generateTicketImage(ticket.ticketCode);
 
-    // Raw qrCode backup as base64 data URL
+
     const rawQrBase64 = ticket.qrCode.replace(/^data:image\/png;base64,/, '');
 
     const attachments = [];

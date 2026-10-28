@@ -10,7 +10,7 @@ export default function TheEncore() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', buktiTransfer: null });
   const [referralCode, setReferralCode] = useState('');
   const [refStatus, setRefStatus] = useState({ state: 'idle', message: '', panitiaName: '' });
-  const [status, setStatus] = useState('idle'); // idle, submitting, success, error
+  const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const verifyTimerRef = useRef(null);
 

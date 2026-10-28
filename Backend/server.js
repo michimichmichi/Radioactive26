@@ -11,6 +11,7 @@ import fileRoutes from "./src/routes/fileRoutes.js";
 import encorianRoutes from "./src/routes/encorianRoutes.js";
 import adminEncorianRoutes from "./src/routes/adminEncorianRoutes.js";
 import adminReferralCodeRoutes from "./src/routes/adminReferralCodeRoutes.js";
+import adminOtsTicketRoutes from "./src/routes/adminOtsTicketRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import { rateLimiter } from './src/middleware/rateLimiter.js';
 
@@ -27,7 +28,7 @@ const CLIENT_ORIGINS = new Set(
         .map((origin) => origin.trim())
         .filter(Boolean)
 );
-const TRUST_PROXY = Number(process.env.TRUST_PROXY || 0); // Set trust proxy jadi 1 kalo misalnya udh nnti kalo udh mau deploy ke server biar dpt IP User, kalo msh local jadiin 0 aja dl
+const TRUST_PROXY = Number(process.env.TRUST_PROXY || 0);
 const apiLimiter = rateLimiter({
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
     maxRequests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 300,
@@ -58,7 +59,7 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'no-referrer');
-    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
     res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
@@ -86,6 +87,7 @@ app.use("/users", userRoutes);
 app.use("/encorians", encorianRoutes);
 app.use("/admin/encorians", adminEncorianRoutes);
 app.use("/admin/referral-codes", adminReferralCodeRoutes);
+app.use("/admin/ots-tickets", adminOtsTicketRoutes);
 app.use("/admin", adminRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'This endpoint was not found. Refresh the page and try again.' }));

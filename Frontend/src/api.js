@@ -12,7 +12,7 @@ API.interceptors.response.use(
     if (error.response?.data instanceof Blob && error.response.data.type.includes("json")) {
       try {
         error.response.data = JSON.parse(await error.response.data.text());
-      } catch { /* Fall back to a status-specific message if the response is unreadable. */ }
+      } catch {}
     }
     error.userMessage = getApiErrorMessage(error);
     if (error.response?.status === 401 && error.config?.url !== "/users/login") {
@@ -65,6 +65,13 @@ export const referralCodeAPI = {
   create: (data) => API.post('/admin/referral-codes', data),
   update: (id, data) => API.patch(`/admin/referral-codes/${id}`, data),
   delete: (id) => API.delete(`/admin/referral-codes/${id}`),
+};
+
+export const otsTicketAPI = {
+  getAll: () => API.get('/admin/ots-tickets'),
+  record: (data) => API.post('/admin/ots-tickets', data || {}),
+  delete: (id) => API.delete(`/admin/ots-tickets/${id}`),
+  updateSettings: (data) => API.patch('/admin/ots-tickets/settings', data),
 };
 
 export default API;

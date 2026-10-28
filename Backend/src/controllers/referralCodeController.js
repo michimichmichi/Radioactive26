@@ -4,7 +4,6 @@ import Encorian from '../models/Encorian.js';
 import { sendError } from '../middleware/errorHandler.js';
 import { isValidObjectId, normalizeString } from '../utils/security.js';
 
-// Generate a random code: RAC-XXXXX (5 characters)
 export const generateRandomCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let randomPart = '';
@@ -15,12 +14,10 @@ export const generateRandomCode = () => {
     return `RAC-${randomPart}`;
 };
 
-// GET /admin/referral-codes -- list all codes with live sales stats
 export const getReferralCodes = async (req, res) => {
     try {
         const codes = await ReferralCode.find().sort({ createdAt: -1 });
 
-        // Aggregate Encorian counts by referralCode and status
         const stats = await Encorian.aggregate([
             { $match: { referralCode: { $ne: null } } },
             {
@@ -76,7 +73,6 @@ export const getReferralCodes = async (req, res) => {
     }
 };
 
-// POST /admin/referral-codes -- create referral code
 export const createReferralCode = async (req, res) => {
     try {
         const panitiaName = normalizeString(req.body.panitiaName, { max: 120, required: true });
@@ -93,7 +89,6 @@ export const createReferralCode = async (req, res) => {
 
         let finalCode = customCode;
         if (!finalCode) {
-            // Auto generate unique RAC-XXXXX
             let attempts = 0;
             do {
                 finalCode = generateRandomCode();
@@ -102,7 +97,6 @@ export const createReferralCode = async (req, res) => {
                 attempts++;
             } while (attempts < 10);
         } else {
-            // If custom code doesn't start with RAC-, prefix it
             if (!finalCode.startsWith('RAC-')) {
                 finalCode = `RAC-${finalCode.replace(/[^A-Z0-9_-]/g, '')}`;
             } else {
@@ -131,7 +125,6 @@ export const createReferralCode = async (req, res) => {
     }
 };
 
-// PATCH /admin/referral-codes/:id -- update quota or active status
 export const updateReferralCode = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -168,7 +161,6 @@ export const updateReferralCode = async (req, res) => {
     }
 };
 
-// DELETE /admin/referral-codes/:id -- delete referral code
 export const deleteReferralCode = async (req, res) => {
     try {
         if (!isValidObjectId(req.params.id)) {
@@ -186,7 +178,6 @@ export const deleteReferralCode = async (req, res) => {
     }
 };
 
-// GET /encorians/verify-code/:code -- public check for buyer
 export const verifyReferralCode = async (req, res) => {
     try {
         const rawCode = req.params.code ? req.params.code.trim().toUpperCase() : '';
