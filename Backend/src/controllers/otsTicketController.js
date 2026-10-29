@@ -51,7 +51,7 @@ export const getOtsTickets = async (req, res) => {
         const defaultPrice = await getSettingPrice();
 
         const userRole = req.user?.role || '';
-        const canViewMoney = ['admin', 'it_admin', 'finance'].includes(userRole);
+        const canViewMoney = ['admin', 'it_admin', 'finance', 'admin_finance'].includes(userRole);
 
         const stats = totals[0] || {
             totalTickets: 0,
