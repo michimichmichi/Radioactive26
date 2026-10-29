@@ -1883,9 +1883,10 @@ export default function Admin() {
       .catch(() => {});
   }, []);
 
-  const canViewMoney = ["admin", "it_admin", "finance"].includes(currentUser?.role);
+  const canViewMoney = ["admin", "it_admin", "finance", "admin_finance"].includes(currentUser?.role);
+  const isFinanceOnly = ["finance", "admin_finance"].includes(currentUser?.role);
 
-  const menu = [
+  const allMenu = [
     {
       id: "dashboard",
       label: "Dashboard",
@@ -1928,7 +1929,19 @@ export default function Admin() {
     },
   ];
 
-  const currentTab = menu.find((item) => item.id === tab);
+  const allowedTabs = isFinanceOnly
+    ? ["dashboard", "encorians", "referral-codes", "ots-tickets"]
+    : ["dashboard", "competitions", "teams", "rac-attendance", "users", "encorians", "referral-codes", "ots-tickets"];
+
+  const menu = allMenu.filter((item) => allowedTabs.includes(item.id));
+
+  useEffect(() => {
+    if (isFinanceOnly && !allowedTabs.includes(tab)) {
+      setTab("dashboard");
+    }
+  }, [isFinanceOnly, tab]);
+
+  const currentTab = menu.find((item) => item.id === tab) || menu[0];
 
   const handleSelectTab = (tabId) => {
     setTab(tabId);
@@ -1939,21 +1952,25 @@ export default function Admin() {
   };
 
   const renderPage = () => {
+    if (isFinanceOnly && !allowedTabs.includes(tab)) {
+      return <DashboardPanel canViewMoney={canViewMoney} />;
+    }
+
     switch (tab) {
       case "dashboard":
         return <DashboardPanel canViewMoney={canViewMoney} />;
 
       case "competitions":
-        return <CompetitionsPanel />;
+        return isFinanceOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <CompetitionsPanel />;
 
       case "teams":
-        return <TeamsPanel />;
+        return isFinanceOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <TeamsPanel />;
 
       case "users":
-        return <UsersPanel />;
+        return isFinanceOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <UsersPanel />;
 
       case "rac-attendance":
-        return <RacAttendancePanel attendance={attendance} />;
+        return isFinanceOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <RacAttendancePanel attendance={attendance} />;
 
       case "encorians":
         return <EncoriansPanel canViewMoney={canViewMoney} />;
@@ -1983,13 +2000,15 @@ export default function Admin() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/admin/scanner"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold shadow-md shadow-pink-600/30 transition-all"
-          >
-            <QrCode size={15} />
-            Scanner
-          </Link>
+          {!isFinanceOnly && (
+            <Link
+              to="/admin/scanner"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold shadow-md shadow-pink-600/30 transition-all"
+            >
+              <QrCode size={15} />
+              Scanner
+            </Link>
+          )}
 
           <button
             type="button"
@@ -2030,14 +2049,16 @@ export default function Admin() {
           </div>
 
           <div className="mt-5 pt-4 border-t border-pink-500/20 space-y-2">
-            <Link
-              to="/admin/scanner"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex w-full items-center gap-3 rounded-2xl border border-pink-500/40 bg-pink-500/10 px-4 py-3 text-sm font-bold text-pink-200"
-            >
-              <QrCode size={18} className="text-pink-400" />
-              Ticket Scanner
-            </Link>
+            {!isFinanceOnly && (
+              <Link
+                to="/admin/scanner"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex w-full items-center gap-3 rounded-2xl border border-pink-500/40 bg-pink-500/10 px-4 py-3 text-sm font-bold text-pink-200"
+              >
+                <QrCode size={18} className="text-pink-400" />
+                Ticket Scanner
+              </Link>
+            )}
 
             <Link
               to="/"
@@ -2078,13 +2099,15 @@ export default function Admin() {
           })}
         </div>
 
-        <Link
-          to="/admin/scanner"
-          className="mt-8 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
-        >
-          <QrCode size={20} />
-          Ticket Scanner
-        </Link>
+        {!isFinanceOnly && (
+          <Link
+            to="/admin/scanner"
+            className="mt-8 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
+          >
+            <QrCode size={20} />
+            Ticket Scanner
+          </Link>
+        )}
 
         <Link
           to="/"

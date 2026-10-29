@@ -30,7 +30,7 @@ export const getAdminStats = async (req, res) => {
         const totalRevenue = encoreRevenue + otsRevenue;
 
         const userRole = req.user?.role || '';
-        const canViewMoney = ['admin', 'it_admin', 'finance'].includes(userRole);
+        const canViewMoney = ['admin', 'it_admin', 'finance', 'admin_finance'].includes(userRole);
 
         return res.status(200).json({
             users,

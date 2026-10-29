@@ -154,8 +154,10 @@ export const requireRole = (...roles) => {
             });
         }
 
-        const isAuthorized = roles.includes(req.user.role) ||
-            (roles.includes('admin') && ['admin', 'it_admin', 'finance'].includes(req.user.role));
+        const userRole = req.user.role;
+        const isAuthorized = roles.includes(userRole) ||
+            (roles.includes('admin') && ['admin', 'it_admin'].includes(userRole)) ||
+            (roles.includes('finance') && ['finance', 'admin_finance'].includes(userRole));
 
         if (!isAuthorized) {
             return res.status(403).json({

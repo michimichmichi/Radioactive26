@@ -9,7 +9,7 @@ import { verifyToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.use(verifyToken, requireRole('admin'));
+router.use(verifyToken, requireRole('admin', 'finance'));
 
 router.get('/', getOtsTickets);
 router.post('/', recordOtsTicket);
