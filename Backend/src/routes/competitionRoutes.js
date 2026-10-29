@@ -9,9 +9,9 @@ import { verifyToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post("/", verifyToken, requireRole('admin'), createCompetition);
+router.post("/", verifyToken, requireRole('admin', 'event'), createCompetition);
 router.get("/", getCompetition);
-router.put("/:id", verifyToken, requireRole('admin'), updateCompetition);
-router.delete("/:id", verifyToken, requireRole('admin'), deleteCompetition);
+router.put("/:id", verifyToken, requireRole('admin', 'event'), updateCompetition);
+router.delete("/:id", verifyToken, requireRole('admin', 'event'), deleteCompetition);
 
 export default router;

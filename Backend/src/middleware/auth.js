@@ -157,7 +157,8 @@ export const requireRole = (...roles) => {
         const userRole = req.user.role;
         const isAuthorized = roles.includes(userRole) ||
             (roles.includes('admin') && ['admin', 'it_admin'].includes(userRole)) ||
-            (roles.includes('finance') && ['finance', 'admin_finance'].includes(userRole));
+            (roles.includes('finance') && ['finance', 'admin_finance'].includes(userRole)) ||
+            (roles.includes('event') && ['event', 'admin_event'].includes(userRole));
 
         if (!isAuthorized) {
             return res.status(403).json({

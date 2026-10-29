@@ -21,11 +21,11 @@ router.post('/login', loginUser);
 router.post('/logout', optionalVerifyToken, logoutUser);
 router.get('/me', verifyToken, getCurrentUser);
 
-router.post('/', verifyToken, requireRole('admin'),  uploadKtm.single('ktm'), validateKtmUpload, createUser);
-router.get('/', verifyToken, requireRole('admin'), getUser);
+router.post('/', verifyToken, requireRole('admin', 'event'),  uploadKtm.single('ktm'), validateKtmUpload, createUser);
+router.get('/', verifyToken, requireRole('admin', 'event'), getUser);
 router.get('/participants', verifyToken, getParticipants);
-router.get('/:id', verifyToken, requireRole('admin'), getUserById);
-router.put('/:id', verifyToken, requireRole('admin'), uploadKtm.single('ktm'), validateKtmUpload, updateUser);
-router.delete('/:id', verifyToken, requireRole('admin'), deleteUser);
+router.get('/:id', verifyToken, requireRole('admin', 'event'), getUserById);
+router.put('/:id', verifyToken, requireRole('admin', 'event'), uploadKtm.single('ktm'), validateKtmUpload, updateUser);
+router.delete('/:id', verifyToken, requireRole('admin', 'event'), deleteUser);
 
 export default router;

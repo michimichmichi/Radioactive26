@@ -15,8 +15,8 @@ router.post("/", (_req, res) => res.status(403).json({
     message: "Competition registration is closed. Existing registrations can still be viewed.",
 }));
 router.get("/", verifyToken, getAllTeams);
-router.get("/search", verifyToken, requireRole('admin'), searchTeams);
-router.delete("/:id", verifyToken, requireRole('admin'), deleteTeam);
-router.put("/:id", verifyToken, requireRole('admin'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, updateTeam);
+router.get("/search", verifyToken, requireRole('admin', 'event'), searchTeams);
+router.delete("/:id", verifyToken, requireRole('admin', 'event'), deleteTeam);
+router.put("/:id", verifyToken, requireRole('admin', 'event'), uploadTransfer.single("buktiTransfer"), validateTransferUpload, updateTeam);
 
 export default router;
