@@ -36,7 +36,7 @@ function LoginPage() {
       localStorage.setItem("user", JSON.stringify(response.data.user));
       window.dispatchEvent(new Event("auth-change"));
       const role = response.data.user?.role;
-      const isAdminRole = ["admin", "it_admin", "finance", "admin_finance"].includes(role);
+      const isAdminRole = ["admin", "it_admin", "finance", "admin_finance", "event", "admin_event"].includes(role);
       navigate(isAdminRole ? "/admin" : "/");
     } catch (err) {
       setError(err.userMessage || "Login failed. Please try again.");

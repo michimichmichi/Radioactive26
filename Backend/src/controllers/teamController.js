@@ -182,7 +182,8 @@ export const createTeam = async (req, res) => {
 //Tampilin Nama Teams(Admin)
 export const getAllTeams = async (req, res) => {
     try {
-        const query = req.user.role === 'admin'
+        const isStaff = ['admin', 'it_admin', 'event', 'admin_event'].includes(req.user?.role);
+        const query = isStaff
             ? {}
             : { $or: [{ leaderId: req.user.id }, { members: req.user.id }] };
         const competitionId = req.query?.competitionId;
@@ -192,7 +193,7 @@ export const getAllTeams = async (req, res) => {
             }
             query.competitionId = competitionId;
         }
-        const userFields = req.user.role === 'admin' ? "name email university nim" : "name university nim";
+        const userFields = isStaff ? "name email university nim" : "name university nim";
         const teams = await Team.find(query)
             .limit(500)
             .populate("leaderId", userFields)
@@ -209,7 +210,8 @@ export const getAllTeams = async (req, res) => {
 //Update Team (Admin only)
 export const updateTeam = async (req, res) => {
     try {
-        if (req.user?.role !== "admin") {
+        const isStaff = ['admin', 'it_admin', 'event', 'admin_event'].includes(req.user?.role);
+        if (!isStaff) {
             if (req.file) await deleteUploadedTransfer(req.file.filename);
             return res.status(403).json({
                 message: "Only admins can modify team registrations"
@@ -234,7 +236,7 @@ export const updateTeam = async (req, res) => {
         }
 
         const oldTransfer = existingTeam.buktiTransfer;
-        const isAdmin = req.user?.role === "admin";
+        const isAdmin = ['admin', 'it_admin', 'event', 'admin_event'].includes(req.user?.role);
         const nextCompetitionId = req.body.competitionId || existingTeam.competitionId;
         const nextLeaderId = isAdmin && req.body.leaderId
             ? req.body.leaderId

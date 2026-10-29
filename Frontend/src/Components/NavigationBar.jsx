@@ -125,7 +125,7 @@ const Navbar = () => {
                   {/* User Profile Summary Header */}
                   <div className="border-b border-zinc-100 bg-zinc-50/50 px-4 py-3">
                     <p className="truncate text-sm font-bold text-pink-600 flex items-center gap-1.5">
-                      {["admin", "it_admin", "finance", "admin_finance"].includes(user?.role) && <ShieldAlert size={14} className="text-amber-500" />}
+                      {["admin", "it_admin", "finance", "admin_finance", "event", "admin_event"].includes(user?.role) && <ShieldAlert size={14} className="text-amber-500" />}
                       {user.name || "User"}
                     </p>
                     <p className="truncate text-xs text-zinc-500">{user.email}</p>
@@ -148,7 +148,7 @@ const Navbar = () => {
                     <MenuLink to="/my-competitions" label="Registered Events" icon={<Award size={15} />} onClick={() => setIsMenuOpen(false)} />
                     
                     {/* ADMIN STRATEGIC DASHBOARD ROUTE */}
-                    {["admin", "it_admin", "finance", "admin_finance"].includes(user?.role) && (
+                    {["admin", "it_admin", "finance", "admin_finance", "event", "admin_event"].includes(user?.role) && (
                       <MenuLink 
                         to="/admin" 
                         label="Admin Dashboard" 

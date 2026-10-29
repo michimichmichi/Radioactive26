@@ -14,7 +14,7 @@ export const serveUpload = async (req, res) => {
     }
 
     const relativePath = `/uploads/${folder}/${filename}`;
-    let authorized = req.user.role === 'admin';
+    let authorized = ['admin', 'it_admin', 'event', 'admin_event'].includes(req.user?.role);
 
     if (!authorized && folder === 'ktm') {
         authorized = Boolean(await User.exists({ _id: req.user.id, ktm: relativePath }));

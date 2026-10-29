@@ -264,7 +264,7 @@ function Button({ children, className = "", ...props }) {
 
 function DashboardPanel({ canViewMoney }) {
   const { data: stats, loading, error, refresh } = useAdminData("/admin/stats", { initialData: null });
-  const hasMoneyAccess = canViewMoney || Boolean(stats?.canViewMoney);
+  const hasMoneyAccess = Boolean(canViewMoney && stats?.canViewMoney);
   const cards = [
     {
       title: "Users",
@@ -1885,6 +1885,7 @@ export default function Admin() {
 
   const canViewMoney = ["admin", "it_admin", "finance", "admin_finance"].includes(currentUser?.role);
   const isFinanceOnly = ["finance", "admin_finance"].includes(currentUser?.role);
+  const isEventOnly = ["event", "admin_event"].includes(currentUser?.role);
 
   const allMenu = [
     {
@@ -1929,17 +1930,22 @@ export default function Admin() {
     },
   ];
 
-  const allowedTabs = isFinanceOnly
-    ? ["dashboard", "encorians", "referral-codes", "ots-tickets"]
-    : ["dashboard", "competitions", "teams", "rac-attendance", "users", "encorians", "referral-codes", "ots-tickets"];
+  let allowedTabs;
+  if (isFinanceOnly) {
+    allowedTabs = ["dashboard", "encorians", "referral-codes", "ots-tickets"];
+  } else if (isEventOnly) {
+    allowedTabs = ["dashboard", "users", "competitions", "teams", "rac-attendance"];
+  } else {
+    allowedTabs = ["dashboard", "competitions", "teams", "rac-attendance", "users", "encorians", "referral-codes", "ots-tickets"];
+  }
 
   const menu = allMenu.filter((item) => allowedTabs.includes(item.id));
 
   useEffect(() => {
-    if (isFinanceOnly && !allowedTabs.includes(tab)) {
+    if ((isFinanceOnly || isEventOnly) && !allowedTabs.includes(tab)) {
       setTab("dashboard");
     }
-  }, [isFinanceOnly, tab]);
+  }, [isFinanceOnly, isEventOnly, tab]);
 
   const currentTab = menu.find((item) => item.id === tab) || menu[0];
 
@@ -1952,7 +1958,7 @@ export default function Admin() {
   };
 
   const renderPage = () => {
-    if (isFinanceOnly && !allowedTabs.includes(tab)) {
+    if ((isFinanceOnly || isEventOnly) && !allowedTabs.includes(tab)) {
       return <DashboardPanel canViewMoney={canViewMoney} />;
     }
 
@@ -1973,13 +1979,13 @@ export default function Admin() {
         return isFinanceOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <RacAttendancePanel attendance={attendance} />;
 
       case "encorians":
-        return <EncoriansPanel canViewMoney={canViewMoney} />;
+        return isEventOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <EncoriansPanel canViewMoney={canViewMoney} />;
 
       case "referral-codes":
-        return <ReferralCodesPanel />;
+        return isEventOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <ReferralCodesPanel />;
 
       case "ots-tickets":
-        return <OtsTicketsPanel canViewMoney={canViewMoney} />;
+        return isEventOnly ? <DashboardPanel canViewMoney={canViewMoney} /> : <OtsTicketsPanel canViewMoney={canViewMoney} />;
 
       default:
         return null;
@@ -2000,7 +2006,7 @@ export default function Admin() {
         </div>
 
         <div className="flex items-center gap-2">
-          {!isFinanceOnly && (
+          {!isFinanceOnly && !isEventOnly && (
             <Link
               to="/admin/scanner"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold shadow-md shadow-pink-600/30 transition-all"
@@ -2049,7 +2055,7 @@ export default function Admin() {
           </div>
 
           <div className="mt-5 pt-4 border-t border-pink-500/20 space-y-2">
-            {!isFinanceOnly && (
+            {!isFinanceOnly && !isEventOnly && (
               <Link
                 to="/admin/scanner"
                 onClick={() => setMobileMenuOpen(false)}
@@ -2099,7 +2105,7 @@ export default function Admin() {
           })}
         </div>
 
-        {!isFinanceOnly && (
+        {!isFinanceOnly && !isEventOnly && (
           <Link
             to="/admin/scanner"
             className="mt-8 flex w-full items-center gap-3 rounded-2xl border border-pink-500/30 px-4 py-4 font-semibold text-pink-200 transition-all duration-300 hover:bg-pink-500 hover:text-white"
