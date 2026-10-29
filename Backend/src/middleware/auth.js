@@ -154,7 +154,10 @@ export const requireRole = (...roles) => {
             });
         }
 
-        if (!roles.includes(req.user.role)) {
+        const isAuthorized = roles.includes(req.user.role) ||
+            (roles.includes('admin') && ['admin', 'it_admin', 'finance'].includes(req.user.role));
+
+        if (!isAuthorized) {
             return res.status(403).json({
                 message: 'Your account does not have permission to do this. Please use an admin account.'
             });

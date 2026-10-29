@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import API, { openProtectedFile, referralCodeAPI, otsTicketAPI } from "../api";
+import API, { authAPI, openProtectedFile, referralCodeAPI, otsTicketAPI } from "../api";
 import {
   Trophy,
   Users,
@@ -262,8 +262,9 @@ function Button({ children, className = "", ...props }) {
 
 
 
-function DashboardPanel() {
+function DashboardPanel({ canViewMoney }) {
   const { data: stats, loading, error, refresh } = useAdminData("/admin/stats", { initialData: null });
+  const hasMoneyAccess = canViewMoney || Boolean(stats?.canViewMoney);
   const cards = [
     {
       title: "Users",
@@ -283,12 +284,29 @@ function DashboardPanel() {
       icon: Trophy,
       color: "bg-rose-500",
     },
+    {
+      title: "Sold Tickets",
+      value: stats?.soldTickets ?? "…",
+      subtitle: stats ? `${stats.encoreSold || 0} by Website • ${stats.otsSold || 0} OTS` : "",
+      icon: Ticket,
+      color: "bg-pink-600",
+    },
+    ...(hasMoneyAccess && stats?.totalRevenue !== undefined
+      ? [
+          {
+            title: "Total Revenue",
+            value: `Rp ${(stats.totalRevenue || 0).toLocaleString("id-ID")}`,
+            icon: DollarSign,
+            color: "bg-emerald-600",
+          },
+        ]
+      : []),
   ];
 
   return (
     <div>
       <DataStatus loading={loading} error={error} onRefresh={refresh} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card, i) => {
         const Icon = card.icon;
 
@@ -300,9 +318,12 @@ function DashboardPanel() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-pink-500 font-medium">{card.title}</p>
-                <h1 className="text-4xl font-bold mt-2 text-slate-800">
+                <h1 className="text-3xl sm:text-4xl font-bold mt-2 text-slate-800">
                   {card.value}
                 </h1>
+                {card.subtitle && (
+                  <p className="text-xs text-slate-400 mt-1">{card.subtitle}</p>
+                )}
               </div>
 
               <div className={`${card.color} p-4 rounded-2xl text-white`}>
@@ -316,8 +337,6 @@ function DashboardPanel() {
     </div>
   );
 }
-
-
 
 function CompetitionsPanel() {
   const { busy, runAction } = useAdminAction();
@@ -1183,12 +1202,22 @@ function TeamsPanel() {
 
 
 
-function EncoriansPanel() {
+function EncoriansPanel({ canViewMoney }) {
   const { busy, runAction } = useAdminAction();
   const [statusFilter, setStatusFilter] = useState("");
-  const { data: encorians, loading, error, refresh: fetchEncorians } = useAdminData(
-    statusFilter ? `/admin/encorians?status=${statusFilter}` : "/admin/encorians",
+  const { data: allEncorians, loading, error, refresh: fetchEncorians } = useAdminData(
+    "/admin/encorians",
   );
+
+  const encorianList = Array.isArray(allEncorians) ? allEncorians : [];
+  const approvedList = encorianList.filter((e) => e.status === "approved");
+  const pendingList = encorianList.filter((e) => e.status === "pending");
+  const ticketPrice = 35000;
+  const approvedRevenue = approvedList.length * ticketPrice;
+  const pendingRevenue = pendingList.length * ticketPrice;
+  const encorians = statusFilter
+    ? encorianList.filter((e) => e.status === statusFilter)
+    : encorianList;
 
   const handleApprove = async (id) => {
     if (!window.confirm("Approve this ticket registration?")) return;
@@ -1229,9 +1258,73 @@ function EncoriansPanel() {
     { label: "Rejected", value: "rejected" },
   ];
 
+  const cards = (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="account-panel rounded-2xl p-5 border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-950/30 to-black shadow-xl">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+            Total Sold Revenue
+          </p>
+          <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+            <DollarSign size={20} />
+          </div>
+        </div>
+        <p className="text-3xl sm:text-4xl font-black text-emerald-300 mt-2 tracking-tight">
+          {canViewMoney ? `Rp ${approvedRevenue.toLocaleString("id-ID")}` : "••••••"}
+        </p>
+      </div>
+
+      <div className="account-panel rounded-2xl p-5 border border-pink-500/30 shadow-lg">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-pink-300 uppercase tracking-wider">
+            Approved Tickets
+          </p>
+          <div className="p-2 rounded-xl bg-pink-500/20 text-pink-400">
+            <Ticket size={20} />
+          </div>
+        </div>
+        <p className="text-3xl sm:text-4xl font-black text-white mt-2">
+          {approvedList.length} <span className="text-base font-semibold text-pink-300">tickets</span>
+        </p>
+       
+      </div>
+
+      <div className="account-panel rounded-2xl p-5 border border-yellow-500/30 shadow-lg">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-yellow-400 uppercase tracking-wider">
+            Pending Money
+          </p>
+          <div className="p-2 rounded-xl bg-yellow-500/20 text-yellow-400">
+            <Wallet size={20} />
+          </div>
+        </div>
+        <p className="text-2xl sm:text-3xl font-extrabold text-yellow-300 mt-2">
+          {canViewMoney ? `Rp ${pendingRevenue.toLocaleString("id-ID")}` : "••••••"}
+        </p>
+       
+      </div>
+
+      <div className="account-panel rounded-2xl p-5 border border-pink-500/20 shadow-lg">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-pink-300 uppercase tracking-wider">
+            Total Orders
+          </p>
+          <div className="p-2 rounded-xl bg-pink-500/20 text-pink-400">
+            <Banknote size={20} />
+          </div>
+        </div>
+        <p className="text-3xl sm:text-4xl font-black text-white mt-2">
+          {encorianList.length}
+        </p>
+        
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <SectionCard>
+        {cards}
         <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
           {filters.map((f) => (
             <button
@@ -1465,7 +1558,7 @@ function ReferralCodesPanel() {
         <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
           <p className="text-xs font-semibold text-pink-300 uppercase tracking-wider">Total Committee Members</p>
           <p className="text-3xl font-extrabold text-white mt-1">{items.length}</p>
-          <p className="text-xs text-pink-200/60 mt-1">Registered with referral codes</p>
+          <p className="text-xs text-pink-200/60 mt-1">Registered Members</p>
         </div>
 
         <div className="account-panel rounded-2xl p-5 border border-pink-500/20">
@@ -1767,6 +1860,31 @@ export default function Admin() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const attendance = useRacAttendance();
 
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    authAPI
+      .getCurrentUser()
+      .then((res) => {
+        if (res?.data) {
+          setCurrentUser(res.data);
+          try {
+            localStorage.setItem("user", JSON.stringify(res.data));
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const canViewMoney = ["admin", "it_admin", "finance"].includes(currentUser?.role);
+
   const menu = [
     {
       id: "dashboard",
@@ -1823,9 +1941,7 @@ export default function Admin() {
   const renderPage = () => {
     switch (tab) {
       case "dashboard":
-        return (
-          <DashboardPanel />
-        );
+        return <DashboardPanel canViewMoney={canViewMoney} />;
 
       case "competitions":
         return <CompetitionsPanel />;
@@ -1840,13 +1956,13 @@ export default function Admin() {
         return <RacAttendancePanel attendance={attendance} />;
 
       case "encorians":
-        return <EncoriansPanel />;
+        return <EncoriansPanel canViewMoney={canViewMoney} />;
 
       case "referral-codes":
         return <ReferralCodesPanel />;
 
       case "ots-tickets":
-        return <OtsTicketsPanel />;
+        return <OtsTicketsPanel canViewMoney={canViewMoney} />;
 
       default:
         return null;

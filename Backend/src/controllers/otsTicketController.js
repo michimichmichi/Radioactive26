@@ -50,6 +50,9 @@ export const getOtsTickets = async (req, res) => {
 
         const defaultPrice = await getSettingPrice();
 
+        const userRole = req.user?.role || '';
+        const canViewMoney = ['admin', 'it_admin', 'finance'].includes(userRole);
+
         const stats = totals[0] || {
             totalTickets: 0,
             totalRevenue: 0,
@@ -59,10 +62,26 @@ export const getOtsTickets = async (req, res) => {
             totalQrisTickets: 0
         };
 
+        if (!canViewMoney) {
+            stats.totalRevenue = null;
+            stats.totalCashRevenue = null;
+            stats.totalQrisRevenue = null;
+        }
+
+        const safeSales = canViewMoney
+            ? sales
+            : sales.map((s) => {
+                const doc = s.toObject ? s.toObject() : { ...s };
+                doc.totalAmount = null;
+                doc.pricePerTicket = null;
+                return doc;
+            });
+
         res.json({
-            sales,
+            sales: safeSales,
             stats,
-            defaultPrice
+            defaultPrice: canViewMoney ? defaultPrice : 35000,
+            canViewMoney
         });
     } catch (err) {
         sendError(res, err);

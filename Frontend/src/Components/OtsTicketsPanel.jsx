@@ -16,8 +16,9 @@ import {
 } from "lucide-react";
 import { otsTicketAPI } from "../api";
 
-export default function OtsTicketsPanel() {
+export default function OtsTicketsPanel({ canViewMoney = true }) {
   const [sales, setSales] = useState([]);
+  const [hasMoneyAccess, setHasMoneyAccess] = useState(Boolean(canViewMoney));
   const [stats, setStats] = useState({
     totalTickets: 0,
     totalRevenue: 0,
@@ -35,12 +36,21 @@ export default function OtsTicketsPanel() {
   const [priceModalOpen, setPriceModalOpen] = useState(false);
   const [priceInput, setPriceInput] = useState(35000);
 
+  useEffect(() => {
+    if (typeof canViewMoney === "boolean") {
+      setHasMoneyAccess(canViewMoney);
+    }
+  }, [canViewMoney]);
+
   const fetchSalesData = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
       const res = await otsTicketAPI.getAll();
       setSales(res.data.sales || []);
+      if (typeof res.data.canViewMoney === "boolean") {
+        setHasMoneyAccess(res.data.canViewMoney);
+      }
       setStats(
         res.data.stats || {
           totalTickets: 0,
@@ -97,7 +107,8 @@ export default function OtsTicketsPanel() {
 
       playChime();
       const totalRecorded = qty * defaultPrice;
-      setLastNotice(`+${qty} Ticket (${paymentMethod.toUpperCase()}) recorded: Rp ${totalRecorded.toLocaleString("id-ID")}`);
+      const amountNotice = hasMoneyAccess ? `: Rp ${totalRecorded.toLocaleString("id-ID")}` : "";
+      setLastNotice(`+${qty} Ticket (${paymentMethod.toUpperCase()}) recorded${amountNotice}`);
       setTimeout(() => setLastNotice(null), 3500);
 
       await fetchSalesData();
@@ -110,9 +121,10 @@ export default function OtsTicketsPanel() {
   };
 
   const handleDelete = async (id, amount, qty, method) => {
+    const amountStr = hasMoneyAccess && amount !== null && amount !== undefined ? `, Rp ${amount.toLocaleString("id-ID")}` : "";
     if (
       !window.confirm(
-        `Delete this entry (${qty} ticket, Rp ${amount.toLocaleString("id-ID")}, ${method})? This will subtract it from total revenue.`
+        `Delete this entry (${qty} ticket${qty > 1 ? "s" : ""}${amountStr}, ${method})? This will subtract it from total revenue.`
       )
     ) {
       return;
@@ -145,26 +157,19 @@ export default function OtsTicketsPanel() {
   };
 
   const formatRupiah = (num) => {
+    if (!hasMoneyAccess || num === null || num === undefined) {
+      return "••••••";
+    }
     return `Rp ${(Number(num) || 0).toLocaleString("id-ID")}`;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-pink-500 tracking-wide flex items-center gap-2">
-            <Banknote size={28} className="text-pink-400" />
-            OTS Ticket Sales & Money Tracker
-          </h2>
-          <p className="text-sm text-pink-200 mt-1">
-            Fast venue ticket counter for The Encore on-the-spot sales.
-          </p>
-        </div>
-
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-pink-500/15 border border-pink-500/30 text-xs sm:text-sm text-pink-200">
             <span className="text-pink-400/80">OTS Price:</span>
-            <span className="font-bold text-white">{formatRupiah(defaultPrice)}</span>
+            <span className="font-bold text-white">Rp {(Number(defaultPrice) || 0).toLocaleString("id-ID")}</span>
             <button
               type="button"
               onClick={() => {
@@ -202,9 +207,11 @@ export default function OtsTicketsPanel() {
           <p className="text-3xl sm:text-4xl font-black text-emerald-300 mt-2 tracking-tight">
             {formatRupiah(stats.totalRevenue)}
           </p>
-          <p className="text-xs text-emerald-400/80 mt-1 font-medium">
-            {stats.totalTickets} total tickets sold
-          </p>
+          {!hasMoneyAccess && (
+            <p className="text-xs text-emerald-400/70 mt-1 font-semibold">
+              Finance and IT Admin Only
+            </p>
+          )}
         </div>
 
         <div className="account-panel rounded-2xl p-5 border border-pink-500/30 shadow-lg">
@@ -219,15 +226,12 @@ export default function OtsTicketsPanel() {
           <p className="text-3xl sm:text-4xl font-black text-white mt-2">
             {stats.totalTickets} <span className="text-base font-semibold text-pink-300">tickets</span>
           </p>
-          <p className="text-xs text-pink-300/60 mt-1">
-            Sold on-the-spot at venue
-          </p>
         </div>
 
         <div className="account-panel rounded-2xl p-5 border border-emerald-500/25 shadow-lg">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-              Cash In Hand
+              Cash
             </p>
             <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
               <Wallet size={20} />
@@ -236,15 +240,17 @@ export default function OtsTicketsPanel() {
           <p className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
             {formatRupiah(stats.totalCashRevenue)}
           </p>
-          <p className="text-xs text-emerald-400/80 mt-1">
-            {stats.totalCashTickets} tickets paid in cash
-          </p>
+          {!hasMoneyAccess && (
+            <p className="text-xs text-emerald-400/70 mt-1 font-semibold">
+              Finance and IT Admin Only
+            </p>
+          )}
         </div>
 
         <div className="account-panel rounded-2xl p-5 border border-cyan-500/25 shadow-lg">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
-              QRIS / Digital
+              QRIS
             </p>
             <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400">
               <QrCode size={20} />
@@ -253,25 +259,15 @@ export default function OtsTicketsPanel() {
           <p className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
             {formatRupiah(stats.totalQrisRevenue)}
           </p>
-          <p className="text-xs text-cyan-400/80 mt-1">
-            {stats.totalQrisTickets} tickets scanned QRIS
-          </p>
+          {!hasMoneyAccess && (
+            <p className="text-xs text-cyan-400/70 mt-1 font-semibold">
+              Finance and IT Admin Only
+            </p>
+          )}
         </div>
       </div>
 
       <div className="account-panel rounded-3xl p-5 sm:p-7 border border-pink-500/30 bg-black/60 shadow-2xl">
-        <div className="mb-4">
-          <span className="text-xs font-bold uppercase tracking-widest text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-full border border-pink-500/20">
-            One-Click Logger
-          </span>
-          <h3 className="text-xl font-bold text-white mt-2">
-            Record Ticket Sale
-          </h3>
-          <p className="text-xs text-pink-200/70">
-            Tap either button below to log the ticket and track money instantly.
-          </p>
-        </div>
-
         {lastNotice && (
           <div className="mb-4 p-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
             <CheckCircle2 size={18} className="shrink-0" />
@@ -288,11 +284,8 @@ export default function OtsTicketsPanel() {
           >
             <div className="flex items-center gap-2 font-black text-xl sm:text-2xl">
               <Banknote size={26} />
-              <span>+1 CASH TICKET</span>
+              <span> + CASH</span>
             </div>
-            <span className="text-xs font-medium text-emerald-100 mt-1">
-              Add {formatRupiah(defaultPrice)} to Cash
-            </span>
           </button>
 
           <button
@@ -303,11 +296,8 @@ export default function OtsTicketsPanel() {
           >
             <div className="flex items-center gap-2 font-black text-xl sm:text-2xl">
               <QrCode size={26} />
-              <span>+1 QRIS TICKET</span>
+              <span>+ QRIS </span>
             </div>
-            <span className="text-xs font-medium text-cyan-100 mt-1">
-              Add {formatRupiah(defaultPrice)} to QRIS
-            </span>
           </button>
         </div>
 
@@ -322,7 +312,7 @@ export default function OtsTicketsPanel() {
                 onClick={() => handleRecord(q, "cash")}
                 className="px-3 py-1.5 rounded-xl bg-pink-500/15 hover:bg-pink-500/30 text-pink-200 text-xs font-bold border border-pink-500/25 transition-all"
               >
-                +{q} Cash ({formatRupiah(q * defaultPrice)})
+                +{q} Cash {hasMoneyAccess ? `(${formatRupiah(q * defaultPrice)})` : ""}
               </button>
             ))}
           </div>
@@ -352,7 +342,7 @@ export default function OtsTicketsPanel() {
               onClick={() => handleRecord(customQty, "cash")}
               className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition-all ml-1"
             >
-              Cash ({formatRupiah(customQty * defaultPrice)})
+              Cash {hasMoneyAccess ? `(${formatRupiah(customQty * defaultPrice)})` : ""}
             </button>
             <button
               type="button"
@@ -371,11 +361,8 @@ export default function OtsTicketsPanel() {
           <div>
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               <Clock size={20} className="text-pink-400" />
-              OTS Transaction History
+              Transaction History
             </h3>
-            <p className="text-xs text-pink-200/60 mt-0.5">
-              Live audit log of all on-the-spot purchases.
-            </p>
           </div>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30">
             {sales.length} records

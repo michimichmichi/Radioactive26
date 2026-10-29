@@ -14,7 +14,8 @@ function ProtectedAdminRoute({ children }) {
         localStorage.setItem("user", JSON.stringify(response.data));
         window.dispatchEvent(new Event("auth-change"));
         setUser(response.data);
-        setStatus(response.data.role === "admin" ? "allowed" : "forbidden");
+        const allowedRoles = ["admin", "it_admin", "finance"];
+        setStatus(allowedRoles.includes(response.data.role) ? "allowed" : "forbidden");
       } catch (err) {
         setError(err.userMessage || "Unable to verify your account. Please try again.");
         setStatus(err.response?.status === 401 ? "unauthenticated" : "error");
