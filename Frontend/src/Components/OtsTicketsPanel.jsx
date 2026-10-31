@@ -12,9 +12,11 @@ import {
   CreditCard,
   Edit,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  UserCheck,
+  X
 } from "lucide-react";
-import { otsTicketAPI } from "../api";
+import { otsTicketAPI, referralCodeAPI } from "../api";
 
 export default function OtsTicketsPanel({ canViewMoney = true }) {
   const [sales, setSales] = useState([]);
@@ -27,6 +29,8 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
     totalQrisRevenue: 0,
     totalQrisTickets: 0,
   });
+  const [committees, setCommittees] = useState([]);
+  const [selectedCommittee, setSelectedCommittee] = useState("");
   const [defaultPrice, setDefaultPrice] = useState(35000);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -41,6 +45,15 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
       setHasMoneyAccess(canViewMoney);
     }
   }, [canViewMoney]);
+
+  const fetchCommittees = useCallback(async () => {
+    try {
+      const res = await referralCodeAPI.getAll();
+      if (Array.isArray(res.data)) {
+        setCommittees(res.data);
+      }
+    } catch {}
+  }, []);
 
   const fetchSalesData = useCallback(async () => {
     try {
@@ -74,7 +87,8 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
 
   useEffect(() => {
     fetchSalesData();
-  }, [fetchSalesData]);
+    fetchCommittees();
+  }, [fetchSalesData, fetchCommittees]);
 
   const playChime = () => {
     try {
@@ -99,20 +113,25 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
     if (busy) return;
     setBusy(true);
     try {
+      const recordedCommittee = selectedCommittee.trim();
       await otsTicketAPI.record({
         quantity: qty,
         paymentMethod,
         pricePerTicket: defaultPrice,
+        committee: recordedCommittee,
       });
 
       playChime();
       const totalRecorded = qty * defaultPrice;
       const amountNotice = hasMoneyAccess ? `: Rp ${totalRecorded.toLocaleString("id-ID")}` : "";
-      setLastNotice(`+${qty} Ticket (${paymentMethod.toUpperCase()}) recorded${amountNotice}`);
-      setTimeout(() => setLastNotice(null), 3500);
+      const committeeNotice = recordedCommittee ? ` [Referred by: ${recordedCommittee}]` : "";
+      setLastNotice(`+${qty} Ticket (${paymentMethod.toUpperCase()})${committeeNotice} recorded${amountNotice}`);
+      setTimeout(() => setLastNotice(null), 4000);
 
       await fetchSalesData();
+      fetchCommittees();
       setCustomQty(1);
+      setSelectedCommittee("");
     } catch (err) {
       alert(err.userMessage || "Failed to record OTS ticket sale.");
     } finally {
@@ -120,11 +139,12 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
     }
   };
 
-  const handleDelete = async (id, amount, qty, method) => {
+  const handleDelete = async (id, amount, qty, method, committeeName) => {
     const amountStr = hasMoneyAccess && amount !== null && amount !== undefined ? `, Rp ${amount.toLocaleString("id-ID")}` : "";
+    const refStr = committeeName ? ` (Referred: ${committeeName})` : "";
     if (
       !window.confirm(
-        `Delete this entry (${qty} ticket${qty > 1 ? "s" : ""}${amountStr}, ${method})? This will subtract it from total revenue.`
+        `Delete this entry (${qty} ticket${qty > 1 ? "s" : ""}${amountStr}, ${method}${refStr})? This will subtract it from total revenue and committee quota.`
       )
     ) {
       return;
@@ -133,6 +153,7 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
     try {
       await otsTicketAPI.delete(id);
       await fetchSalesData();
+      fetchCommittees();
     } catch (err) {
       alert(err.userMessage || "Failed to delete ticket record.");
     } finally {
@@ -184,7 +205,10 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
 
           <button
             type="button"
-            onClick={fetchSalesData}
+            onClick={() => {
+              fetchSalesData();
+              fetchCommittees();
+            }}
             disabled={loading}
             className="p-2.5 rounded-xl bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 disabled:opacity-50 border border-pink-500/20"
             title="Refresh Data"
@@ -274,6 +298,47 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
             <span>{lastNotice}</span>
           </div>
         )}
+
+        <div className="mb-5 p-4 rounded-2xl bg-black/40 border border-pink-500/25">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-xs font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1.5">
+              <UserCheck size={15} className="text-pink-400" />
+              <span>Referred by Committee (Fulfill Quota)</span>
+            </label>
+            {selectedCommittee && (
+              <button
+                type="button"
+                onClick={() => setSelectedCommittee("")}
+                className="text-xs text-pink-400 hover:text-white flex items-center gap-0.5 underline font-medium"
+              >
+                <X size={12} /> Clear
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              list="committee-referral-options"
+              value={selectedCommittee}
+              onChange={(e) => setSelectedCommittee(e.target.value)}
+              placeholder="Type or select committee name or RAC- code (optional)..."
+              className="admin-field w-full px-4 py-2.5 text-sm font-medium"
+            />
+            <datalist id="committee-referral-options">
+              {committees.map((c) => (
+                <option
+                  key={c._id}
+                  value={`${c.panitiaName} (${c.code})`}
+                >
+                  Quota: {c.approvedCount || 0}/{c.targetQuota || 10} sold
+                </option>
+              ))}
+            </datalist>
+          </div>
+          <p className="text-[11px] text-pink-300/60 mt-1.5">
+            If an attendee mentions a committee member at the OTS desk, enter their name or code above to count these tickets towards their quota.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <button
@@ -376,7 +441,7 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
         )}
 
         <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-          <table className="w-full min-w-[700px] whitespace-nowrap">
+          <table className="w-full min-w-[800px] whitespace-nowrap">
             <thead>
               <tr className="border-b border-pink-500/20 text-xs text-pink-300 uppercase tracking-wider">
                 <th className="text-left py-3.5">#</th>
@@ -385,6 +450,7 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
                 <th className="text-right py-3.5">Price / Ticket</th>
                 <th className="text-right py-3.5 font-bold">Total Amount</th>
                 <th className="text-center py-3.5">Payment Method</th>
+                <th className="text-left py-3.5">Committee</th>
                 <th className="text-left py-3.5">Recorded By</th>
                 <th className="text-right py-3.5">Action</th>
               </tr>
@@ -392,13 +458,13 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
             <tbody className="divide-y divide-pink-500/10 text-sm">
               {loading && sales.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-8 text-center text-pink-300">
+                  <td colSpan="9" className="py-8 text-center text-pink-300">
                     Loading OTS transactions...
                   </td>
                 </tr>
               ) : sales.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-8 text-center text-pink-300/60">
+                  <td colSpan="9" className="py-8 text-center text-pink-300/60">
                     No OTS tickets recorded yet.
                   </td>
                 </tr>
@@ -453,6 +519,22 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
                           </span>
                         )}
                       </td>
+                      <td className="text-xs">
+                        {item.committeeName || item.referralCode ? (
+                          <div className="flex flex-col max-w-[160px]">
+                            <span className="font-semibold text-white truncate">
+                              {item.committeeName || item.referralCode}
+                            </span>
+                            {item.referralCode && (
+                              <span className="text-[10px] font-mono font-bold text-pink-400">
+                                {item.referralCode}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-zinc-500">-</span>
+                        )}
+                      </td>
                       <td className="text-xs text-zinc-300 font-medium">
                         {item.recordedBy || "Admin"}
                       </td>
@@ -465,7 +547,8 @@ export default function OtsTicketsPanel({ canViewMoney = true }) {
                               item._id,
                               item.totalAmount,
                               item.quantity,
-                              item.paymentMethod
+                              item.paymentMethod,
+                              item.committeeName || item.referralCode
                             )
                           }
                           className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"

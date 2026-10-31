@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import ReferralCode from '../models/ReferralCode.js';
 import Encorian from '../models/Encorian.js';
+import OtsTicket from '../models/OtsTicket.js';
 import { sendError } from '../middleware/errorHandler.js';
 import { isValidObjectId, normalizeString } from '../utils/security.js';
 
@@ -18,14 +19,25 @@ export const getReferralCodes = async (req, res) => {
     try {
         const codes = await ReferralCode.find().sort({ createdAt: -1 });
 
-        const stats = await Encorian.aggregate([
-            { $match: { referralCode: { $ne: null } } },
-            {
-                $group: {
-                    _id: { code: '$referralCode', status: '$status' },
-                    count: { $sum: 1 }
+        const [stats, otsStats] = await Promise.all([
+            Encorian.aggregate([
+                { $match: { referralCode: { $ne: null } } },
+                {
+                    $group: {
+                        _id: { code: '$referralCode', status: '$status' },
+                        count: { $sum: 1 }
+                    }
                 }
-            }
+            ]),
+            OtsTicket.aggregate([
+                { $match: { referralCode: { $ne: null, $ne: '' } } },
+                {
+                    $group: {
+                        _id: '$referralCode',
+                        totalTickets: { $sum: '$quantity' }
+                    }
+                }
+            ])
         ]);
 
         const statsMap = {};
@@ -40,9 +52,18 @@ export const getReferralCodes = async (req, res) => {
             }
         }
 
+        const otsMap = {};
+        for (const item of otsStats) {
+            if (item._id) {
+                otsMap[item._id] = item.totalTickets || 0;
+            }
+        }
+
         const result = codes.map((doc) => {
             const codeStats = statsMap[doc.code] || { approved: 0, pending: 0, rejected: 0 };
-            const approvedCount = codeStats.approved;
+            const onlineApproved = codeStats.approved;
+            const otsSold = otsMap[doc.code] || 0;
+            const approvedCount = onlineApproved + otsSold;
             const pendingCount = codeStats.pending;
             const rejectedCount = codeStats.rejected;
             const totalSubmissions = approvedCount + pendingCount;
@@ -58,6 +79,8 @@ export const getReferralCodes = async (req, res) => {
                 targetQuota: doc.targetQuota,
                 isActive: doc.isActive,
                 approvedCount,
+                onlineApprovedCount: onlineApproved,
+                otsApprovedCount: otsSold,
                 pendingCount,
                 rejectedCount,
                 totalSubmissions,

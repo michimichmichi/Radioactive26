@@ -34,6 +34,17 @@ const otsTicketSchema = new mongoose.Schema({
         type: String,
         trim: true,
         default: 'Admin'
+    },
+    referralCode: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: null
+    },
+    committeeName: {
+        type: String,
+        trim: true,
+        default: ''
     }
 }, { timestamps: true });
 

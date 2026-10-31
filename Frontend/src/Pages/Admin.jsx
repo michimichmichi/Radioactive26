@@ -1690,8 +1690,15 @@ function ReferralCodesPanel() {
                       </td>
                       <td>
                         <div className="space-y-1">
-                          <div className="flex justify-between text-xs">
-                            <span className="font-semibold text-green-400">{item.approvedCount} sold</span>
+                          <div className="flex justify-between text-xs items-baseline">
+                            <span className="font-semibold text-green-400">
+                              {item.approvedCount} sold
+                              {item.otsApprovedCount > 0 && (
+                                <span className="text-[10px] text-pink-300/80 font-normal ml-1">
+                                  ({item.onlineApprovedCount || 0} online • {item.otsApprovedCount} OTS)
+                                </span>
+                              )}
+                            </span>
                             <span className="text-pink-300/70">{item.progressPercentage}%</span>
                           </div>
                           <div className="w-full bg-black/40 rounded-full h-2 overflow-hidden border border-pink-500/20">
