@@ -1,6 +1,8 @@
 import OtsTicket from '../models/OtsTicket.js';
 import OtsSetting from '../models/OtsSetting.js';
+import ReferralCode from '../models/ReferralCode.js';
 import { sendError } from '../middleware/errorHandler.js';
+import { escapeRegex } from '../utils/security.js';
 
 const getSettingPrice = async () => {
     try {
@@ -90,7 +92,7 @@ export const getOtsTickets = async (req, res) => {
 
 export const recordOtsTicket = async (req, res) => {
     try {
-        let { quantity, pricePerTicket, paymentMethod, notes } = req.body || {};
+        let { quantity, pricePerTicket, paymentMethod, notes, referralCode, committeeName, committee } = req.body || {};
 
         quantity = Math.max(1, parseInt(quantity, 10) || 1);
 
@@ -105,12 +107,49 @@ export const recordOtsTicket = async (req, res) => {
 
         const totalAmount = quantity * pricePerTicket;
 
+        let matchedReferralCode = null;
+        let matchedCommitteeName = '';
+
+        const committeeInput = (referralCode || committeeName || committee || '').trim();
+        if (committeeInput) {
+            const raw = committeeInput;
+            const codeMatch = raw.match(/\b(RAC-[A-Z0-9_-]+)\b/i);
+            const possibleCode = codeMatch ? codeMatch[1].toUpperCase() : raw.toUpperCase();
+
+            let refDoc = await ReferralCode.findOne({ code: possibleCode });
+            if (!refDoc) {
+                const cleanedName = raw.replace(/\(RAC-[A-Z0-9_-]+\)/i, '').trim();
+                if (cleanedName) {
+                    refDoc = await ReferralCode.findOne({
+                        panitiaName: { $regex: new RegExp(`^${escapeRegex(cleanedName)}$`, 'i') }
+                    });
+                    if (!refDoc) {
+                        refDoc = await ReferralCode.findOne({
+                            panitiaName: { $regex: new RegExp(escapeRegex(cleanedName), 'i') }
+                        });
+                    }
+                }
+            }
+
+            if (refDoc) {
+                matchedReferralCode = refDoc.code;
+                matchedCommitteeName = refDoc.panitiaName;
+            } else {
+                matchedCommitteeName = raw.replace(/\(RAC-[A-Z0-9_-]+\)/i, '').trim() || raw;
+                if (/^RAC-[A-Z0-9_-]+$/i.test(possibleCode)) {
+                    matchedReferralCode = possibleCode;
+                }
+            }
+        }
+
         const ticket = await OtsTicket.create({
             quantity,
             pricePerTicket,
             totalAmount,
             paymentMethod: method,
             notes: (notes || '').trim(),
+            referralCode: matchedReferralCode,
+            committeeName: matchedCommitteeName,
             recordedBy: req.user?.name || 'Admin'
         });
 

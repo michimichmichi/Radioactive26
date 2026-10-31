@@ -35,7 +35,11 @@ export default function Scanner() {
 
   const scannerRef = useRef(null);
   const isProcessingScan = useRef(false);
+  const isStoppingRef = useRef(false);
   const fileInputRef = useRef(null);
+  const activeCameraIdRef = useRef(null);
+  const lastScannedCodeRef = useRef(null);
+  const ignoreUntilRef = useRef(0);
 
   const playScanChime = useCallback(() => {
     try {
@@ -73,24 +77,44 @@ export default function Scanner() {
   }, []);
 
   const stopScanner = useCallback(async () => {
-    if (scannerRef.current) {
-      try {
-        if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
+    if (isStoppingRef.current) return;
+    isStoppingRef.current = true;
+
+    try {
+      if (scannerRef.current) {
+        try {
+          const s = scannerRef.current.getState?.();
+          if (s === 2 || s === 3 || scannerRef.current.isScanning) {
+            await scannerRef.current.stop();
+          }
+        } catch (err) {
+          console.warn('Scanner stop warning:', err?.message || err);
         }
-        await scannerRef.current.clear();
-      } catch (err) {
-        console.warn('Scanner stop/clear error:', err?.message || err);
+        try {
+          scannerRef.current.clear?.();
+        } catch {}
+        scannerRef.current = null;
       }
-      scannerRef.current = null;
+    } finally {
+      isStoppingRef.current = false;
+      setTorchOn(false);
+      setHasTorch(false);
     }
-    setTorchOn(false);
-    setHasTorch(false);
   }, []);
 
   const handleLookup = useCallback(async (code) => {
-    if (isProcessingScan.current) return;
+    if (!code || isProcessingScan.current) return;
+    const trimmed = code.trim();
+    if (!trimmed) return;
+
+    const now = Date.now();
+    if (trimmed === lastScannedCodeRef.current && now < ignoreUntilRef.current) {
+      return;
+    }
+
     isProcessingScan.current = true;
+    lastScannedCodeRef.current = trimmed;
+    ignoreUntilRef.current = now + 4000;
 
     playScanChime();
     await stopScanner();
@@ -99,7 +123,7 @@ export default function Scanner() {
     setErrorMsg('');
 
     try {
-      const res = await encorianAPI.lookupTicket(code.trim());
+      const res = await encorianAPI.lookupTicket(trimmed);
       setTicketData(res.data);
       setState('preview');
     } catch (err) {
@@ -122,6 +146,8 @@ export default function Scanner() {
       let cameraConfig;
       if (cameraId) {
         cameraConfig = { deviceId: { exact: cameraId } };
+      } else if (activeCameraIdRef.current) {
+        cameraConfig = { deviceId: { exact: activeCameraIdRef.current } };
       } else {
         try {
           const devices = await Html5Qrcode.getCameras();
@@ -129,6 +155,7 @@ export default function Scanner() {
             setCameras(devices);
             const rearCamera = devices.find(d => /back|rear|environment/i.test(d.label));
             const chosen = rearCamera || devices[0];
+            activeCameraIdRef.current = chosen.id;
             setActiveCameraId(chosen.id);
             cameraConfig = { deviceId: { exact: chosen.id } };
           } else {
@@ -195,9 +222,10 @@ export default function Scanner() {
 
   const switchCamera = async () => {
     if (cameras.length <= 1) return;
-    const currentIndex = cameras.findIndex(c => c.id === activeCameraId);
+    const currentIndex = cameras.findIndex(c => c.id === activeCameraIdRef.current);
     const nextIndex = (currentIndex + 1) % cameras.length;
     const nextCamera = cameras[nextIndex];
+    activeCameraIdRef.current = nextCamera.id;
     setActiveCameraId(nextCamera.id);
     await startCamera(nextCamera.id);
   };
@@ -239,8 +267,8 @@ export default function Scanner() {
     if (state === 'scanning') {
       isProcessingScan.current = false;
       const timer = setTimeout(() => {
-        startCamera(activeCameraId);
-      }, 100);
+        startCamera(activeCameraIdRef.current);
+      }, 120);
 
       return () => {
         clearTimeout(timer);
@@ -249,7 +277,7 @@ export default function Scanner() {
     } else {
       stopScanner();
     }
-  }, [state, activeCameraId, startCamera, stopScanner]);
+  }, [state, startCamera, stopScanner]);
 
   const handleManualLookup = (e) => {
     e.preventDefault();
@@ -272,6 +300,10 @@ export default function Scanner() {
 
   const scanNext = () => {
     isProcessingScan.current = false;
+    if (ticketData?.ticket?.ticketCode) {
+      lastScannedCodeRef.current = ticketData.ticket.ticketCode;
+    }
+    ignoreUntilRef.current = Date.now() + 4000;
     setTicketData(null);
     setManualCode('');
     setErrorMsg('');
@@ -325,108 +357,106 @@ export default function Scanner() {
       )}
 
       <div className="account-panel w-full max-w-lg p-4 sm:p-6 rounded-3xl border border-pink-500/25 shadow-2xl">
-        {state === 'scanning' && (
-          <div className="flex flex-col items-center">
-            {cameraError ? (
-              <div className="w-full bg-red-500/15 border border-red-500/40 p-5 rounded-2xl text-center mb-6">
-                <AlertTriangle size={36} className="text-red-400 mx-auto mb-2" />
-                <p className="text-red-200 text-sm mb-4 leading-relaxed">{cameraError}</p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <button
-                    onClick={() => startCamera(activeCameraId)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold shadow-lg transition-all"
-                  >
-                    <RefreshCcw size={14} /> Retry Camera
-                  </button>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-pink-200 text-xs font-semibold border border-pink-500/20 transition-all"
-                  >
-                    <Upload size={14} /> Upload QR Image
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full mb-4">
-                <div className="relative w-full rounded-2xl overflow-hidden border-2 border-pink-500/30 bg-black shadow-inner aspect-square flex items-center justify-center">
-                  <div id="qr-reader" className="w-full h-full [&_video]:object-cover"></div>
-
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-8">
-                    <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-2xl border border-pink-400/40">
-                      <span className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-pink-500 rounded-tl-lg"></span>
-                      <span className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-pink-500 rounded-tr-lg"></span>
-                      <span className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-pink-500 rounded-bl-lg"></span>
-                      <span className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-pink-500 rounded-br-lg"></span>
-
-                      <div className="absolute inset-x-2 top-0 h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent shadow-[0_0_12px_#ec4899] animate-[bounce_2.5s_infinite]"></div>
-                    </div>
-                  </div>
-
-                  <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-                    {hasTorch && (
-                      <button
-                        type="button"
-                        onClick={toggleTorch}
-                        className={`p-2 rounded-xl backdrop-blur-md transition-all ${
-                          torchOn ? 'bg-yellow-400 text-black shadow-lg shadow-yellow-400/50' : 'bg-black/60 text-white hover:bg-black/80'
-                        }`}
-                        title="Toggle Flashlight"
-                      >
-                        {torchOn ? <Zap size={18} /> : <ZapOff size={18} />}
-                      </button>
-                    )}
-                    {cameras.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={switchCamera}
-                        className="p-2 rounded-xl bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all border border-white/10"
-                        title="Switch Camera (Front / Rear)"
-                      >
-                        <FlipHorizontal size={18} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-pink-300/80 px-1 mt-2">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
-                    Camera Live
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:text-pink-200 underline inline-flex items-center gap-1"
-                  >
-                    <Upload size={12} /> Scan from Photo
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="w-full border-t border-pink-500/20 pt-5 mt-2">
-              <p className="text-center text-xs text-pink-300/80 mb-3 font-semibold uppercase tracking-wider">
-                Or enter ticket code manually
-              </p>
-              <form onSubmit={handleManualLookup} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="e.g. ENC-A1B2C3D4"
-                  className="admin-field flex-grow px-3.5 py-2.5 text-sm uppercase tracking-wider font-mono"
-                  value={manualCode}
-                  onChange={(e) => setManualCode(e.target.value)}
-                />
+        <div className={state === 'scanning' ? 'flex flex-col items-center' : 'hidden'}>
+          {cameraError ? (
+            <div className="w-full bg-red-500/15 border border-red-500/40 p-5 rounded-2xl text-center mb-6">
+              <AlertTriangle size={36} className="text-red-400 mx-auto mb-2" />
+              <p className="text-red-200 text-sm mb-4 leading-relaxed">{cameraError}</p>
+              <div className="flex flex-wrap justify-center gap-2">
                 <button
-                  type="submit"
-                  disabled={!manualCode.trim()}
-                  className="bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-pink-600/30 whitespace-nowrap"
+                  onClick={() => startCamera(activeCameraIdRef.current)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold shadow-lg transition-all"
                 >
-                  Verify
+                  <RefreshCcw size={14} /> Retry Camera
                 </button>
-              </form>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-pink-200 text-xs font-semibold border border-pink-500/20 transition-all"
+                >
+                  <Upload size={14} /> Upload QR Image
+                </button>
+              </div>
             </div>
+          ) : (
+            <div className="w-full mb-4">
+              <div className="relative w-full rounded-2xl overflow-hidden border-2 border-pink-500/30 bg-black shadow-inner aspect-square flex items-center justify-center">
+                <div id="qr-reader" className="w-full h-full [&_video]:object-cover"></div>
+
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-8">
+                  <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-2xl border border-pink-400/40">
+                    <span className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-pink-500 rounded-tl-lg"></span>
+                    <span className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-pink-500 rounded-tr-lg"></span>
+                    <span className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-pink-500 rounded-bl-lg"></span>
+                    <span className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-pink-500 rounded-br-lg"></span>
+
+                    <div className="absolute inset-x-2 top-0 h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent shadow-[0_0_12px_#ec4899] animate-[bounce_2.5s_infinite]"></div>
+                  </div>
+                </div>
+
+                <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                  {hasTorch && (
+                    <button
+                      type="button"
+                      onClick={toggleTorch}
+                      className={`p-2 rounded-xl backdrop-blur-md transition-all ${
+                        torchOn ? 'bg-yellow-400 text-black shadow-lg shadow-yellow-400/50' : 'bg-black/60 text-white hover:bg-black/80'
+                      }`}
+                      title="Toggle Flashlight"
+                    >
+                      {torchOn ? <Zap size={18} /> : <ZapOff size={18} />}
+                    </button>
+                  )}
+                  {cameras.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={switchCamera}
+                      className="p-2 rounded-xl bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all border border-white/10"
+                      title="Switch Camera (Front / Rear)"
+                    >
+                      <FlipHorizontal size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-pink-300/80 px-1 mt-2">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+                  Camera Live
+                </span>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hover:text-pink-200 underline inline-flex items-center gap-1"
+                >
+                  <Upload size={12} /> Scan from Photo
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="w-full border-t border-pink-500/20 pt-5 mt-2">
+            <p className="text-center text-xs text-pink-300/80 mb-3 font-semibold uppercase tracking-wider">
+              Or enter ticket code manually
+            </p>
+            <form onSubmit={handleManualLookup} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g. ENC-A1B2C3D4"
+                className="admin-field flex-grow px-3.5 py-2.5 text-sm uppercase tracking-wider font-mono"
+                value={manualCode}
+                onChange={(e) => setManualCode(e.target.value)}
+              />
+              <button
+                type="submit"
+                disabled={!manualCode.trim()}
+                className="bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-pink-600/30 whitespace-nowrap"
+              >
+                Verify
+              </button>
+            </form>
           </div>
-        )}
+        </div>
 
         {state === 'loading' && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
